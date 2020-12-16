@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".Activities.UploadCourseActivity">
+
+    <LinearLayout
+        android:id="@+id/select"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:elevation="10dp"
+        android:background="@drawable/tool_bar_shadow"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            android:src="@drawable/abc_vector_test"
+            android:onClick="back"
+            android:background="@drawable/ripple_effect_oval_no_background" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            android:padding="15dp"
+            android:src="@drawable/pdf_file"
+            android:onClick="download"
+            android:background="@drawable/ripple_effect_oval_no_background" />
+        <!--        -->
+        <!--        <ImageButton-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:padding="10dp"-->
+        <!--            android:layout_gravity="center"-->
+        <!--            android:scaleType="centerInside"-->
+        <!--            android:src="@drawable/ic_more_vert_black_24dp"-->
+        <!--            android:background="@drawable/ripple_effect_oval" />-->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dates"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/sec"
+        android:orientation="vertical"
+        android:elevation="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_toEndOf="@+id/sec">
+
+        <LinearLayout
+            android:id="@+id/selectDates"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/selectDatesArrow"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:minWidth="200dp"
+                android:orientation="horizontal"
+                android:onClick="getCourses"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:background="@drawable/ripple_effect_rec_no_background"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/chooseDateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:text="Inatake"
+                    android:layout_marginEnd="10dp" />
+
+                <ImageView
+                    android:id="@+id/imageSelectDate"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_gravity="center"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/arrow_down_float"
+                    android:layout_marginStart="5dp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/fram"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="-5dp"
+                android:background="@color/colorPrimary">
+
+                <ListView
+                    android:id="@+id/Dates"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:textAlignment="center" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/edit"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:onClick="Upload"
+        android:src="@drawable/upload_pdf"
+        android:layout_marginEnd="20dp"
+        app:fabCustomSize="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true" />
+
+
+    <ImageView
+        android:id="@+id/first"
+        android:layout_toRightOf="@+id/sec"
+        android:layout_toEndOf="@+id/sec"
+        android:layout_centerVertical="true"
+        android:elevation="11dp"
+        android:src="@drawable/circle2"
+        android:background="@drawable/ripple_effect_oval_no_background"
+        android:layout_width="40dp"
+        android:layout_marginLeft="-20dp"
+        android:layout_height="40dp" />
+
+    <ImageView
+        android:id="@+id/dragger"
+        android:layout_toRightOf="@+id/sec"
+        android:elevation="11dp"
+        android:layout_toEndOf="@+id/sec"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="-5dp"
+        android:src="@drawable/ic_chevron_right_black_24dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="-5dp" />
+
+
+
+
+    <LinearLayout
+        android:id="@+id/sec"
+        android:elevation="11dp"
+        android:orientation="vertical"
+        android:background="@color/colorPrimary"
+        android:layout_width="0dp"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/electronics"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:onClick="electronics"
+            android:layout_weight="1"
+            android:src="@drawable/electronics" />
+
+        <ImageView
+            android:id="@+id/Computer"
+            android:layout_width="160dp"
+            android:layout_weight="1"
+            android:onClick="Computer"
+            android:layout_height="wrap_content"
+            android:src="@drawable/computer" />
+
+        <ImageView
+            android:id="@+id/tele"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:onClick="tele"
+            android:layout_weight="1"
+            android:src="@drawable/tele" />
+
+        <ImageView
+            android:id="@+id/electrical"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:onClick="electrical"
+            android:layout_weight="1"
+            android:src="@drawable/electrical" />
+
+        <ImageView
+            android:id="@+id/nano"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:onClick="nano"
+            android:layout_weight="1"
+            android:src="@drawable/nano" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/title"
+        android:layout_below="@+id/select"
+        android:layout_marginTop="-5dp"
+        android:layout_toRightOf="@+id/sec"
+        android:layout_width="match_parent"
+        android:background="@color/colorAccent"
+        android:layout_height="30dp"
+        android:layout_toEndOf="@+id/sec"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="5dp"
+            android:textSize="12sp"
+            android:paddingLeft="5dp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:text="Grade"/>
+
+        <TextView
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="12sp"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:text="Code"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:text="Subject"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginRight="5dp"
+            android:text="Hours"
+            android:layout_marginEnd="5dp" />
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_below="@+id/title"
+        android:layout_toRightOf="@+id/sec"
+        android:id="@+id/CourseStructureList"
+        android:divider="@null"
+        android:background="@color/colorAccent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toEndOf="@+id/sec" />
+
+
+
+    <ImageView
+        android:id="@+id/list"
+        android:layout_width="15dp"
+        android:layout_height="match_parent"
+        android:elevation="11dp"
+        android:layout_marginLeft="-15dp"
+        android:layout_toRightOf="@+id/sec"
+        android:layout_toEndOf="@+id/sec"
+        android:background="@color/colorPrimary" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_toRightOf="@+id/sec"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:indeterminateDrawable="@drawable/progg"
+        android:layout_centerInParent="true"
+        android:layout_toEndOf="@+id/sec" />
+</RelativeLayout>

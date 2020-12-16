@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "627316722930",
+    "firebase_url": "https://m-aim-you.firebaseio.com",
+    "project_id": "m-aim-you",
+    "storage_bucket": "m-aim-you.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:627316722930:android:0e5d4914a0214aeacb146b",
+        "android_client_info": {
+          "package_name": "com.example.maimyou"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "627316722930-cj3ajpqgh1qd105c61sfg3g1384na4sl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvtlPauE2ZSZjfy-O3qP71R216eTKimd8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "627316722930-cj3ajpqgh1qd105c61sfg3g1384na4sl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
