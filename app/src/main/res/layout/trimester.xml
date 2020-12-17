@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -8,165 +8,178 @@
         android:id="@+id/trimester"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Trimester 3 - 2017/2018"
         android:layout_marginTop="17dp"
         android:layout_marginBottom="17dp"
+        android:text="Trimester 3 - 2017/2018"
         android:textColor="#000000"
-        android:textStyle="bold"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/middl"
-        android:layout_below="@+id/trimester"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#000000"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_below="@id/trimester"
+        android:layout_margin="5dp"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="5dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/middl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:layout_weight="1"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:text="GPA" />
+                android:background="#000000"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/gpa"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="GPA"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/gpa"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="3.6"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Hours"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/hours"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginTop="1dp"
+                        android:layout_marginRight="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="15"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:layout_weight="1"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorPrimaryDark"
-                android:text="3.6" />
+                android:layout_below="@+id/middl"
+                android:background="#000000"
+                android:orientation="vertical">
 
-            <TextView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Code"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:layout_weight="1"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Course Title"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginRight="1dp"
+                        android:layout_marginBottom="1dp"
+                        android:background="#FAFAFA"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:text="Grade"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/subjectsList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:layout_weight="1"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:text="Hours" />
+                android:layout_height="200dp"
+                android:layout_below="@+id/bottom"
+                android:background="#000000"
+                android:divider="@null" />
+        </RelativeLayout>
 
-            <TextView
-                android:id="@+id/hours"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:layout_weight="1"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginRight="1dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorPrimaryDark"
-                android:text="15" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/bottom"
-        android:layout_below="@+id/middl"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#000000"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:text="Code" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:layout_weight="1"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:text="Course Title" />
-
-            <TextView
-                android:layout_width="45dp"
-                android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:paddingLeft="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginBottom="1dp"
-                android:layout_marginRight="1dp"
-                android:layout_marginLeft="1dp"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:text="Grade" />
-
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <ListView
-        android:id="@+id/subjectsList"
-        android:layout_below="@+id/bottom"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="#000000"
-        android:divider="@null" />
-
+    </androidx.cardview.widget.CardView>
 </RelativeLayout>

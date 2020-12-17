@@ -30,6 +30,11 @@ public class DashBoardActivity extends AppCompatActivity {
     Context context = this;
     public static BottomNavigationView bottomNav;
 
+    public void edit(View view){
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new FragmentHome()).commit();
+    }
+
     public void UploadCourse(View view) {
         startActivity(new Intent(getApplicationContext(), UploadCourseActivity.class));
         overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);

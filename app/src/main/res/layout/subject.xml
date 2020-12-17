@@ -8,7 +8,7 @@
         android:layout_width="70dp"
         android:layout_height="30dp"
         android:gravity="center_vertical"
-        android:background="#FFFFFF"
+        android:background="#FAFAFA"
         android:paddingLeft="5dp"
         android:layout_marginBottom="1dp"
         android:layout_marginLeft="1dp"
@@ -17,7 +17,7 @@
         android:id="@+id/Code"/>
     <FrameLayout
         android:layout_width="wrap_content"
-        android:background="#FFFFFF"
+        android:background="#FAFAFA"
         android:layout_marginBottom="1dp"
         android:paddingLeft="5dp"
         android:layout_marginLeft="1dp"
@@ -36,7 +36,7 @@
     <TextView
         android:layout_width="45dp"
         android:layout_height="30dp"
-        android:background="#FFFFFF"
+        android:background="#FAFAFA"
         android:gravity="center_vertical"
         android:paddingLeft="5dp"
         android:layout_marginBottom="1dp"
