@@ -21,7 +21,7 @@
         android:layout_below="@id/trimester"
         android:layout_margin="5dp"
         app:cardCornerRadius="0dp"
-        app:cardElevation="5dp">
+        app:cardElevation="4dp">
 
         <RelativeLayout
             android:layout_width="match_parent"

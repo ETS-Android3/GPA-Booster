@@ -195,7 +195,7 @@
                 <FrameLayout
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="#81000000"/>
+                    android:background="#81000000" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -237,6 +237,105 @@
         </androidx.cardview.widget.CardView>
     </FrameLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="20dp"
+        tools:targetApi="lollipop">
+
+        <FrameLayout
+            android:id="@+id/picContainer"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilePictureAdmin2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:src="@drawable/avatar" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_toLeftOf="@+id/pin"
+            android:layout_toRightOf="@+id/picContainer"
+            android:id="@+id/userInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="-5dp"
+            android:orientation="vertical"
+            android:layout_toEndOf="@+id/picContainer"
+            android:layout_toStartOf="@+id/pin"
+            android:layout_marginEnd="-5dp">
+
+            <TextView
+                android:id="@+id/userName2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="bottom"
+                android:text=""
+                android:textSize="12sp"
+                android:maxLines="1"
+                app:autoSizeMaxTextSize="100sp"
+                app:autoSizeMinTextSize="6sp"
+                app:autoSizeStepGranularity="2sp"
+                app:autoSizeTextType="uniform"
+                android:textStyle="bold"
+                android:textColor="#FAFAFA"
+                tools:ignore="NestedWeights" />
+
+            <TextView
+                android:id="@+id/ID2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:text=""
+                android:textSize="11sp"
+                android:textColor="#FAFAFA"
+                tools:ignore="NestedWeights" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/pin"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_toLeftOf="@+id/menu"
+            android:layout_toStartOf="@+id/menu"
+            android:layout_marginRight="-15dp"
+            android:layout_marginEnd="-15dp">
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:padding="5dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                android:src="@drawable/ic_edit_black"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/menu"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="-5dp"
+            android:layout_marginEnd="-5dp">
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:padding="5dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                android:src="@drawable/ic_baseline_more_vert_24"/>
+        </FrameLayout>
+    </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/edit"

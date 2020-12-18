@@ -2,20 +2,16 @@ package com.example.maimyou.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -27,11 +23,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.maimyou.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,11 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -53,11 +40,11 @@ import maes.tech.intentanim.CustomIntent;
 public class RegisterActivity extends AppCompatActivity {
 
     public static final String TAG = "TAG";
-    long maxid = 0;
+    long maxId = 0;
     LinearLayout linearLayout, forLogin;
     TextView enterTitle, RegistrationTitle2,forgotText;
-    EditText nameE, emailE, passE, confirmpassE, focused;
-    FrameLayout name, email, pass, confirmpass, forReg;
+    EditText nameE, emailE, passE, confirmPassE, focused;
+    FrameLayout name, email, pass, confirmPass, forReg;
     ScrollView scrollView;
     ImageView back;
 
@@ -86,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
             final String name = nameE.getText().toString().trim();
             final String email = emailE.getText().toString().trim();
             String password = passE.getText().toString().trim();
-            String ConfinrmPassword = confirmpassE.getText().toString().trim();
+            String ConfinrmPassword = confirmPassE.getText().toString().trim();
 
             if (TextUtils.isEmpty(name)) {
                 nameE.setError("Id is Required.");
@@ -109,7 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             if (password.compareTo(ConfinrmPassword) != 0) {
-                confirmpassE.setError("Password is not similar.");
+                confirmPassE.setError("Password is not similar.");
                 return;
             }
 
@@ -117,47 +104,36 @@ public class RegisterActivity extends AppCompatActivity {
 
             // register the user in firebase
 
-            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
-                        userID = fAuth.getCurrentUser().getUid();
-                        DocumentReference documentReference = fStore.collection("users").document(userID);
-                        Map<String, Object> user = new HashMap<>();
-                        reff.child(String.valueOf(maxid + 1)).child("Id").setValue(name);
-                        reff.child(String.valueOf(maxid + 1)).child("email").setValue(email);
+            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
+                    userID = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
+                    DocumentReference documentReference = fStore.collection("users").document(userID);
+                    Map<String, Object> user = new HashMap<>();
+                    reff.child(String.valueOf(maxId + 1)).child("Id").setValue(name);
+                    reff.child(String.valueOf(maxId + 1)).child("email").setValue(email);
 
-                        user.put("Id", Long.toString(maxid + 1));
-                        saveData(Long.toString(maxid + 1), "Id");
+                    user.put("Id", Long.toString(maxId + 1));
+                    saveData(Long.toString(maxId + 1), "Id");
 
-                        documentReference.set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                fail = false;
-                                Log.d(TAG, "onSuccess: user Profile is created for " + userID);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure: " + e.toString());
-                                progressBar.setVisibility(View.GONE);
-                                fail = true;
-                            }
-                        });
-                        if (!fail) {
-                            saveData("0", "Selection");
-                            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-                            startActivity(new Intent(getApplicationContext(), ScanMarksActivity.class));
-                            finish();
-                        }
-                    } else {
-                        Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    documentReference.set(user).addOnSuccessListener(aVoid -> {
+                        fail = false;
+                        Log.d(TAG, "onSuccess: user Profile is created for " + userID);
+                    }).addOnFailureListener(e -> {
+                        Log.d(TAG, "onFailure: " + e.toString());
                         progressBar.setVisibility(View.GONE);
+                        fail = true;
+                    });
+                    if (!fail) {
+                        saveData("0", "Selection");
+                        startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ScanMarksActivity.class));
+                        finish();
                     }
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Error ! " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                 }
-
-
             });
         } else {
 
@@ -196,11 +172,12 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     public void Login(View view) {
         clearFocus();
         if (register) {
             name.setVisibility(View.GONE);
-            confirmpass.setVisibility(View.GONE);
+            confirmPass.setVisibility(View.GONE);
             forgotText.setVisibility(View.VISIBLE);
             emailE.setText("");
             passE.setText("");
@@ -218,22 +195,22 @@ public class RegisterActivity extends AppCompatActivity {
 
         } else {
             name.setVisibility(View.VISIBLE);
-            confirmpass.setVisibility(View.VISIBLE);
+            confirmPass.setVisibility(View.VISIBLE);
             forgotText.setVisibility(View.GONE);
             linearLayout.setVisibility(View.GONE);
 
             nameE.setText("");
             emailE.setText("");
             passE.setText("");
-            confirmpassE.setText("");
+            confirmPassE.setText("");
             nameE.setError(null);
             emailE.setError(null);
             passE.setError(null);
-            confirmpassE.setError(null);
+            confirmPassE.setError(null);
             nameE.clearFocus();
             emailE.clearFocus();
             passE.clearFocus();
-            confirmpassE.clearFocus();
+            confirmPassE.clearFocus();
 
             passE.setHint("Camsys Password");
             forReg.setVisibility(View.VISIBLE);
@@ -268,13 +245,13 @@ public class RegisterActivity extends AppCompatActivity {
 //            }
     }
 
-    public String loadData(String name) {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        if (sharedPreferences == null) {
-            return "";
-        }
-        return sharedPreferences.getString(name, "");
-    }
+//    public String loadData(String name) {
+//        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+//        if (sharedPreferences == null) {
+//            return "";
+//        }
+//        return sharedPreferences.getString(name, "");
+//    }
 
     @SuppressLint("ClickableViewAccessibility")
     public void initBackground() {
@@ -282,20 +259,13 @@ public class RegisterActivity extends AppCompatActivity {
         scrollView = findViewById(R.id.scrole);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        scrollView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                clearFocus();
-                return false;
-            }
+        scrollView.setOnTouchListener((v, event) -> {
+            clearFocus();
+            return false;
         });
-        back.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                clearFocus();
-                return false;
-            }
+        back.setOnTouchListener((v, event) -> {
+            clearFocus();
+            return false;
         });
     }
 
@@ -325,41 +295,29 @@ public class RegisterActivity extends AppCompatActivity {
         name = findViewById(R.id.Id);
         email = findViewById(R.id.email);
         pass = findViewById(R.id.pass);
-        confirmpass = findViewById(R.id.conPass);
+        confirmPass = findViewById(R.id.conPass);
         nameE = findViewById(R.id.studentId);
-        nameE.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (hasFocus) {
-                    focused = nameE;
-                }
+        nameE.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                focused = nameE;
             }
         });
         emailE = findViewById(R.id.emailadress);
-        emailE.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (hasFocus) {
-                    focused = emailE;
-                }
+        emailE.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                focused = emailE;
             }
         });
         passE = findViewById(R.id.password);
-        passE.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (hasFocus) {
-                    focused = passE;
-                }
+        passE.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                focused = passE;
             }
         });
-        confirmpassE = findViewById(R.id.confirmpassword);
-        confirmpassE.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (hasFocus) {
-                    focused = confirmpassE;
-                }
+        confirmPassE = findViewById(R.id.confirmpassword);
+        confirmPassE.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                focused = confirmPassE;
             }
         });
         fAuth = FirebaseAuth.getInstance();
@@ -369,7 +327,7 @@ public class RegisterActivity extends AppCompatActivity {
         reff.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                maxid = dataSnapshot.getChildrenCount();
+                maxId = dataSnapshot.getChildrenCount();
             }
 
             @Override
@@ -379,7 +337,6 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-
     public void saveData(String data, String name) {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -388,39 +345,36 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void saveId() {
-        String userID = fAuth.getCurrentUser().getUid();
+        String userID = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
         noteRef = fStore.collection("users").document(userID);
-        noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                if (e != null) {
-                    Toast.makeText(RegisterActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, e.toString());
-                    FirebaseAuth.getInstance().signOut();//logout
-                    progressBar.setVisibility(View.GONE);
-                    return;
-                }
+        noteRef.addSnapshotListener(this, (documentSnapshot, e) -> {
+            if (e != null) {
+                Toast.makeText(RegisterActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, e.toString());
+                FirebaseAuth.getInstance().signOut();//logout
+                progressBar.setVisibility(View.GONE);
+                return;
+            }
 
-                if (documentSnapshot.exists()) {
-                    String Id = documentSnapshot.getString("Id");
-                    saveData(Id, "Id");
-                    Toast.makeText(RegisterActivity.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-                    finish();
-                }
+            if (Objects.requireNonNull(documentSnapshot).exists()) {
+                String Id = documentSnapshot.getString("Id");
+                saveData(Id, "Id");
+                Toast.makeText(RegisterActivity.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                finish();
             }
         });
     }
 
-    public int dpToPx(int dip) {
-        Resources r = getResources();
-        float px = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dip,
-                r.getDisplayMetrics()
-        );
-        return (int) px;
-    }
+//    public int dpToPx(int dip) {
+//        Resources r = getResources();
+//        float px = TypedValue.applyDimension(
+//                TypedValue.COMPLEX_UNIT_DIP,
+//                dip,
+//                r.getDisplayMetrics()
+//        );
+//        return (int) px;
+//    }
 
     @Override
     protected void onDestroy() {

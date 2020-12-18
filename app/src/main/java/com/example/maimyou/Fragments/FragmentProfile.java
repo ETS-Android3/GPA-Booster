@@ -7,19 +7,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+
 import com.example.maimyou.Adapters.AdapterTrimester;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
@@ -35,15 +43,17 @@ import java.util.ArrayList;
 public class FragmentProfile extends Fragment {
     String id = "";
     Context context;
-    boolean buttonOut = false,containerOut=false;
+    boolean buttonOut = false, containerOut = false;
 
     ListView gradlistView;
-    TextView TotalHours, CGPA, userName, ID;
+    TextView TotalHours, CGPA, userName, userName2, ID, ID2;
     ArrayList<Trimester> trimesters;
+    ImageView profilePictureAdmin, profilePictureAdmin2;
     ProgressBar progressBar;
     FloatingActionButton edit;
     NestedScrollView nestedScrollView;
     FrameLayout cardViewContainer;
+    LinearLayout userInfo;
 
     public FragmentProfile() {
     }
@@ -79,20 +89,29 @@ public class FragmentProfile extends Fragment {
             edit = getView().findViewById(R.id.edit);
             progressBar = getView().findViewById(R.id.progressBar);
             userName = getView().findViewById(R.id.userName);
+            userName2 = getView().findViewById(R.id.userName2);
             CGPA = getView().findViewById(R.id.CGPA);
             TotalHours = getView().findViewById(R.id.TotalHours);
 //            Name = getView().findViewById(R.id.Name);
             ID = getView().findViewById(R.id.ID);
+            ID2 = getView().findViewById(R.id.ID2);
 //            Degree = getView().findViewById(R.id.Degree);
             gradlistView = getView().findViewById(R.id.gradlistView);
+            profilePictureAdmin = getView().findViewById(R.id.profilePictureAdmin);
+            profilePictureAdmin2 = getView().findViewById(R.id.profilePictureAdmin2);
+            userInfo = getView().findViewById(R.id.userInfo);
+            fadeOutNoDelay(userInfo);
+            fadeOutNoDelay(profilePictureAdmin2);
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 nestedScrollView.setOnScrollChangeListener((View.OnScrollChangeListener) (view1, i, i1, i2, i3) -> {
                     if (i1 > i3) {
-                        if(!containerOut) {
+                        if (!containerOut) {
                             animationOutUP(cardViewContainer);
-                            containerOut=true;
+                            fadeIn(userInfo);
+                            fadeIn(profilePictureAdmin2);
+                            containerOut = true;
                         }
                         if (!buttonOut) {
                             animationOutDOWN(edit);
@@ -100,8 +119,10 @@ public class FragmentProfile extends Fragment {
                         }
                     } else {
                         if (i1 == 0) {
+                            fadeOut(userInfo);
+                            fadeOut(profilePictureAdmin2);
                             returnAndFadeIn(cardViewContainer);
-                            containerOut=false;
+                            containerOut = false;
                         }
                         if (buttonOut) {
                             animationInUP(edit);
@@ -117,11 +138,12 @@ public class FragmentProfile extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.child("Name").getValue() != null) {
                         userName.setText(snapshot.child("Name").getValue().toString());
-//                        Name.setText(snapshot.child("Name").getValue().toString());
+                        userName2.setText(snapshot.child("Name").getValue().toString());
                     }
 
                     if (snapshot.child("Id").getValue() != null) {
                         ID.setText(snapshot.child("Id").getValue().toString());
+                        ID2.setText(snapshot.child("Id").getValue().toString());
                     }
 
 //                    if (snapshot.child("Degree").getValue() != null) {
@@ -216,17 +238,28 @@ public class FragmentProfile extends Fragment {
         }
         return trimester;
     }
+    public void fadeIn(View view){
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
+        fadeIn.setDuration(200);
+        fadeIn.setFillAfter(true);
+        view.startAnimation(fadeIn);
+    }
 
-    public void animationInUP(View view) {
-        Animation inFromBottom = new TranslateAnimation(
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f,
-                Animation.RELATIVE_TO_PARENT, +1.0f,
-                Animation.RELATIVE_TO_PARENT, 0.0f);
-        inFromBottom.setDuration(500);
-        inFromBottom.setInterpolator(new AccelerateInterpolator());
-        inFromBottom.setFillAfter(true);
-        view.startAnimation(inFromBottom);
+    public void fadeOut(View view){
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new DecelerateInterpolator()); //and this
+        fadeOut.setDuration(200);
+        fadeOut.setFillAfter(true);
+        view.startAnimation(fadeOut);
+    }
+
+    public void fadeOutNoDelay(View view){
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new DecelerateInterpolator()); //and this
+        fadeOut.setDuration(0);
+        fadeOut.setFillAfter(true);
+        view.startAnimation(fadeOut);
     }
 
     public void returnAndFadeIn(View view) {
@@ -236,6 +269,18 @@ public class FragmentProfile extends Fragment {
                 Animation.RELATIVE_TO_PARENT, -1.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f);
         inFromBottom.setDuration(0);
+        inFromBottom.setInterpolator(new AccelerateInterpolator());
+        inFromBottom.setFillAfter(true);
+        view.startAnimation(inFromBottom);
+    }
+
+    public void animationInUP(View view) {
+        Animation inFromBottom = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, +1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        inFromBottom.setDuration(500);
         inFromBottom.setInterpolator(new AccelerateInterpolator());
         inFromBottom.setFillAfter(true);
         view.startAnimation(inFromBottom);
