@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/colorAccent"
+    tools:targetApi="lollipop"
+    tools:ignore="HardcodedText"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginBottom="-1dp"
+        android:elevation="20dp"
+        android:orientation="horizontal"
+        style="@style/Base_ToolbarStyle"
+        tools:targetApi="lollipop">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/dash" />
-
-        <ImageView
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@color/colorAccent"
-            android:layout_weight="1"
-            android:scaleType="fitXY"/>
-    </LinearLayout>
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:text="GPA Booster"
+            tools:ignore="HardcodedText" />
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
 
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
                 android:rowCount="3"
+                android:layout_margin="3dp"
+                android:paddingBottom="10dp"
                 android:alignmentMode="alignMargins"
                 android:columnOrderPreserved="false">
+
                 <androidx.cardview.widget.CardView
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
@@ -47,11 +51,12 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
-                    android:layout_margin="12dp"
+                    android:layout_margin="6dp"
                     android:onClick="UpdateMarks"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -65,7 +70,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/result" />
+                            android:src="@drawable/result"
+                            tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -86,11 +92,12 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
-                    android:layout_margin="12dp"
-                    android:onClick="UploadCourse"
+                    android:layout_margin="6dp"
+                    android:onClick="UpdateMarks"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -104,7 +111,49 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/upload" />
+                            android:src="@drawable/result"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Download result"
+                            android:gravity="center"
+                            android:layout_marginTop="12dp"
+                            android:textColor="#000000"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    app:cardElevation="6dp"
+                    app:cardCornerRadius="12dp"
+                    android:layout_margin="6dp"
+                    android:onClick="UploadCourse"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:stateListAnimator="@anim/animation"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="17dp"
+                        android:gravity="center"
+                        android:layout_gravity="center">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/upload"
+                            tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -125,11 +174,12 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
-                    android:layout_margin="12dp"
+                    android:layout_margin="6dp"
                     android:onClick="Progress"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -143,7 +193,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/growth" />
+                            android:src="@drawable/growth"
+                            tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -164,11 +215,12 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
-                    android:layout_margin="12dp"
+                    android:layout_margin="6dp"
                     android:onClick="Calculator"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -182,7 +234,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/calculator" />
+                            android:src="@drawable/calculator"
+                            tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -203,11 +256,12 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
-                    android:layout_margin="12dp"
+                    android:layout_margin="6dp"
                     android:onClick="logout"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -221,7 +275,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/logoutpic" />
+                            android:src="@drawable/logoutpic"
+                            tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -236,7 +291,6 @@
 
                 </androidx.cardview.widget.CardView>
             </GridLayout>
-        </LinearLayout>
     </ScrollView>
 
-</FrameLayout>
+</RelativeLayout>

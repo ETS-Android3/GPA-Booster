@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.SubjectsActivity">
+
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginBottom="-1dp"
+        android:elevation="20dp"
+        style="@style/Base_ToolbarStyle"
+        tools:targetApi="lollipop">
+
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/abc_vector_test"
+            android:onClick="back"
+            android:background="@drawable/ripple_effect_oval"
+            android:layout_marginStart="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:text="Find User"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="50dp">
+
+            <EditText
+                android:layout_width="40dp"
+                android:textSize="15sp"
+                android:id="@+id/input_search"
+                android:layout_gravity="end"
+                android:layout_height="40dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="40dp"
+                android:textColorHint="@color/grey"
+                android:background="@drawable/edit_text_with_shadow"
+                android:inputType="textPersonName"
+                android:textColor="@color/colorPrimaryDark"
+                android:paddingStart="15dp"
+                android:paddingEnd="40dp" />
+
+            <!--            android:hint="Enter User's name, passport or Id."-->
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right"
+                android:scaleType="centerInside"
+                android:id="@+id/search_bar"
+                android:src="@drawable/ic_search_blue_24dp"
+                android:onClick="search_bar"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                tools:ignore="OnClick" />
+        </FrameLayout>
+
+        <!--        <ImageButton-->
+        <!--            android:layout_width="40dp"-->
+        <!--            android:layout_height="40dp"-->
+        <!--            android:layout_gravity="center"-->
+        <!--            android:scaleType="centerInside"-->
+        <!--            android:src="@drawable/ic_more_vert_black_24dp"-->
+        <!--            android:background="@drawable/ripple_effect_oval" />-->
+    </RelativeLayout>
+
+
+</RelativeLayout>
