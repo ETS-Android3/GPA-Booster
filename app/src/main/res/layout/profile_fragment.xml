@@ -145,16 +145,14 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="#000000"
-            app:cardCornerRadius="0dp"
+            app:cardBackgroundColor="#FAFAFA"
+            app:cardCornerRadius="20dp"
             app:cardElevation="3dp">
 
 
             <LinearLayout
                 android:layout_width="200dp"
                 android:layout_height="match_parent"
-                android:layout_margin="1dp"
-                android:background="#FAFAFA"
                 android:orientation="horizontal">
 
                 <FrameLayout
@@ -345,10 +343,12 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/backGroundColour"
         android:onClick="edit"
-        android:src="@drawable/ic_edit_black"
+        android:src="@drawable/upload_pdf"
         app:fabCustomSize="50dp"
-        tools:ignore="RtlHardcoded" />
+        tools:ignore="RtlHardcoded"
+        tools:targetApi="lollipop" />
 
     <ProgressBar
         android:id="@+id/progressBar"

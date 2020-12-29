@@ -52,7 +52,7 @@
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
                     android:layout_margin="6dp"
-                    android:onClick="UpdateMarks"
+                    android:onClick="Subjects"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
                     android:clickable="true"

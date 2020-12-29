@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -25,9 +26,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.maimyou.Classes.FileUtils;
+import com.example.maimyou.Classes.subjects;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
@@ -46,6 +51,7 @@ public class ScanMarksActivity extends AppCompatActivity {
     ScanMarksActivity scanMarks = this;
     ImageButton camsys;
     ArrayList<Trimester> trimesters = new ArrayList<>();
+    ArrayList<subjects> subjects = new ArrayList<>();
 
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -101,7 +107,7 @@ public class ScanMarksActivity extends AppCompatActivity {
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     camsys.setImageResource(R.drawable.camsys);
                     if (rect.contains(view.getLeft() + (int) event.getX(), view.getTop() + (int) event.getY())) {
-                        openCustomTab("https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes");
+                        openCustomTab();
                     }
                 }
                 return true;
@@ -147,15 +153,15 @@ public class ScanMarksActivity extends AppCompatActivity {
 //            System.out.println("PAAAAAAAAAAAAAAAAAAAAAATTTTTTHHHHHHHHHHHHHHHHH:     "+path);
             if (path != null && !path.isEmpty() && !FileName.isEmpty()) {
                 try {
-                    String parsedText = "";
+                    StringBuilder parsedText = new StringBuilder();
                     PdfReader reader = new PdfReader(path);
                     int n = reader.getNumberOfPages();
 
                     for (int i = 0; i < n; i++) {
-                        parsedText += PdfTextExtractor.getTextFromPage(reader, i + 1).trim() + "\n"; //Extracting the content from the different pages
+                        parsedText.append(PdfTextExtractor.getTextFromPage(reader, i + 1).trim()).append("\n"); //Extracting the content from the different pages
                     }
                     reader.close();
-                    scan(parsedText);
+                    scan(parsedText.toString());
                     saveData("0", "Selection");
                     bottomNav.setSelectedItemId(R.id.profile);
                     finish();
@@ -171,6 +177,7 @@ public class ScanMarksActivity extends AppCompatActivity {
 
     public void scan(String res) {
         trimesters.clear();
+        subjects.clear();
         String Name = "", Id = "", Degree = "";
         String[] lines = res.split("\n", -1);
         for (int i = 0; i < lines.length; i++) {
@@ -208,7 +215,7 @@ public class ScanMarksActivity extends AppCompatActivity {
                         }
                     }
                     Trimester trimester = new Trimester(trim, gpa, Cgpa, status, Hours, TotalHours, TotalPoint);
-                    Boolean breakk = false;
+                    boolean breakk = false;
                     for (int x = i + 2; x < lines.length; x++) {
                         if (isFound("Code", lines[x])) {
                             x++;
@@ -229,6 +236,7 @@ public class ScanMarksActivity extends AppCompatActivity {
                                 String name = lines[y].substring(7, lines[y].length() - 2).trim();
                                 String grade = lines[y].substring(lines[y].length() - 2).trim();
                                 trimester.addSubject(code, name, grade);
+                                subjects.add(new subjects(code, name, grade));
                             }
                         }
                         if (breakk) {
@@ -243,14 +251,39 @@ public class ScanMarksActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("CamsysInfo").child("Id").setValue(Id);
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("CamsysInfo").child("Degree").setValue(Degree);
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("CamsysInfo").child("Trimesters").setValue(trimesters);
+        SetSubjectsReviews();
     }
+
     public void saveData(String data, String name) {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(name, data);
         editor.apply();
     }
-    void openCustomTab(String url) {
+
+    public void SetSubjectsReviews() {
+        FirebaseDatabase.getInstance().getReference().child("Subjects").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (subjects subjects : subjects) {
+                    if(snapshot.child(subjects.getCode()).exists()){
+                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(loadData("Id")).setValue(subjects.getGrade());
+                    }else{
+                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Subject Name").setValue(subjects.getName());
+                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(loadData("Id")).setValue(subjects.getGrade());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
+    void openCustomTab() {
         // Use a CustomTabsIntent.Builder to configure CustomTabsIntent.
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
         // set toolbar color and/or setting custom actions before invoking build()
@@ -283,7 +316,7 @@ public class ScanMarksActivity extends AppCompatActivity {
         // Once ready, call CustomTabsIntent.Builder.build() to create a CustomTabsIntent
         CustomTabsIntent customTabsIntent = builder.build();
         // and launch the desired Url with CustomTabsIntent.launchUrl()
-        customTabsIntent.launchUrl(this, Uri.parse(url));
+        customTabsIntent.launchUrl(this, Uri.parse("https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes"));
     }
 
     public String between(String value, String a, String b) {
@@ -332,7 +365,6 @@ public class ScanMarksActivity extends AppCompatActivity {
     }
 
     public boolean isFound(String p, String hph) {
-        boolean Found = hph.indexOf(p) != -1 ? true : false;
-        return Found;
+        return hph.contains(p);
     }
 }

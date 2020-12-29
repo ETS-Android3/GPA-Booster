@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backGroundColour"
     tools:context=".Activities.SubjectsActivity">
 
     <RelativeLayout
@@ -16,7 +17,6 @@
         style="@style/Base_ToolbarStyle"
         tools:targetApi="lollipop">
 
-
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -25,7 +25,7 @@
             android:scaleType="centerInside"
             android:src="@drawable/abc_vector_test"
             android:onClick="back"
-            android:background="@drawable/ripple_effect_oval"
+            android:background="@drawable/ripple_effect_oval_no_background"
             android:layout_marginStart="10dp" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_centerInParent="true"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
-            android:text="Find User"/>
+            android:text="Find subject"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -45,10 +45,25 @@
             android:layout_marginEnd="10dp"
             android:layout_marginStart="50dp">
 
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_search_white_24dp"
+                android:onClick="search_bar"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                tools:ignore="OnClick" />
+
+            <FrameLayout
+                android:id="@+id/SearchBarContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible">
             <EditText
                 android:layout_width="40dp"
                 android:textSize="15sp"
-                android:id="@+id/input_search"
+                android:id="@+id/inputSearch"
                 android:layout_gravity="end"
                 android:layout_height="40dp"
                 android:paddingLeft="15dp"
@@ -59,29 +74,29 @@
                 android:textColor="@color/colorPrimaryDark"
                 android:paddingStart="15dp"
                 android:paddingEnd="40dp" />
-
-            <!--            android:hint="Enter User's name, passport or Id."-->
-
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_gravity="right"
+                android:layout_gravity="end"
                 android:scaleType="centerInside"
                 android:id="@+id/search_bar"
                 android:src="@drawable/ic_search_blue_24dp"
                 android:onClick="search_bar"
                 android:background="@drawable/ripple_effect_oval_no_background"
                 tools:ignore="OnClick" />
+            </FrameLayout>
         </FrameLayout>
 
-        <!--        <ImageButton-->
-        <!--            android:layout_width="40dp"-->
-        <!--            android:layout_height="40dp"-->
-        <!--            android:layout_gravity="center"-->
-        <!--            android:scaleType="centerInside"-->
-        <!--            android:src="@drawable/ic_more_vert_black_24dp"-->
-        <!--            android:background="@drawable/ripple_effect_oval" />-->
-    </RelativeLayout>
+ </RelativeLayout>
 
+
+    <ListView
+        android:id="@+id/SubjectsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginTop="3dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"/>
 
 </RelativeLayout>

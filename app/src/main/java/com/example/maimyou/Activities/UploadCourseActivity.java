@@ -810,8 +810,7 @@ public class UploadCourseActivity extends AppCompatActivity {
     }
 
     int semName = 0;
-    TrimesterCourse trimesterCourseToPrint;
-    boolean course = false, grades = false;
+    boolean grades = false;
 
     public void printGrades(final String fileName) {
         FirebaseDatabase.getInstance().getReference().child("Course Structure").child(fileName).addListenerForSingleValueEvent(new ValueEventListener() {

@@ -35,6 +35,11 @@ public class DashBoardActivity extends AppCompatActivity {
                 new FragmentHome()).commit();
     }
 
+    public void Subjects(View view) {
+        startActivity(new Intent(getApplicationContext(), SubjectsActivity.class));
+        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
+    }
+
     public void UploadCourse(View view) {
         startActivity(new Intent(getApplicationContext(), UploadCourseActivity.class));
         overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
