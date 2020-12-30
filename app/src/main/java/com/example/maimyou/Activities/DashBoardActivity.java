@@ -79,9 +79,7 @@ public class DashBoardActivity extends AppCompatActivity {
         int width = displayMetrics.widthPixels;
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
-        fragmentProfile = new FragmentProfile();
-        fragmentProfile.setId(loadData("Id"));
-        fragmentProfile.setContext(context);
+        fragmentProfile = new FragmentProfile(loadData("Id"),context);
 
         if (savedInstanceState == null) {
             if (loadData("Selection").compareTo("0") == 0) {

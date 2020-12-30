@@ -79,18 +79,22 @@ public class UploadCourseActivity extends AppCompatActivity {
     TextView text;
     TrimesterCourse trimesterCourse = new TrimesterCourse();
     Context context = this;
-    ArrayList<String> uploadedPdf = new ArrayList<>();
     ImageView imageSelectDate;
     ArrayList<Trimester> trimesters;
     ProgressBar progressBar;
-    FrameLayout fram;
+    FrameLayout frame;
     ListView CourseStructureList, Dates;
     TextView chooseDateText;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
+    private static final String[] PERMISSIONS_STORAGE;
+
+    static {
+        PERMISSIONS_STORAGE = new String[]{
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+    }
+
     public static class Touch
     {
         public boolean setIstouched = false;
@@ -284,7 +288,7 @@ public class UploadCourseActivity extends AppCompatActivity {
         electronics = findViewById(R.id.electronics);
         Computer = findViewById(R.id.Computer);
         tele = findViewById(R.id.tele);
-        fram = findViewById(R.id.fram);
+        frame = findViewById(R.id.fram);
         electrical = findViewById(R.id.electrical);
         nano = findViewById(R.id.nano);
         progressBar = findViewById(R.id.progressBar);
@@ -476,7 +480,7 @@ public class UploadCourseActivity extends AppCompatActivity {
 
                 simpleAdapter adapter = new simpleAdapter(context, R.layout.file_name, structures);
                 Dates.setAdapter(adapter);
-                expand(fram);
+                expand(frame);
             }
 
             @Override
@@ -487,7 +491,7 @@ public class UploadCourseActivity extends AppCompatActivity {
     }
 
     public void getCourses(View view) {
-        if (fram.getHeight() == 0) {
+        if (frame.getHeight() == 0) {
             FirebaseDatabase.getInstance().getReference().child("Course Structure").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -502,7 +506,7 @@ public class UploadCourseActivity extends AppCompatActivity {
 
                     simpleAdapter adapter = new simpleAdapter(context, R.layout.file_name, structures);
                     Dates.setAdapter(adapter);
-                    expand(fram);
+                    expand(frame);
                 }
 
                 @Override
@@ -512,7 +516,7 @@ public class UploadCourseActivity extends AppCompatActivity {
             });
         } else {
             rotate(imageSelectDate, false);
-            slideViewHeihgt(fram, fram.getHeight(), 0, 300);
+            slideViewHeihgt(frame, frame.getHeight(), 0, 300);
         }
     }
 
@@ -865,7 +869,7 @@ public class UploadCourseActivity extends AppCompatActivity {
                     CourseStructureList.setAdapter(adapter);
 
                     rotate(imageSelectDate, false);
-                    slideViewHeihgt(fram, fram.getHeight(), 0, 300);
+                    slideViewHeihgt(frame, frame.getHeight(), 0, 300);
                 }
             }
 

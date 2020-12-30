@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#000000"
-        android:alpha="0.3"
+        android:alpha="0.5"
         android:isScrollContainer="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"

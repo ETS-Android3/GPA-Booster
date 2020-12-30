@@ -89,7 +89,6 @@
 
  </RelativeLayout>
 
-
     <ListView
         android:id="@+id/SubjectsList"
         android:layout_width="match_parent"

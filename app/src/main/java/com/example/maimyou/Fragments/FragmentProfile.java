@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
@@ -32,6 +33,7 @@ import com.example.maimyou.Adapters.AdapterTrimester;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,35 +41,32 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FragmentProfile extends Fragment {
-    String id = "";
+    String id = "", Name = "", StudentId = "";
+    int y = -1;
     Context context;
-    boolean buttonOut = false, containerOut = false;
+    ArrayList<Trimester> trimesters;
+    boolean buttonOut = false, containerOut = false, UserDataPrinted = false, collapsed = false;
 
     ListView gradlistView;
     TextView TotalHours, CGPA, userName, userName2, ID, ID2;
-    ArrayList<Trimester> trimesters;
     ImageView profilePictureAdmin, profilePictureAdmin2;
     ProgressBar progressBar;
     FloatingActionButton edit;
     NestedScrollView nestedScrollView;
     FrameLayout cardViewContainer;
     LinearLayout userInfo;
+    CardView cardView;
+    AppBarLayout appBar;
 
-    public FragmentProfile() {
-    }
-
-
-    public FragmentProfile setContext(Context context) {
-        this.context = context;
-        return this;
-    }
-
-    public FragmentProfile setId(String id) {
+    public FragmentProfile(String id, Context context) {
         this.id = id;
-        return this;
+        this.context = context;
+        downLoadData();
     }
+
 
     @Nullable
     @Override
@@ -80,13 +79,12 @@ public class FragmentProfile extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getView() != null) {
+            UserDataPrinted = false;
 
-
-            Animation animFadeIn = AnimationUtils.loadAnimation(context, R.anim.fade_inn);
-            Animation animFadeOut = AnimationUtils.loadAnimation(context, R.anim.fade_out);
             cardViewContainer = getView().findViewById(R.id.cardViewContainer);
             nestedScrollView = getView().findViewById(R.id.nestedScrollView);
             edit = getView().findViewById(R.id.edit);
+            appBar = getView().findViewById(R.id.appBar);
             progressBar = getView().findViewById(R.id.progressBar);
             userName = getView().findViewById(R.id.userName);
             userName2 = getView().findViewById(R.id.userName2);
@@ -100,82 +98,127 @@ public class FragmentProfile extends Fragment {
             profilePictureAdmin = getView().findViewById(R.id.profilePictureAdmin);
             profilePictureAdmin2 = getView().findViewById(R.id.profilePictureAdmin2);
             userInfo = getView().findViewById(R.id.userInfo);
+            cardView = getView().findViewById(R.id.cardView);
             fadeOutNoDelay(userInfo);
             fadeOutNoDelay(profilePictureAdmin2);
 
+            collapsed = false;
+            if (y > 0) {
+                appBar.setExpanded(false, false);
+                animationOutUP(cardViewContainer, 0);
+                fadeIn(userInfo, 0);
+                fadeIn(profilePictureAdmin2, 0);
+                containerOut = true;
+            }
+            collapsed = true;
+            buttonOut = false;
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 nestedScrollView.setOnScrollChangeListener((View.OnScrollChangeListener) (view1, i, i1, i2, i3) -> {
+
+                    y = i1;
+
                     if (i1 > i3) {
-                        if (!containerOut) {
-                            animationOutUP(cardViewContainer);
-                            fadeIn(userInfo);
-                            fadeIn(profilePictureAdmin2);
-                            containerOut = true;
-                        }
+
                         if (!buttonOut) {
                             animationOutDOWN(edit);
                             buttonOut = true;
                         }
                     } else {
-                        if (i1 == 0) {
-                            fadeOut(userInfo);
-                            fadeOut(profilePictureAdmin2);
-                            returnAndFadeIn(cardViewContainer);
-                            containerOut = false;
-                        }
+
                         if (buttonOut) {
                             animationInUP(edit);
                             buttonOut = false;
                         }
                     }
-//                    System.out.println(i1);
                 });
             }
 
-            FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.child("Name").getValue() != null) {
-                        userName.setText(snapshot.child("Name").getValue().toString());
-                        userName2.setText(snapshot.child("Name").getValue().toString());
-                    }
+            appBar.addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+                if (collapsed) {
+                    if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
+                        //  Collapsed
 
-                    if (snapshot.child("Id").getValue() != null) {
-                        ID.setText(snapshot.child("Id").getValue().toString());
-                        ID2.setText(snapshot.child("Id").getValue().toString());
+                        if (!containerOut) {
+                            animationOutUP(cardViewContainer, 500);
+                            fadeIn(userInfo, 200);
+                            fadeIn(profilePictureAdmin2, 200);
+                            containerOut = true;
+                        }
+                    } else {
+                        //Expanded
+
+                        if (containerOut) {
+                            fadeOut(userInfo);
+                            fadeOut(profilePictureAdmin2);
+                            returnAndFadeIn(cardViewContainer);
+                            fadeIn(cardView, 500);
+                            containerOut = false;
+                        }
                     }
+                }
+            });
+
+
+            if (!Name.isEmpty() && !StudentId.isEmpty()) {
+                printUserData();
+            }
+        }
+    }
+
+    public void downLoadData() {
+        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("Name").getValue() != null) {
+                    Name = Objects.requireNonNull(snapshot.child("Name").getValue()).toString();
+                }
+
+                if (snapshot.child("Id").getValue() != null) {
+                    StudentId = Objects.requireNonNull(snapshot.child("Id").getValue()).toString();
+                }
 
 //                    if (snapshot.child("Degree").getValue() != null) {
 //                        Degree.setText(snapshot.child("Degree").getValue().toString());
 //                    }
-                    if (snapshot.child("Trimesters").getValue() != null) {
-                        trimesters = new ArrayList<>();
-                        Iterable<DataSnapshot> children = snapshot.child("Trimesters").getChildren();
-                        for (DataSnapshot child : children) {
-                            if (child.getValue() != null) {
-                                trimesters.add(getTrim(child));
-                            }
+                if (snapshot.child("Trimesters").getValue() != null) {
+                    trimesters = new ArrayList<>();
+                    Iterable<DataSnapshot> children = snapshot.child("Trimesters").getChildren();
+                    for (DataSnapshot child : children) {
+                        if (child.getValue() != null) {
+                            trimesters.add(getTrim(child));
                         }
-                        if (trimesters.size() > 0) {
-
-                            CGPA.setText(trimesters.get(trimesters.size() - 1).getCGPA());
-                            TotalHours.setText(trimesters.get(trimesters.size() - 1).getTotalHours());
-                            AdapterTrimester adapter = new AdapterTrimester(context, R.layout.trimester, trimesters);
-                            gradlistView.setAdapter(adapter);
-
-                            setListViewHeightBasedOnChildren(gradlistView);
-
-                        }
-                        progressBar.setVisibility(View.GONE);
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                    printUserData();
 
                 }
-            });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void printUserData() {
+        if (!UserDataPrinted && getView() != null) {
+            UserDataPrinted = true;
+            userName.setText(Name);
+            userName2.setText(Name);
+            ID.setText(StudentId);
+            ID2.setText(StudentId);
+            if (trimesters.size() > 0) {
+
+                CGPA.setText(trimesters.get(trimesters.size() - 1).getCGPA());
+                TotalHours.setText(trimesters.get(trimesters.size() - 1).getTotalHours());
+                AdapterTrimester adapter = new AdapterTrimester(context, R.layout.trimester, trimesters);
+                gradlistView.setAdapter(adapter);
+                setListViewHeightBasedOnChildren(gradlistView);
+
+            }
+            progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -238,15 +281,16 @@ public class FragmentProfile extends Fragment {
         }
         return trimester;
     }
-    public void fadeIn(View view){
+
+    public void fadeIn(View view, int duration) {
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
-        fadeIn.setDuration(200);
+        fadeIn.setDuration(duration);
         fadeIn.setFillAfter(true);
         view.startAnimation(fadeIn);
     }
 
-    public void fadeOut(View view){
+    public void fadeOut(View view) {
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new DecelerateInterpolator()); //and this
         fadeOut.setDuration(200);
@@ -254,7 +298,7 @@ public class FragmentProfile extends Fragment {
         view.startAnimation(fadeOut);
     }
 
-    public void fadeOutNoDelay(View view){
+    public void fadeOutNoDelay(View view) {
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new DecelerateInterpolator()); //and this
         fadeOut.setDuration(0);
@@ -298,13 +342,13 @@ public class FragmentProfile extends Fragment {
         view.startAnimation(outtoBottom);
     }
 
-    private void animationOutUP(View view) {
+    private void animationOutUP(View view, int duration) {
         Animation outtoBottom = new TranslateAnimation(
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, -1.0f);
-        outtoBottom.setDuration(500);
+        outtoBottom.setDuration(duration);
         outtoBottom.setInterpolator(new AccelerateInterpolator());
         outtoBottom.setFillAfter(true);
         view.startAnimation(outtoBottom);

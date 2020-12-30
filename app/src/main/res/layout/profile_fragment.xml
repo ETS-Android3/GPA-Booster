@@ -8,7 +8,7 @@
 
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent">
@@ -135,10 +135,11 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        app:layout_anchor="@id/app_bar"
+        app:layout_anchor="@id/appBar"
         app:layout_anchorGravity="bottom|center">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
             android:layout_width="wrap_content"
             android:layout_height="65dp"
             android:layout_gravity="bottom|center"
