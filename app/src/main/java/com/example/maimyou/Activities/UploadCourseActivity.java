@@ -95,8 +95,7 @@ public class UploadCourseActivity extends AppCompatActivity {
         };
     }
 
-    public static class Touch
-    {
+    public static class Touch {
         public boolean setIstouched = false;
 
         public Touch(boolean setIstouched) {
@@ -242,13 +241,13 @@ public class UploadCourseActivity extends AppCompatActivity {
     }
 
     public void open() {
-        rotate(dragger,true);
+        rotate(dragger, true);
 //        dragger.setImageResource(R.drawable.ic_chevron_left_black_24dp);
         draggerOpened = true;
     }
 
     public void close() {
-        rotate(dragger,false);
+        rotate(dragger, false);
 //        dragger.setImageResource(R.drawable.ic_chevron_right_black_24dp);
         draggerOpened = false;
     }
@@ -578,7 +577,6 @@ public class UploadCourseActivity extends AppCompatActivity {
         return totalHeight;
     }
 
-
     public RectF fillBounds(Rectangle2D rect) {
         RectF bounds = new RectF();
         bounds.left = (float) rect.getMinX();
@@ -606,20 +604,23 @@ public class UploadCourseActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            progressBar.setVisibility(View.VISIBLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
 
-            busy = true;
-            path = FileUtils.getPath(context, data.getData());
-            FileName = "";
-            if (new File(data.getData().getPath()).getAbsolutePath() != null) {
+                progressBar.setVisibility(View.VISIBLE);
+
+                busy = true;
+                path = FileUtils.getPath(context, data.getData());
+                FileName = "";
+//            new File(data.getData().getPath()).getAbsolutePath();
                 Uri uri = data.getData();
 
                 String filename;
-                Cursor cursor = getContentResolver().query(uri, null, null, null, null);
 
-                if (cursor == null) filename = uri.getPath();
-                else {
+                Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+                if (cursor == null) {
+                    filename = uri.getPath();
+                } else {
                     cursor.moveToFirst();
                     int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
                     filename = cursor.getString(idx);
@@ -630,52 +631,47 @@ public class UploadCourseActivity extends AppCompatActivity {
                 if (arr.length > 0) {
                     FileName = arr[0];
                 }
-            }
-            Toast.makeText(getApplicationContext(), "It will take a minute to scan " + FileName + " please be patient.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "It will take a minute to scan " + FileName + " please be patient.", Toast.LENGTH_LONG).show();
 
-            System.out.println("PAAAAAAAAAAAAAAAAAAAAAATTTTTTHHHHHHHHHHHHHHHHH:     " + path);
-            Thread thread = new Thread() {
-                @Override
-                public void run() {
-                    try (PDDocument document = PDDocument.load(new File(path))) {
-                        for (PDPage page : document.getDocumentCatalog().getPages()) {
-                            PdfBoxFinder boxFinder = new PdfBoxFinder(page);
-                            boxFinder.processPage(page);
+//            System.out.println("path:     " + path);
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try (PDDocument document = PDDocument.load(new File(path))) {
+                            for (PDPage page : document.getDocumentCatalog().getPages()) {
+                                PdfBoxFinder boxFinder = new PdfBoxFinder(page);
+                                boxFinder.processPage(page);
 
-                            PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
                                 for (Map.Entry<String, Rectangle2D> entry : boxFinder.getRegions().entrySet()) {
                                     stripperByArea.addRegion(entry.getKey(), new RectF(fillBounds(entry.getValue())));
                                 }
-                            }
-                            stripperByArea.extractRegions(page);
-                            List<String> names = stripperByArea.getRegions();
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                names.sort(null);
-                            }
 
-                            final ArrayList<ArrayList<String>> lines = new ArrayList<>();
-                            for (String name : names)
-                                System.out.println("============================      " + name);
-                            for (int x = 65; x < 250; x++) {
-                                ArrayList<String> line = new ArrayList<>();
-                                for (int y = 0; y < 20; y++) {
-                                    try {
-                                        line.add(stripperByArea.getTextForRegion(String.valueOf((char) x) + y).replaceAll("\n", "").trim());
-                                    } catch (Exception ignored) {
-                                        line.add("");
+                                stripperByArea.extractRegions(page);
+//                                List<String> names = stripperByArea.getRegions();
+//                                names.sort(null);
+
+
+                                final ArrayList<ArrayList<String>> lines = new ArrayList<>();
+//                              for (String name : names)  System.out.println("============================      " + name);
+                                for (int x = 65; x < 250; x++) {
+                                    ArrayList<String> line = new ArrayList<>();
+                                    for (int y = 0; y < 20; y++) {
+                                        try {
+                                            line.add(stripperByArea.getTextForRegion(String.valueOf((char) x) + y).replaceAll("\n", "").trim());
+                                        } catch (Exception ignored) {
+                                            line.add("");
+                                        }
                                     }
+                                    lines.add(line);
                                 }
-                                lines.add(line);
-                            }
-                            if (lines.size() > 0) {
-                                FirebaseDatabase.getInstance().getReference().child("Course Structure").child(FileName).setValue(lines);
-                                printGrades(FileName);
-                            }
+                                if (lines.size() > 0) {
+                                    FirebaseDatabase.getInstance().getReference().child("Course Structure").child(FileName).setValue(lines);
+                                    printGrades(FileName);
+                                }
 
 
-                            progressBar.post(new Runnable() {
-                                public void run() {
+                                progressBar.post(() -> {
                                     if (lines.size() > 0) {
                                         Toast.makeText(getApplicationContext(), "Course structure was uploaded successfully!", Toast.LENGTH_LONG).show();
                                     } else {
@@ -683,8 +679,7 @@ public class UploadCourseActivity extends AppCompatActivity {
                                     }
                                     progressBar.setVisibility(View.INVISIBLE);
                                     busy = false;
-                                }
-                            });
+                                });
 //                            trimesterCourse = new TrimesterCourse();
 //                            boolean start = true, elective = false;
 //                            int firstSem = 0, currSem = 0;
@@ -730,14 +725,14 @@ public class UploadCourseActivity extends AppCompatActivity {
 //                                }
 //
 //                            }
-                        }
+                            }
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            };
-            thread.start();
+                };
+                thread.start();
 
 
 //            if (path != null && !path.isEmpty()&&!FileName.isEmpty()) {
@@ -801,8 +796,11 @@ public class UploadCourseActivity extends AppCompatActivity {
 //                };
 //                thread.start();
 //            }
-        } else {
-            Toast.makeText(getApplicationContext(), "Please select a file.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Please select a file.", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Toast.makeText(getApplicationContext(), "Your device is too old to do the task", Toast.LENGTH_SHORT).show();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -889,7 +887,6 @@ public class UploadCourseActivity extends AppCompatActivity {
         return sharedPreferences.getString(name, "");
     }
 
-
     public void scan(String st) {
         boolean semester = false, elective = false;
         String[] lines = st.split("\n", -1);
@@ -948,7 +945,6 @@ public class UploadCourseActivity extends AppCompatActivity {
 //            loc=300;
 //        }
     }
-
 
     public boolean isCode(String string) {
         try {

@@ -38,7 +38,6 @@ public class AdapterTrimesterCourse extends ArrayAdapter<String> {
     UploadCourseActivity uploadCourseActivity;
     ArrayList<Trimester> trimesters;
 
-
     public AdapterTrimesterCourse setTrimesters(ArrayList<Trimester> trimesters) {
         this.trimesters = trimesters;
         return this;
@@ -70,7 +69,6 @@ public class AdapterTrimesterCourse extends ArrayAdapter<String> {
         mContext = context;
         mResource = resource;
     }
-
 
     @NonNull
     @Override
@@ -226,7 +224,6 @@ public class AdapterTrimesterCourse extends ArrayAdapter<String> {
         );
         return (int) px;
     }
-
 
     public String getTrim(String trim) {
         if (isNumeric(trim)) {
