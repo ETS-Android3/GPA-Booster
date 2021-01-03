@@ -67,7 +67,6 @@ public class FragmentProfile extends Fragment {
         downLoadData();
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -138,7 +137,6 @@ public class FragmentProfile extends Fragment {
                 if (collapsed) {
                     if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
                         //  Collapsed
-
                         if (!containerOut) {
                             animationOutUP(cardViewContainer, 500);
                             fadeIn(userInfo, 200);
@@ -146,8 +144,7 @@ public class FragmentProfile extends Fragment {
                             containerOut = true;
                         }
                     } else {
-                        //Expanded
-
+                        // Expanded
                         if (containerOut) {
                             fadeOut(userInfo);
                             fadeOut(profilePictureAdmin2);
