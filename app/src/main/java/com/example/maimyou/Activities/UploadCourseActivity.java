@@ -69,6 +69,8 @@ import com.tom_roush.pdfbox.text.PDFTextStripperByArea;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -633,7 +635,6 @@ public class UploadCourseActivity extends AppCompatActivity {
                 }
                 Toast.makeText(getApplicationContext(), "It will take a minute to scan " + FileName + " please be patient.", Toast.LENGTH_LONG).show();
 
-//            System.out.println("path:     " + path);
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
@@ -648,38 +649,82 @@ public class UploadCourseActivity extends AppCompatActivity {
                                 }
 
                                 stripperByArea.extractRegions(page);
-//                                List<String> names = stripperByArea.getRegions();
+                                List<String> names = stripperByArea.getRegions();
+                                Collections.sort(names, (s1, s2) -> {
+                                    int s1int = ((int) s1.charAt(0))*100 + Integer.parseInt(s1.substring(1));
+                                    int s2int = ((int) s2.charAt(0))*100 + Integer.parseInt(s2.substring(1));
+                                    return s1int - s2int;
+                                });
+
+//                                Collections.sort(names);
+
 //                                names.sort(null);
 
-
-                                final ArrayList<ArrayList<String>> lines = new ArrayList<>();
-//                              for (String name : names)  System.out.println("============================      " + name);
-                                for (int x = 65; x < 250; x++) {
-                                    ArrayList<String> line = new ArrayList<>();
-                                    for (int y = 0; y < 20; y++) {
-                                        try {
-                                            line.add(stripperByArea.getTextForRegion(String.valueOf((char) x) + y).replaceAll("\n", "").trim());
-                                        } catch (Exception ignored) {
-                                            line.add("");
+                                String codeIndex = "", SubjectNameIndex = "", PreIndex = "";
+                                boolean elective = false;
+                                int i = 0;
+                                for (String name : names) {
+                                    System.out.println(name);
+                                    if (stripperByArea.getTextForRegion(name).toLowerCase().contains("code") && codeIndex.isEmpty()) {
+                                        codeIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("subject") && SubjectNameIndex.isEmpty()) {
+                                        SubjectNameIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("requisite") && PreIndex.isEmpty()) {
+                                        PreIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("total")) {
+                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("TotalHours").setValue(stripperByArea.getTextForRegion(name.charAt(0) + PreIndex).replaceAll("\n", ""));
+                                        break;
+                                    }
+                                    if (!codeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !PreIndex.isEmpty()) {
+                                        if (elective && name.substring(1).compareTo(codeIndex) == 0 && stripperByArea.getTextForRegion(name).replaceAll("\n", "").isEmpty()) {
+                                            elective = false;
+                                        }
+                                        if (stripperByArea.getTextForRegion(name).toLowerCase().contains("elective") && name.contains(SubjectNameIndex)) {
+                                            elective = true;
+                                        }
+                                        if (checkHours(SubjectNameIndex, stripperByArea.getTextForRegion(name).replaceAll("\n", ""), PreIndex)) {
+                                            String SubjectCode = stripperByArea.getTextForRegion(name.charAt(0) + codeIndex).replaceAll("\n", "").replaceAll("/", " ");
+                                            String SubjectName = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
+                                            String SubjectHours = stripperByArea.getTextForRegion(name).replaceAll("\n", "");
+                                            String PreRequisite = stripperByArea.getTextForRegion(name.charAt(0) + PreIndex).replaceAll("\n", "");
+                                            String trimester = getTrimester(name.substring(1), SubjectNameIndex);
+                                            if (!SubjectName.toLowerCase().contains("total")) {
+                                                if (!SubjectCode.isEmpty()) {
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("SubjectName").setValue(SubjectName);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("SubjectHours").setValue(SubjectHours);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("Elective").setValue(elective);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("PreRequisite").setValue(PreRequisite);
+                                                } else {
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectName").setValue(SubjectName);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectHours").setValue(SubjectHours);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("Elective").setValue(elective);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("PreRequisite").setValue(PreRequisite);
+                                                    i++;
+                                                }
+                                            }
+//                                            courseSubjects.add(new CourseSubject(SubjectName,SubjectCode,SubjectHours,trimester,elective));
                                         }
                                     }
-                                    lines.add(line);
-                                }
-                                if (lines.size() > 0) {
-                                    FirebaseDatabase.getInstance().getReference().child("Course Structure").child(FileName).setValue(lines);
-                                    printGrades(FileName);
                                 }
 
+//                                for (int x = 65; x < 250; x++) {
+//                                    ArrayList<String> line = new ArrayList<>();
+//                                    for (int y = 0; y < 20; y++) {
+//                                        try {
+//                                            line.add(stripperByArea.getTextForRegion(String.valueOf((char) x) + y).replaceAll("\n", "").trim());
+//                                        } catch (Exception ignored) {
+//                                            line.add("");
+//                                        }
+//                                    }
+//                                    lines.add(line);
+//                                }
+//                                if (lines.size() > 0) {
+//                                    FirebaseDatabase.getInstance().getReference().child("Course Structure").child(FileName).setValue(lines);
+//                                    printGrades(FileName);
+//                                }
+//                                if (courseSubjects.size() > 0) {
+//                                }
 
-                                progressBar.post(() -> {
-                                    if (lines.size() > 0) {
-                                        Toast.makeText(getApplicationContext(), "Course structure was uploaded successfully!", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(getApplicationContext(), "Error scanning the file!", Toast.LENGTH_LONG).show();
-                                    }
-                                    progressBar.setVisibility(View.INVISIBLE);
-                                    busy = false;
-                                });
 //                            trimesterCourse = new TrimesterCourse();
 //                            boolean start = true, elective = false;
 //                            int firstSem = 0, currSem = 0;
@@ -726,7 +771,15 @@ public class UploadCourseActivity extends AppCompatActivity {
 //
 //                            }
                             }
-
+                            progressBar.post(() -> {
+//                                    if (lines.size() > 0) {
+//                                        Toast.makeText(getApplicationContext(), "Course structure was uploaded successfully!", Toast.LENGTH_LONG).show();
+//                                    } else {
+//                                        Toast.makeText(getApplicationContext(), "Error scanning the file!", Toast.LENGTH_LONG).show();
+//                                    }
+                                progressBar.setVisibility(View.INVISIBLE);
+                                busy = false;
+                            });
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -799,10 +852,26 @@ public class UploadCourseActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(getApplicationContext(), "Please select a file.", Toast.LENGTH_SHORT).show();
             }
-        }else{
+        } else {
             Toast.makeText(getApplicationContext(), "Your device is too old to do the task", Toast.LENGTH_SHORT).show();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public boolean checkHours(String firstIndex, String hours, String secondIndex) {
+        try {
+            return (Integer.parseInt(firstIndex) < Integer.parseInt(hours) && Integer.parseInt(hours) < Integer.parseInt(secondIndex));
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    public String getTrimester(String nameIndex, String hoursIndex) {
+        try {
+            return Integer.toString(Integer.parseInt(nameIndex) - Integer.parseInt(hoursIndex));
+        } catch (Exception ignored) {
+            return "";
+        }
     }
 
     class FontRenderFilter extends RenderFilter {

@@ -41,7 +41,7 @@ public class DashBoardActivity extends AppCompatActivity {
     }
 
     public void UploadCourse(View view) {
-        startActivity(new Intent(getApplicationContext(), CourseStructure.class));
+        startActivity(new Intent(getApplicationContext(), UploadCourseActivity.class));
         overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
     }
 
