@@ -18,21 +18,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import com.example.maimyou.Adapters.AdapterTrimesterCourse;
 import com.example.maimyou.Adapters.SubjectReviewsAdapter;
 import com.example.maimyou.Classes.SubjectReviews;
-import com.example.maimyou.Classes.subjects;
 import com.example.maimyou.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-import java.util.Objects;
-
 import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
 
 public class SubjectsActivity extends AppCompatActivity {
@@ -66,7 +59,6 @@ public class SubjectsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_subjects);
 
         initViews();
-
         showSubjects();
     }
 
@@ -77,13 +69,12 @@ public class SubjectsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot child : snapshot.getChildren()) {
-                        subjects.add(new SubjectReviews(Objects.requireNonNull(child.child("Subject Name").getValue()).toString(), child.getKey(), getRatings(), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("Id")).exists()));
+                        subjects.add(new SubjectReviews(child.child("SubjectName").getValue(), child.getKey(), getRatings(), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("Id")).exists()));
                     }
                     SubjectReviewsAdapter adapter = new SubjectReviewsAdapter(context, R.layout.subject_review, subjects);
                     SubjectsList.setAdapter(adapter);
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -127,9 +118,7 @@ public class SubjectsActivity extends AppCompatActivity {
         hideKeyBoard(inputSearch);
         slideViewWidth(inputSearch, width - dpToPx(60), dpToPx(40), 500);
         Handler handler = new Handler();
-        handler.postDelayed(() -> {
-            SearchBarContainer.setVisibility(View.INVISIBLE);
-        }, 500);
+        handler.postDelayed(() -> SearchBarContainer.setVisibility(View.INVISIBLE), 500);
         inputSearch.setHint("");
         inputSearch.setText("");
         inputSearch.setError(null);

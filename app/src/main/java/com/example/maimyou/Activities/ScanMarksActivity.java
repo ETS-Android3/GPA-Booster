@@ -269,9 +269,13 @@ public class ScanMarksActivity extends AppCompatActivity {
                     if(snapshot.child(subjects.getCode()).exists()){
                         FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(loadData("Id")).setValue(subjects.getGrade());
                     }else{
-                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Subject Name").setValue(subjects.getName());
-                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(loadData("Id")).setValue(subjects.getGrade());
+
                     }
+
+//                    else{
+//                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Subject Name").setValue(subjects.getName());
+//                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(loadData("Id")).setValue(subjects.getGrade());
+//                    }
                 }
             }
 

@@ -24,11 +24,15 @@ public class SubjectReviews {
         return isFinished;
     }
 
-    public SubjectReviews(String subjectName, String subjectCode, String subjectRate, String subjectUsers, boolean isFinished) {
-        SubjectName = subjectName;
-        SubjectCode = subjectCode;
-        SubjectRate = subjectRate;
-        SubjectUsers = subjectUsers;
+    public SubjectReviews(Object subjectName, String subjectCode, String subjectRate, String subjectUsers, boolean isFinished) {
+        if(subjectName!=null) {
+            this.SubjectName = subjectName.toString().trim();
+        }else{
+            this.SubjectName = "";
+        }
+        this.SubjectCode = subjectCode;
+        this.SubjectRate = subjectRate;
+        this.SubjectUsers = subjectUsers;
         this.isFinished = isFinished;
     }
 }

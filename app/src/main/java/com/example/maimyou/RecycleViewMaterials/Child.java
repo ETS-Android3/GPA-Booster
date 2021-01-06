@@ -2,16 +2,21 @@ package com.example.maimyou.RecycleViewMaterials;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
-
-import java.util.List;
+import com.example.maimyou.Activities.CourseStructure;
 
 public class Child implements Parcelable {
     public final String Title;
+    CourseStructure courseStructure;
 
-    public Child(String title) {
-        Title = title;
+    public void viewCourse(String str){
+        if(courseStructure!=null){
+            courseStructure.viewCourse(str.trim());
+        }
+    }
+
+    public Child(String title, CourseStructure courseStructure) {
+        this.Title = title;
+        this.courseStructure = courseStructure;
     }
 
     protected Child(Parcel in) {

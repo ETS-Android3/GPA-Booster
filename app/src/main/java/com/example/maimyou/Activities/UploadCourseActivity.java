@@ -588,18 +588,18 @@ public class UploadCourseActivity extends AppCompatActivity {
         return bounds;
     }
 
-    String parsedText = "";
-    int loc = 100;
-    //    PdfReader reader;
+//    String parsedText = "";
+//    int loc = 100;
+//    PdfReader reader;
     String path;
-    int n = 0;
-    TrimesterCourse trimesterCourseChild = new TrimesterCourse();
-    TextExtractionStrategy strategy;
-    FontRenderFilter fontFilter;
-    int l;
-    //    ArrayList<RegionTextRenderFilter> regionTextRenderFilter = new ArrayList<>();
-    Double reg = 20d;
-    Double adder = 30d;
+//    int n = 0;
+//    TrimesterCourse trimesterCourseChild = new TrimesterCourse();
+//    TextExtractionStrategy strategy;
+//    FontRenderFilter fontFilter;
+//    int l;
+//    ArrayList<RegionTextRenderFilter> regionTextRenderFilter = new ArrayList<>();
+//    Double reg = 20d;
+//    Double adder = 30d;
     String FileName = "";
     boolean busy = false;
 
@@ -651,20 +651,19 @@ public class UploadCourseActivity extends AppCompatActivity {
                                 stripperByArea.extractRegions(page);
                                 List<String> names = stripperByArea.getRegions();
                                 Collections.sort(names, (s1, s2) -> {
-                                    int s1int = ((int) s1.charAt(0))*100 + Integer.parseInt(s1.substring(1));
-                                    int s2int = ((int) s2.charAt(0))*100 + Integer.parseInt(s2.substring(1));
+                                    int s1int = ((int) s1.charAt(0)) * 100 + Integer.parseInt(s1.substring(1));
+                                    int s2int = ((int) s2.charAt(0)) * 100 + Integer.parseInt(s2.substring(1));
                                     return s1int - s2int;
                                 });
 
 //                                Collections.sort(names);
-
 //                                names.sort(null);
 
                                 String codeIndex = "", SubjectNameIndex = "", PreIndex = "";
                                 boolean elective = false;
                                 int i = 0;
                                 for (String name : names) {
-                                    System.out.println(name);
+//                                    System.out.println(name + ": " + stripperByArea.getTextForRegion(name));
                                     if (stripperByArea.getTextForRegion(name).toLowerCase().contains("code") && codeIndex.isEmpty()) {
                                         codeIndex = name.substring(1);
                                     } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("subject") && SubjectNameIndex.isEmpty()) {
@@ -672,7 +671,12 @@ public class UploadCourseActivity extends AppCompatActivity {
                                     } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("requisite") && PreIndex.isEmpty()) {
                                         PreIndex = name.substring(1);
                                     } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("total")) {
-                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("TotalHours").setValue(stripperByArea.getTextForRegion(name.charAt(0) + PreIndex).replaceAll("\n", ""));
+                                        if (!codeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !PreIndex.isEmpty()) {
+                                            for (int s = 1; s <= 12; s++) {
+                                                FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child("" + s).child("TotalHours").setValue(stripperByArea.getTextForRegion(name.charAt(0) + getPos(SubjectNameIndex, s)).replaceAll("\n", ""));
+                                            }
+                                            FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("TotalHours").setValue(stripperByArea.getTextForRegion(name.charAt(0) + PreIndex).replaceAll("\n", ""));
+                                        }
                                         break;
                                     }
                                     if (!codeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !PreIndex.isEmpty()) {
@@ -682,7 +686,7 @@ public class UploadCourseActivity extends AppCompatActivity {
                                         if (stripperByArea.getTextForRegion(name).toLowerCase().contains("elective") && name.contains(SubjectNameIndex)) {
                                             elective = true;
                                         }
-                                        if (checkHours(SubjectNameIndex, stripperByArea.getTextForRegion(name).replaceAll("\n", ""), PreIndex)) {
+                                        if (checkHours(SubjectNameIndex, stripperByArea.getTextForRegion(name).replaceAll("\n", ""),name.substring(1), PreIndex)) {
                                             String SubjectCode = stripperByArea.getTextForRegion(name.charAt(0) + codeIndex).replaceAll("\n", "").replaceAll("/", " ");
                                             String SubjectName = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
                                             String SubjectHours = stripperByArea.getTextForRegion(name).replaceAll("\n", "");
@@ -694,6 +698,12 @@ public class UploadCourseActivity extends AppCompatActivity {
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("SubjectHours").setValue(SubjectHours);
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("Elective").setValue(elective);
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("PreRequisite").setValue(PreRequisite);
+
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("SubjectName" ).setValue(SubjectName);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("SubjectHours").setValue(SubjectHours);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("Elective"    ).child(FileName).setValue(elective);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("PreRequisite").child(FileName).setValue(PreRequisite);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("Major").setValue(FileName.substring(0,2));
                                                 } else {
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectName").setValue(SubjectName);
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectHours").setValue(SubjectHours);
@@ -702,7 +712,6 @@ public class UploadCourseActivity extends AppCompatActivity {
                                                     i++;
                                                 }
                                             }
-//                                            courseSubjects.add(new CourseSubject(SubjectName,SubjectCode,SubjectHours,trimester,elective));
                                         }
                                     }
                                 }
@@ -858,9 +867,18 @@ public class UploadCourseActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public boolean checkHours(String firstIndex, String hours, String secondIndex) {
+    public String getPos(String subIn,int trim){
+        try{
+            return Integer.toString(Integer.parseInt(subIn)+trim);
+        }catch (Exception ignored){
+            return "";
+        }
+    }
+
+    public boolean checkHours(String firstIndex, String hours,String hoursIndex, String secondIndex) {
         try {
-            return (Integer.parseInt(firstIndex) < Integer.parseInt(hours) && Integer.parseInt(hours) < Integer.parseInt(secondIndex));
+            Integer.parseInt(hours.trim());
+            return (Integer.parseInt(firstIndex.trim()) < Integer.parseInt(hoursIndex.trim()) && Integer.parseInt(hoursIndex.trim()) < Integer.parseInt(secondIndex.trim()));
         } catch (Exception ignored) {
             return false;
         }
