@@ -588,11 +588,11 @@ public class UploadCourseActivity extends AppCompatActivity {
         return bounds;
     }
 
-//    String parsedText = "";
+    //    String parsedText = "";
 //    int loc = 100;
 //    PdfReader reader;
     String path;
-//    int n = 0;
+    //    int n = 0;
 //    TrimesterCourse trimesterCourseChild = new TrimesterCourse();
 //    TextExtractionStrategy strategy;
 //    FontRenderFilter fontFilter;
@@ -686,7 +686,7 @@ public class UploadCourseActivity extends AppCompatActivity {
                                         if (stripperByArea.getTextForRegion(name).toLowerCase().contains("elective") && name.contains(SubjectNameIndex)) {
                                             elective = true;
                                         }
-                                        if (checkHours(SubjectNameIndex, stripperByArea.getTextForRegion(name).replaceAll("\n", ""),name.substring(1), PreIndex)) {
+                                        if (checkHours(SubjectNameIndex, stripperByArea.getTextForRegion(name).replaceAll("\n", ""), name.substring(1), PreIndex)) {
                                             String SubjectCode = stripperByArea.getTextForRegion(name.charAt(0) + codeIndex).replaceAll("\n", "").replaceAll("/", " ");
                                             String SubjectName = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
                                             String SubjectHours = stripperByArea.getTextForRegion(name).replaceAll("\n", "");
@@ -699,11 +699,11 @@ public class UploadCourseActivity extends AppCompatActivity {
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("Elective").setValue(elective);
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("PreRequisite").setValue(PreRequisite);
 
-                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("SubjectName" ).setValue(SubjectName);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("SubjectName").setValue(SubjectName);
                                                     FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("SubjectHours").setValue(SubjectHours);
-                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("Elective"    ).child(FileName).setValue(elective);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("Elective").child(FileName).setValue(elective);
                                                     FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("PreRequisite").child(FileName).setValue(PreRequisite);
-                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("Major").setValue(FileName.substring(0,2));
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(SubjectCode).child("Major").setValue(FileName.substring(0, 2));
                                                 } else {
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectName").setValue(SubjectName);
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectHours").setValue(SubjectHours);
@@ -867,15 +867,15 @@ public class UploadCourseActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    public String getPos(String subIn,int trim){
-        try{
-            return Integer.toString(Integer.parseInt(subIn)+trim);
-        }catch (Exception ignored){
+    public String getPos(String subIn, int trim) {
+        try {
+            return Integer.toString(Integer.parseInt(subIn) + trim);
+        } catch (Exception ignored) {
             return "";
         }
     }
 
-    public boolean checkHours(String firstIndex, String hours,String hoursIndex, String secondIndex) {
+    public boolean checkHours(String firstIndex, String hours, String hoursIndex, String secondIndex) {
         try {
             Integer.parseInt(hours.trim());
             return (Integer.parseInt(firstIndex.trim()) < Integer.parseInt(hoursIndex.trim()) && Integer.parseInt(hoursIndex.trim()) < Integer.parseInt(secondIndex.trim()));

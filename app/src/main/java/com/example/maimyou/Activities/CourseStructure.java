@@ -1,19 +1,32 @@
 package com.example.maimyou.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.RectF;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.TypedValue;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -25,12 +38,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.maimyou.Adapters.AdapterDisplayCourse;
-import com.example.maimyou.Adapters.AdapterTrimesterCourse;
 import com.example.maimyou.Classes.DisplayCourse;
+import com.example.maimyou.Classes.FileUtils;
+import com.example.maimyou.Libraries.PdfBoxFinder;
 import com.example.maimyou.R;
 import com.example.maimyou.RecycleViewMaterials.Child;
 import com.example.maimyou.RecycleViewMaterials.ChildAdapter;
@@ -39,27 +54,68 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.itextpdf.awt.geom.Rectangle2D;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.pdmodel.PDPage;
+import com.tom_roush.pdfbox.text.PDFTextStripperByArea;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CourseStructure extends AppCompatActivity {
 
     //Views
-    RecyclerView RecEE, RecCE, RecTE, RecEL, RecNA;
     RelativeLayout RelEE, RelCE, RelTE, RelEL, RelNA;
+    RecyclerView RecEE, RecCE, RecTE, RecEL, RecNA;
     ImageView ArrEE, ArrCE, ArrTE, ArrEL, ArrNA;
     ListView CourseStructureList;
+    ProgressBar progressBar;
 
     //Vars
     Context context = this;
+    String FileName = "", path = "";
     CourseStructure courseStructure = this;
-    Boolean ExpandEE = false, ExpandCE = false, ExpandTE = false, ExpandEL = false, ExpandNA = false;
+    Boolean ExpandEE = false, ExpandCE = false, ExpandTE = false, ExpandEL = false, ExpandNA = false, busy = false;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static final String[] PERMISSIONS_STORAGE;
 
-    public void Menu(View view){
+    static {
+        PERMISSIONS_STORAGE = new String[]{
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void Menu(View view) {
         PopupMenu popup = new PopupMenu(CourseStructure.this, view);
         popup.getMenuInflater().inflate(R.menu.course_structure_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
-            Toast.makeText(CourseStructure.this,"You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+            if (item.getTitle().toString().toLowerCase().contains("download")) {
+                openCustomTab();
+            } else if (item.getTitle().toString().toLowerCase().contains("upload")) {
+                if (!busy) {
+                    if (verifyStoragePermissions(this)) {
+                        Intent intent = new Intent();
+                        intent.setType("application/pdf");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        String[] mimetypes = {"application/pdf"};
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+                        startActivityForResult(Intent.createChooser(intent, "Choose Pdf"), 1);
+                    }
+                } else {
+                    Toast.makeText(this, "loading", Toast.LENGTH_SHORT).show();
+                }
+            } else if (item.getTitle().toString().toLowerCase().contains("help")) {
+                Toast.makeText(context, "Help", Toast.LENGTH_SHORT).show();
+            }
             return true;
         });
         popup.show();
@@ -120,6 +176,7 @@ public class CourseStructure extends AppCompatActivity {
         InflateRec(RecNA, "na");
 
         CourseStructureList = findViewById(R.id.CourseStructureList);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void InflateRec(RecyclerView recyclerView, String Major) {
@@ -135,11 +192,11 @@ public class CourseStructure extends AppCompatActivity {
                         if (child.getKey().toLowerCase().contains(Major)) {
                             int trim = getTrim(child.getKey().toLowerCase());
                             if (trim == 1) {
-                                ChildTrim1.add(new Child(child.getKey(), courseStructure));
+                                ChildTrim1.add(new Child(child.getKey().substring(0,child.getKey().length()-1), courseStructure));
                             } else if (trim == 2) {
-                                ChildTrim2.add(new Child(child.getKey(), courseStructure));
+                                ChildTrim2.add(new Child(child.getKey().substring(0,child.getKey().length()-1), courseStructure));
                             } else if (trim == 3) {
-                                ChildTrim3.add(new Child(child.getKey(), courseStructure));
+                                ChildTrim3.add(new Child(child.getKey().substring(0,child.getKey().length()-1), courseStructure));
                             }
                         }
                     }
@@ -186,11 +243,11 @@ public class CourseStructure extends AppCompatActivity {
                         displayCourses.add(new DisplayCourse(getTitle(trimester.getKey()), 0));
                         for (DataSnapshot subject : trimester.getChildren()) {
                             if (subject.child("Elective").exists() && subject.child("PreRequisite").exists() && subject.child("SubjectHours").exists() && subject.child("SubjectName").exists()) {
-                                displayCourses.add(new DisplayCourse("A",subject.getKey(),subject.child("SubjectName").getValue().toString(),subject.child("SubjectHours").getValue().toString(),subject.child("PreRequisite").getValue().toString()));
+                                displayCourses.add(new DisplayCourse("A", subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString(), Objects.requireNonNull(subject.child("PreRequisite").getValue()).toString()));
                             }
                         }
                         if (trimester.child("TotalHours").exists()) {
-                            displayCourses.add(new DisplayCourse(trimester.child("TotalHours").getValue().toString()));
+                            displayCourses.add(new DisplayCourse(Objects.requireNonNull(trimester.child("TotalHours").getValue()).toString()));
                         }
                     }
                     displayCourses.add(new DisplayCourse());
@@ -226,7 +283,7 @@ public class CourseStructure extends AppCompatActivity {
             return false;
         }
         try {
-            double d = Double.parseDouble(strNum);
+            Double.parseDouble(strNum);
         } catch (NumberFormatException nfe) {
             return false;
         }
@@ -317,6 +374,213 @@ public class CourseStructure extends AppCompatActivity {
                 r.getDisplayMetrics()
         );
         return (int) px;
+    }
+
+    void openCustomTab() {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+
+        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        builder.addDefaultShareMenuItem();
+        builder.addDefaultShareMenuItem();
+        builder.setShowTitle(true);
+        builder.setStartAnimations(this, R.anim.load_up_anim, R.anim.stable);
+        builder.setExitAnimations(this, R.anim.load_down_anim, R.anim.stable);
+
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse("http://foe.mmu.edu.my/v3/main/undergrad/previous_structure.html"));
+    }
+
+    public boolean verifyStoragePermissions(Activity activity) {
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+            return false;
+        }
+        return true;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+
+                progressBar.setVisibility(View.VISIBLE);
+                busy = true;
+                path = FileUtils.getPath(context, data.getData());
+                FileName = "";
+                Uri uri = data.getData();
+
+                String filename;
+
+                Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+                if (cursor == null) {
+                    filename = uri.getPath();
+                } else {
+                    cursor.moveToFirst();
+                    int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                    filename = cursor.getString(idx);
+                    cursor.close();
+                }
+
+                String[] arr = filename.split("[.]");
+                if (arr.length > 0) {
+                    FileName = arr[0];
+                }
+                Toast.makeText(getApplicationContext(), "It will take a minute to scan " + FileName + " please be patient.", Toast.LENGTH_LONG).show();
+
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try (PDDocument document = PDDocument.load(new File(path))) {
+                            for (PDPage page : document.getDocumentCatalog().getPages()) {
+                                PdfBoxFinder boxFinder = new PdfBoxFinder(page);
+                                boxFinder.processPage(page);
+
+                                PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
+                                for (Map.Entry<String, Rectangle2D> entry : boxFinder.getRegions().entrySet()) {
+                                    stripperByArea.addRegion(entry.getKey(), new RectF(fillBounds(entry.getValue())));
+                                }
+
+                                stripperByArea.extractRegions(page);
+                                List<String> names = stripperByArea.getRegions();
+                                Collections.sort(names, (s1, s2) -> {
+                                    int s1int = ((int) s1.charAt(0)) * 100 + Integer.parseInt(s1.substring(1));
+                                    int s2int = ((int) s2.charAt(0)) * 100 + Integer.parseInt(s2.substring(1));
+                                    return s1int - s2int;
+                                });
+                                String codeIndex = "", SubjectNameIndex = "", PreIndex = "";
+                                boolean elective = false;
+                                int i = 0;
+                                for (String name : names) {
+                                    if (stripperByArea.getTextForRegion(name).toLowerCase().contains("code") && codeIndex.isEmpty()) {
+                                        codeIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("subject") && SubjectNameIndex.isEmpty()) {
+                                        SubjectNameIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("requisite") && PreIndex.isEmpty()) {
+                                        PreIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("total")) {
+                                        if (!codeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !PreIndex.isEmpty()) {
+                                            for (int s = 1; s <= 12; s++) {
+                                                FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child("" + s).child("TotalHours").setValue(stripperByArea.getTextForRegion(name.charAt(0) + getPos(SubjectNameIndex, s)).replaceAll("\n", ""));
+                                            }
+                                            FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("TotalHours").setValue(stripperByArea.getTextForRegion(name.charAt(0) + PreIndex).replaceAll("\n", ""));
+                                        }
+                                        break;
+                                    }
+                                    if (!codeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !PreIndex.isEmpty()) {
+                                        if (elective && name.substring(1).compareTo(codeIndex) == 0 && stripperByArea.getTextForRegion(name).replaceAll("\n", "").isEmpty()) {
+                                            elective = false;
+                                        }
+                                        if (stripperByArea.getTextForRegion(name).toLowerCase().contains("elective") && name.contains(SubjectNameIndex)) {
+                                            elective = true;
+                                        }
+                                        if (checkHours(SubjectNameIndex, stripperByArea.getTextForRegion(name).replaceAll("\n", ""), name.substring(1), PreIndex)) {
+                                            String SubjectCode = stripperByArea.getTextForRegion(name.charAt(0) + codeIndex).replaceAll("\n", "").replaceAll("/", " ");
+
+                                            Pattern p = Pattern.compile("([a-zA-Z]{3}[0-9]{4})");
+                                            Matcher n = p.matcher(SubjectCode);
+                                            ArrayList<String> codes = new ArrayList<>();
+                                            while (n.find()) {
+                                                codes.add(n.group(1)); // Prints 123456
+                                            }
+
+                                            String SubjectName = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
+                                            String SubjectHours = stripperByArea.getTextForRegion(name).replaceAll("\n", "");
+                                            String PreRequisite = stripperByArea.getTextForRegion(name.charAt(0) + PreIndex).replaceAll("\n", "");
+                                            String trimester = getTrimester(name.substring(1), SubjectNameIndex);
+                                            if (!SubjectName.toLowerCase().contains("total")) {
+                                                if (!SubjectCode.isEmpty()) {
+                                                    if (codes.size() > 1) {
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0).substring(0, 3)).child("SubjectName").setValue(SubjectName);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0).substring(0, 3)).child("SubjectHours").setValue(SubjectHours);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0).substring(0, 3)).child("Elective").setValue(elective);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0).substring(0, 3)).child("PreRequisite").setValue(PreRequisite);
+                                                    } else if (codes.size() > 0) {
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0)).child("SubjectName").setValue(SubjectName);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0)).child("SubjectHours").setValue(SubjectHours);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0)).child("Elective").setValue(elective);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(codes.get(0)).child("PreRequisite").setValue(PreRequisite);
+                                                    } else {
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("SubjectName").setValue(SubjectName);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("SubjectHours").setValue(SubjectHours);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("Elective").setValue(elective);
+                                                        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("PreRequisite").setValue(PreRequisite);
+                                                    }
+                                                    for (String code : codes) {
+                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("SubjectName").setValue(SubjectName);
+                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("SubjectHours").setValue(SubjectHours);
+                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("Elective").child(FileName).setValue(elective);
+                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("PreRequisite").child(FileName).setValue(PreRequisite);
+                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("Major").setValue(FileName.substring(0, 2));
+                                                    }
+                                                } else {
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectName").setValue(SubjectName);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectHours").setValue(SubjectHours);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("Elective").setValue(elective);
+                                                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("PreRequisite").setValue(PreRequisite);
+                                                    i++;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            progressBar.post(() -> {
+                                progressBar.setVisibility(View.INVISIBLE);
+                                busy = false;
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.start();
+            } else {
+                Toast.makeText(getApplicationContext(), "Please select a file.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Your device is too old to do the task", Toast.LENGTH_SHORT).show();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public RectF fillBounds(Rectangle2D rect) {
+        RectF bounds = new RectF();
+        bounds.left = (float) rect.getMinX();
+        bounds.right = (float) rect.getMaxX();
+        bounds.top = (float) rect.getMinY();
+        bounds.bottom = (float) rect.getMaxY();
+        return bounds;
+    }
+
+    public String getPos(String subIn, int trim) {
+        try {
+            return Integer.toString(Integer.parseInt(subIn) + trim);
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
+
+    public boolean checkHours(String firstIndex, String hours, String hoursIndex, String secondIndex) {
+        try {
+            Integer.parseInt(hours.trim());
+            return (Integer.parseInt(firstIndex.trim()) < Integer.parseInt(hoursIndex.trim()) && Integer.parseInt(hoursIndex.trim()) < Integer.parseInt(secondIndex.trim()));
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    public String getTrimester(String nameIndex, String hoursIndex) {
+        try {
+            return Integer.toString(Integer.parseInt(nameIndex) - Integer.parseInt(hoursIndex));
+        } catch (Exception ignored) {
+            return "";
+        }
     }
 
     @Override

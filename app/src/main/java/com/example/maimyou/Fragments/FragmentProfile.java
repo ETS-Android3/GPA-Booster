@@ -44,12 +44,14 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class FragmentProfile extends Fragment {
+    //vars
     String id = "", Name = "", StudentId = "";
     int y = -1;
     Context context;
     ArrayList<Trimester> trimesters;
     boolean buttonOut = false, containerOut = false, UserDataPrinted = false, collapsed = false;
 
+    //views
     ListView gradlistView;
     TextView TotalHours, CGPA, userName, userName2, ID, ID2;
     ImageView profilePictureAdmin, profilePictureAdmin2;
@@ -248,25 +250,25 @@ public class FragmentProfile extends Fragment {
 
     public Trimester getTrim(DataSnapshot dataSnapshot) {
         String semesterName = "", GPA = "", CGPA = "", academicStatus = "", hours = "", totalHours = "", totalPoint = "";
-        if (dataSnapshot.child("semesterName").getValue() != null) {
+        if (dataSnapshot.child("semesterName").exists()) {
             semesterName = dataSnapshot.child("semesterName").getValue().toString();
         }
-        if (dataSnapshot.child("gpa").getValue() != null) {
+        if (dataSnapshot.child("gpa").exists()) {
             GPA = dataSnapshot.child("gpa").getValue().toString();
         }
-        if (dataSnapshot.child("cgpa").getValue() != null) {
+        if (dataSnapshot.child("cgpa").exists()) {
             CGPA = dataSnapshot.child("cgpa").getValue().toString();
         }
-        if (dataSnapshot.child("academicStatus").getValue() != null) {
+        if (dataSnapshot.child("academicStatus").exists()) {
             academicStatus = dataSnapshot.child("academicStatus").getValue().toString();
         }
-        if (dataSnapshot.child("hours").getValue() != null) {
+        if (dataSnapshot.child("hours").exists()) {
             hours = dataSnapshot.child("hours").getValue().toString();
         }
-        if (dataSnapshot.child("totalHours").getValue() != null) {
+        if (dataSnapshot.child("totalHours").exists()) {
             totalHours = dataSnapshot.child("totalHours").getValue().toString();
         }
-        if (dataSnapshot.child("totalPoint").getValue() != null) {
+        if (dataSnapshot.child("totalPoint").exists()) {
             totalPoint = dataSnapshot.child("totalPoint").getValue().toString();
         }
         Trimester trimester = new Trimester(semesterName, GPA, CGPA, academicStatus, hours, totalHours, totalPoint);

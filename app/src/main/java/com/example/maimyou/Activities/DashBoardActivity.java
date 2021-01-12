@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.maimyou.Fragments.FragmentHome;
 import com.example.maimyou.Fragments.FragmentProfile;
+import com.example.maimyou.Fragments.FragmentUploadCourse;
 import com.example.maimyou.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,9 +31,13 @@ public class DashBoardActivity extends AppCompatActivity {
     Context context = this;
     public static BottomNavigationView bottomNav;
 
+    public void setManually(View view){
+
+    }
+
     public void edit(View view){
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new FragmentHome()).commit();
+                new FragmentUploadCourse()).commit();
     }
 
     public void Subjects(View view) {

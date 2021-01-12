@@ -2,11 +2,14 @@ package com.example.maimyou.Activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +17,9 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.Toast;
@@ -27,6 +33,8 @@ import androidx.core.content.ContextCompat;
 
 import com.example.maimyou.Classes.FileUtils;
 import com.example.maimyou.Classes.subjects;
+import com.example.maimyou.Libraries.CustomTabActivityHelper;
+import com.example.maimyou.Libraries.WebviewFallback;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
 import com.google.firebase.database.DataSnapshot;
@@ -52,7 +60,7 @@ public class ScanMarksActivity extends AppCompatActivity {
     ImageButton camsys;
     ArrayList<Trimester> trimesters = new ArrayList<>();
     ArrayList<subjects> subjects = new ArrayList<>();
-
+    public static String EXTRA_URL = "https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes";
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -95,6 +103,25 @@ public class ScanMarksActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_marks);
+
+
+        String url = "https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes";
+        WebView webView = (WebView) findViewById(R.id.webview);
+        webView.setWebViewClient(new WebViewClient());
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        setTitle(url);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        webView.loadUrl(url);
+
+
+//        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder().build();
+//        CustomTabActivityHelper.openCustomTab(
+//                this,// activity
+//                customTabsIntent,
+//                Uri.parse("http://www.google.com"),
+//                new WebviewFallback()
+//        );
 
         scrole = findViewById(R.id.scrole);
         camsys = findViewById(R.id.CamsysButton);
@@ -266,9 +293,9 @@ public class ScanMarksActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (subjects subjects : subjects) {
-                    if(snapshot.child(subjects.getCode()).exists()){
+                    if (snapshot.child(subjects.getCode()).exists()) {
                         FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(loadData("Id")).setValue(subjects.getGrade());
-                    }else{
+                    } else {
 
                     }
 
@@ -298,21 +325,21 @@ public class ScanMarksActivity extends AppCompatActivity {
 //                android.R.anim.slide_out_right);
         builder.addDefaultShareMenuItem();
 //
-//        builder.setCloseButtonIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_share));
-//
-//        CustomTabsIntent anotherCustomTab = new CustomTabsIntent.Builder().build();
-//
-//        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_share);
-////        builder.setCloseButtonIcon(icon);
-//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_file_upload);
-//
-//        int requestCode = 100;
-//        Intent intent = anotherCustomTab.intent;
-//        intent.setData(Uri.parse("http://www.journaldev.com/author/anupam"));
-//
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        builder.setActionButton(bitmap, "Android", pendingIntent, true);
+        builder.setCloseButtonIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_share));
+
+        CustomTabsIntent anotherCustomTab = new CustomTabsIntent.Builder().build();
+
+//        builder.setCloseButtonIcon(icon);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_baseline_help_24);
+
+        int requestCode = 100;
+        Intent intent = anotherCustomTab.intent;
+        intent.setData(Uri.parse("http://www.journaldev.com/author/anupam"));
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        builder.setActionButton(bitmap, "Android", pendingIntent, true);
+
         builder.setShowTitle(true);
         builder.setStartAnimations(this, R.anim.load_up_anim, R.anim.stable);
         builder.setExitAnimations(this, R.anim.load_down_anim, R.anim.stable);
