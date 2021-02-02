@@ -2,8 +2,6 @@ package com.example.maimyou.RecycleViewMaterials;
 
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.maimyou.R;
 
 public class ChildViewHolder extends com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder {
@@ -13,12 +11,20 @@ public class ChildViewHolder extends com.thoughtbot.expandablerecyclerview.viewh
     public ChildViewHolder(View itemView) {
         super(itemView);
         mTextView = itemView.findViewById(R.id.ChildText);
-        mTextView.setOnClickListener(v -> viewCourse(mTextView.getText().toString()));
+        mTextView.setOnClickListener(v ->
+        {
+
+            viewCourse(mTextView.getText().toString(),mTextView);
+//            mTextView.setBackgroundColor(Color.parseColor("#c1c1c0"));
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                itemView.setBackgroundColor(itemView.getContext().getColor(R.color.colorRipple));
+//            }
+        });
     }
 
-    public void viewCourse(String str){
+    public void viewCourse(String str,View view){
         if(child!=null){
-            child.viewCourse(str);
+            child.viewCourse(str,view);
         }
     }
 

@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
@@ -40,6 +41,7 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.maimyou.Adapters.AdapterDisplayCourse;
@@ -77,6 +79,9 @@ public class CourseStructure extends AppCompatActivity {
     ImageView ArrEE, ArrCE, ArrTE, ArrEL, ArrNA;
     ListView CourseStructureList;
     ProgressBar progressBar;
+    LinearLayout title;
+    TextView Title;
+    View temp;
 
     //Vars
     Context context = this;
@@ -177,26 +182,29 @@ public class CourseStructure extends AppCompatActivity {
 
         CourseStructureList = findViewById(R.id.CourseStructureList);
         progressBar = findViewById(R.id.progressBar);
+        title = findViewById(R.id.title);
+        Title = findViewById(R.id.Title);
     }
 
     public void InflateRec(RecyclerView recyclerView, String Major) {
-        ArrayList<Child> ChildTrim1 = new ArrayList<>();
-        ArrayList<Child> ChildTrim2 = new ArrayList<>();
-        ArrayList<Child> ChildTrim3 = new ArrayList<>();
-        ArrayList<Parent> parent = new ArrayList<>();
-        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                ArrayList<Child> ChildTrim1 = new ArrayList<>();
+                ArrayList<Child> ChildTrim2 = new ArrayList<>();
+                ArrayList<Child> ChildTrim3 = new ArrayList<>();
+                ArrayList<Parent> parent = new ArrayList<>();
                 for (DataSnapshot child : snapshot.getChildren()) {
                     if (child.getKey() != null) {
                         if (child.getKey().toLowerCase().contains(Major)) {
                             int trim = getTrim(child.getKey().toLowerCase());
                             if (trim == 1) {
-                                ChildTrim1.add(new Child(child.getKey().substring(0,child.getKey().length()-1), courseStructure));
+                                ChildTrim1.add(new Child(child.getKey(), courseStructure));
                             } else if (trim == 2) {
-                                ChildTrim2.add(new Child(child.getKey().substring(0,child.getKey().length()-1), courseStructure));
+                                ChildTrim2.add(new Child(child.getKey(), courseStructure));
                             } else if (trim == 3) {
-                                ChildTrim3.add(new Child(child.getKey().substring(0,child.getKey().length()-1), courseStructure));
+                                ChildTrim3.add(new Child(child.getKey(), courseStructure));
                             }
                         }
                     }
@@ -230,17 +238,30 @@ public class CourseStructure extends AppCompatActivity {
         } else if (Course.contains("feb") || Course.contains("mar")) {
             return 3;
         }
-        return 0;
+        return 1;
     }
 
-    public void viewCourse(String str) {
+    public void viewCourse(String str, View view) {
+        if (temp != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                temp.setBackgroundColor(Color.TRANSPARENT);
+            }
+        }
+        temp = view;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            view.setBackgroundColor(view.getContext().getColor(R.color.colorRipple));
+        }
+        Title.setText(str);
         FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(str).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.child("Trimesters").exists()) {
+                    title.setVisibility(View.VISIBLE);
                     ArrayList<DisplayCourse> displayCourses = new ArrayList<>();
+                    int firstTrim = getTrim(str);
                     for (DataSnapshot trimester : snapshot.child("Trimesters").getChildren()) {
-                        displayCourses.add(new DisplayCourse(getTitle(trimester.getKey()), 0));
+                        displayCourses.add(new DisplayCourse(getTitle(firstTrim), 0));
+                        firstTrim++;
                         for (DataSnapshot subject : trimester.getChildren()) {
                             if (subject.child("Elective").exists() && subject.child("PreRequisite").exists() && subject.child("SubjectHours").exists() && subject.child("SubjectName").exists()) {
                                 displayCourses.add(new DisplayCourse("A", subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString(), Objects.requireNonNull(subject.child("PreRequisite").getValue()).toString()));
@@ -265,17 +286,11 @@ public class CourseStructure extends AppCompatActivity {
         });
     }
 
-    public String getTitle(String trim) {
-        if (isNumeric(trim)) {
-            int trimInt = Integer.parseInt(trim);
-            trimInt++;
-
-            while (trimInt > 3) {
-                trimInt -= 3;
-            }
-            return "Trimester " + trimInt;
+    public String getTitle(int trimInt) {
+        while (trimInt > 3) {
+            trimInt -= 3;
         }
-        return "Trimester ?";
+        return "Trimester " + trimInt;
     }
 
     public boolean isNumeric(String strNum) {
@@ -432,7 +447,7 @@ public class CourseStructure extends AppCompatActivity {
                     FileName = arr[0];
                 }
                 Toast.makeText(getApplicationContext(), "It will take a minute to scan " + FileName + " please be patient.", Toast.LENGTH_LONG).show();
-
+                FileName = FileName.substring(0, FileName.length() - 1);
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
@@ -511,13 +526,13 @@ public class CourseStructure extends AppCompatActivity {
                                                         FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("Elective").setValue(elective);
                                                         FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child(SubjectCode).child("PreRequisite").setValue(PreRequisite);
                                                     }
-                                                    for (String code : codes) {
-                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("SubjectName").setValue(SubjectName);
-                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("SubjectHours").setValue(SubjectHours);
-                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("Elective").child(FileName).setValue(elective);
-                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("PreRequisite").child(FileName).setValue(PreRequisite);
-                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("Major").setValue(FileName.substring(0, 2));
-                                                    }
+//                                                    for (String code : codes) {
+//                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("SubjectName").setValue(SubjectName);
+//                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("SubjectHours").setValue(SubjectHours);
+//                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("Elective").child(FileName).setValue(elective);
+//                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("PreRequisite").child(FileName).setValue(PreRequisite);
+//                                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(code).child("Major").setValue(FileName.substring(0, 2));
+//                                                    }
                                                 } else {
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectName").setValue(SubjectName);
                                                     FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(FileName).child("Trimesters").child(trimester).child("" + i).child("SubjectHours").setValue(SubjectHours);

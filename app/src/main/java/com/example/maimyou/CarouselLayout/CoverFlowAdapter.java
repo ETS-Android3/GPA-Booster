@@ -76,7 +76,6 @@ public class CoverFlowAdapter extends BaseAdapter {
         };
     }
 
-
     private static class ViewHolder {
         private TextView gameName;
         private ImageView gameImage;

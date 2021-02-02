@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
+    android:background="@color/backGroundColour"
     tools:targetApi="lollipop"
     tools:ignore="HardcodedText"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -76,7 +76,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Download result"
+                            android:text="List of Syllabus Offered\n(updated Sept. 2019)"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"
@@ -117,7 +117,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Download result"
+                            android:text="Programme Structure"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"

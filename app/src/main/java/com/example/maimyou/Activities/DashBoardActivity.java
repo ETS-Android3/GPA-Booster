@@ -1,11 +1,13 @@
 package com.example.maimyou.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -13,9 +15,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.maimyou.Fragments.FragmentEdit;
 import com.example.maimyou.Fragments.FragmentHome;
 import com.example.maimyou.Fragments.FragmentProfile;
-import com.example.maimyou.Fragments.FragmentUploadCourse;
+import com.example.maimyou.Fragments.FragmentCamsys;
 import com.example.maimyou.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,16 +31,26 @@ import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
 public class DashBoardActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     FragmentProfile fragmentProfile;
+    DashBoardActivity dashBoardActivity=this;
     Context context = this;
     public static BottomNavigationView bottomNav;
+
+    public void FragEdit(View view){
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new FragmentEdit()).commit();
+    }
 
     public void setManually(View view){
 
     }
 
+    public void empty(View view){
+
+    }
+
     public void edit(View view){
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new FragmentUploadCourse()).commit();
+                new FragmentCamsys(dashBoardActivity)).commit();
     }
 
     public void Subjects(View view) {
@@ -78,13 +91,13 @@ public class DashBoardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        int height = displayMetrics.heightPixels;
+//        int width = displayMetrics.widthPixels;
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
-        fragmentProfile = new FragmentProfile(loadData("Id"),context);
+        fragmentProfile = new FragmentProfile(loadData("Id"),context,dashBoardActivity);
 
         if (savedInstanceState == null) {
             if (loadData("Selection").compareTo("0") == 0) {
@@ -103,8 +116,9 @@ public class DashBoardActivity extends AppCompatActivity {
         }
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener navListener =
+    private final BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @SuppressLint("NonConstantResourceId")
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
@@ -137,7 +151,11 @@ public class DashBoardActivity extends AppCompatActivity {
         editor.putString(name, data);
         editor.apply();
     }
-
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
+    }
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
@@ -148,12 +166,6 @@ public class DashBoardActivity extends AppCompatActivity {
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Please click BACK again to exit", LENGTH_SHORT).show();
 
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, 2000);
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 }

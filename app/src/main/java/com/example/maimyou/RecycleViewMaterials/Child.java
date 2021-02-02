@@ -2,15 +2,17 @@ package com.example.maimyou.RecycleViewMaterials;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.view.View;
+
 import com.example.maimyou.Activities.CourseStructure;
 
 public class Child implements Parcelable {
     public final String Title;
     CourseStructure courseStructure;
 
-    public void viewCourse(String str){
+    public void viewCourse(String str, View view){
         if(courseStructure!=null){
-            courseStructure.viewCourse(str.trim());
+            courseStructure.viewCourse(str.trim(),view);
         }
     }
 

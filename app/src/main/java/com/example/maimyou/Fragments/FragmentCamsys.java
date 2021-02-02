@@ -2,24 +2,19 @@ package com.example.maimyou.Fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -31,7 +26,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -54,9 +49,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import it.moondroid.coverflow.components.ui.containers.FeatureCoverFlow;
 
@@ -64,14 +56,14 @@ import static android.content.Context.DOWNLOAD_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
 
-public class FragmentUploadCourse extends Fragment {
+public class FragmentCamsys extends Fragment {
     private FeatureCoverFlow coverFlow;
     private ArrayList<Game> games;
     int currentPage = 0, tipHeight = 0, tipWidth = 0;
     boolean tipOpened = false;
     DashBoardActivity dashBoardActivity;
 
-    public void setDashBoardActivity(DashBoardActivity dashBoardActivity) {
+    public FragmentCamsys(DashBoardActivity dashBoardActivity) {
         this.dashBoardActivity = dashBoardActivity;
     }
 
@@ -79,6 +71,7 @@ public class FragmentUploadCourse extends Fragment {
     Button back, next;
     TextView pageNumber;
     CardView cardView;
+    FrameLayout arrow;
     ImageButton closeTip, lightBulb;
     RelativeLayout tipContainer;
     CheckBox checkBox;
@@ -86,7 +79,7 @@ public class FragmentUploadCourse extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.upload_grades_fagment, container, false);
+        return inflater.inflate(R.layout.fagment_camsys, container, false);
     }
 
     @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
@@ -104,11 +97,9 @@ public class FragmentUploadCourse extends Fragment {
             next = getView().findViewById(R.id.next);
             pageNumber = getView().findViewById(R.id.pageNumber);
             cardView = getView().findViewById(R.id.cardView);
-//            cardView.post(() -> {
-//                tipHeight = cardView.getHeight();
-//                tipWidth = cardView.getWidth();
-//
-//            });
+            arrow=getView().findViewById(R.id.arrow);
+            fadeOutNoDelay(arrow);
+
             setWebView(getView().findViewById(R.id.webView));
 
             coverFlow = getView().findViewById(R.id.coverflow);
@@ -123,14 +114,15 @@ public class FragmentUploadCourse extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (!snapshot.child("DoNotShowUploadTip").exists()) {
-
                         final Handler handler = new Handler(Looper.getMainLooper());
                         handler.postDelayed(() -> {
-                            OpenTip(400);
-                            TypedValue outValue = new TypedValue();
-                            dashBoardActivity.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
-                            lightBulb.setBackgroundResource(outValue.resourceId);
-                        }, 5000);
+                            OpenTip(200);
+                            fadeIn(arrow,200);
+                            handler.postDelayed(() -> {
+                                fadeOut(arrow,400);
+                            }, 2000);
+
+                        }, 1000);
 
                     } else {
                         checkBox.setChecked(true);
@@ -143,18 +135,15 @@ public class FragmentUploadCourse extends Fragment {
                 }
             });
 
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("DoNotShowUploadTip").setValue("1");
-                    } else {
-                        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("DoNotShowUploadTip").removeValue();
-                    }
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("DoNotShowUploadTip").setValue("1");
+                } else {
+                    FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("DoNotShowUploadTip").removeValue();
                 }
             });
             tipContainer.setOnTouchListener((v, event) -> {
-                CloseTip(400);
+                CloseTip(200);
                 return false;
             });
             back.setOnClickListener(v -> {
@@ -173,8 +162,8 @@ public class FragmentUploadCourse extends Fragment {
                 pageNumber.setText((currentPage + 1) + "/" + games.size());
                 coverFlow.scrollToPosition(currentPage);
             });
-            closeTip.setOnClickListener(v -> CloseTip(400));
-            lightBulb.setOnClickListener(v -> OpenCloseTip(400));
+            closeTip.setOnClickListener(v -> CloseTip(200));
+            lightBulb.setOnClickListener(v -> OpenCloseTip(200));
         }
     }
 

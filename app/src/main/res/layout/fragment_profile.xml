@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent">
+    android:background="@color/backGroundColour">
 
 
     <com.google.android.material.appbar.AppBarLayout
@@ -21,7 +21,6 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="@android:color/transparent">
-
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -76,8 +75,8 @@
                         android:gravity="center"
                         android:paddingTop="15dp"
                         android:text="Your name"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="17dp"
+                        android:textColor="@color/backGroundColour"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -88,8 +87,8 @@
                         android:gravity="center"
                         android:paddingTop="5dp"
                         android:text="Your ID"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="14dp" />
+                        android:textColor="@color/backGroundColour"
+                        android:textSize="14sp" />
                 </LinearLayout>
 
             </RelativeLayout>
@@ -146,15 +145,17 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_marginBottom="10dp"
-            app:cardBackgroundColor="@color/colorPrimaryDark"
+            app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="20dp"
-            app:cardElevation="3dp">
+            app:cardElevation="5dp">
 
 
             <LinearLayout
                 android:layout_width="200dp"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:background="@drawable/ripple"
+                android:baselineAligned="false">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -313,6 +314,7 @@
                 android:layout_margin="10dp"
                 android:padding="5dp"
                 android:alpha="0.6"
+                android:onClick="FragEdit"
                 android:scaleType="fitXY"
                 android:background="@drawable/ripple_effect_oval_no_background"
                 android:src="@drawable/ic_edit_white"/>

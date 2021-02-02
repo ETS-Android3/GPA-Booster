@@ -9,12 +9,9 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -22,6 +19,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +27,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
+import com.example.maimyou.Activities.DashBoardActivity;
 import com.example.maimyou.Adapters.AdapterTrimester;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
@@ -49,6 +48,7 @@ public class FragmentProfile extends Fragment {
     int y = -1;
     Context context;
     ArrayList<Trimester> trimesters;
+    DashBoardActivity dashBoardActivity;
     boolean buttonOut = false, containerOut = false, UserDataPrinted = false, collapsed = false;
 
     //views
@@ -63,9 +63,10 @@ public class FragmentProfile extends Fragment {
     CardView cardView;
     AppBarLayout appBar;
 
-    public FragmentProfile(String id, Context context) {
+    public FragmentProfile(String id, Context context, DashBoardActivity dashBoardActivity) {
         this.id = id;
         this.context = context;
+        this.dashBoardActivity = dashBoardActivity;
         downLoadData();
     }
 
@@ -73,7 +74,7 @@ public class FragmentProfile extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Fresco.initialize(context);
-        return inflater.inflate(R.layout.profile_fragment, container, false);
+        return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
     @Override
@@ -166,6 +167,11 @@ public class FragmentProfile extends Fragment {
     }
 
     public void downLoadData() {
+        if(!dashBoardActivity.isConnected()){
+            Toast.makeText(context,"No internet connection!",Toast.LENGTH_LONG).show();
+            return;
+        }
+
         FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -196,10 +202,11 @@ public class FragmentProfile extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
+
+
 
     public void printUserData() {
         if (!UserDataPrinted && getView() != null) {
