@@ -6,4 +6,6 @@
         android:title="Download Course Structure"/>
     <item
         android:title="Upload Course Structure"/>
+    <item
+        android:title="Upload Syllabus"/>
 </menu>

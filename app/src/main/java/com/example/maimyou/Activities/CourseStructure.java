@@ -105,7 +105,7 @@ public class CourseStructure extends AppCompatActivity {
         popup.setOnMenuItemClickListener(item -> {
             if (item.getTitle().toString().toLowerCase().contains("download")) {
                 openCustomTab();
-            } else if (item.getTitle().toString().toLowerCase().contains("upload")) {
+            } else if (item.getTitle().toString().toLowerCase().contains("upload course structure")) {
                 if (!busy) {
                     if (verifyStoragePermissions(this)) {
                         Intent intent = new Intent();
@@ -114,6 +114,19 @@ public class CourseStructure extends AppCompatActivity {
                         String[] mimetypes = {"application/pdf"};
                         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
                         startActivityForResult(Intent.createChooser(intent, "Choose Pdf"), 1);
+                    }
+                } else {
+                    Toast.makeText(this, "loading", Toast.LENGTH_SHORT).show();
+                }
+            } else if (item.getTitle().toString().toLowerCase().contains("upload syllabus")) {
+                if (!busy) {
+                    if (verifyStoragePermissions(this)) {
+                        Intent intent = new Intent();
+                        intent.setType("application/pdf");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        String[] mimetypes = {"application/pdf"};
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+                        startActivityForResult(Intent.createChooser(intent, "Choose Pdf"), 2);
                     }
                 } else {
                     Toast.makeText(this, "loading", Toast.LENGTH_SHORT).show();
@@ -421,6 +434,7 @@ public class CourseStructure extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
 
@@ -446,7 +460,7 @@ public class CourseStructure extends AppCompatActivity {
                 if (arr.length > 0) {
                     FileName = arr[0];
                 }
-                Toast.makeText(getApplicationContext(), "It will take a minute to scan " + FileName + " please be patient.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "It will take a while to scan " + FileName + ".\n please be patient!", Toast.LENGTH_LONG).show();
                 FileName = FileName.substring(0, FileName.length() - 1);
                 Thread thread = new Thread() {
                     @Override
@@ -546,7 +560,69 @@ public class CourseStructure extends AppCompatActivity {
                                 }
                             }
                             progressBar.post(() -> {
-                                progressBar.setVisibility(View.INVISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                                busy = false;
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.start();
+            } else if (requestCode == 2 && resultCode == RESULT_OK && data != null) {
+                progressBar.setVisibility(View.VISIBLE);
+                busy = true;
+                path = FileUtils.getPath(context, data.getData());
+//                Uri uri = data.getData();
+                Toast.makeText(getApplicationContext(), "It will take a minute to scan the syllabus.\n please be patient!", Toast.LENGTH_LONG).show();
+
+
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try (PDDocument document = PDDocument.load(new File(path))) {
+                            String CodeIndex = "", SubjectNameIndex = "", HoursIndex = "", Category = "";
+                            for (PDPage page : document.getDocumentCatalog().getPages()) {
+
+                                PdfBoxFinder boxFinder = new PdfBoxFinder(page);
+                                boxFinder.processPage(page);
+
+                                PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
+                                for (Map.Entry<String, Rectangle2D> entry : boxFinder.getRegions().entrySet()) {
+                                    stripperByArea.addRegion(entry.getKey(), new RectF(fillBounds(entry.getValue())));
+                                }
+
+                                stripperByArea.extractRegions(page);
+                                List<String> names = stripperByArea.getRegions();
+                                Collections.sort(names, (s1, s2) -> {
+                                    int s1int = ((int) s1.charAt(0)) * 100 + Integer.parseInt(s1.substring(1));
+                                    int s2int = ((int) s2.charAt(0)) * 100 + Integer.parseInt(s2.substring(1));
+                                    return s1int - s2int;
+                                });
+
+                                for (String name : names) {
+                                    if (!CodeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !HoursIndex.isEmpty() && !Category.isEmpty() && !stripperByArea.getTextForRegion(name).isEmpty()) {
+                                        String Code = stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex);
+                                        String Name = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex);
+                                        String Hour = stripperByArea.getTextForRegion(name.charAt(0) + HoursIndex);
+
+
+                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectName").setValue(Name);
+                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectHours").setValue(Hour);
+                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("Category").setValue(Category);
+                                    } else if (stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex).isEmpty() && !stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).isEmpty() && stripperByArea.getTextForRegion(name.charAt(0) + HoursIndex).isEmpty()) {
+                                        Category = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("code") && CodeIndex.isEmpty()) {
+                                        CodeIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("subject") && SubjectNameIndex.isEmpty()) {
+                                        SubjectNameIndex = name.substring(1);
+                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("credit hour") && HoursIndex.isEmpty()) {
+                                        HoursIndex = name.substring(1);
+                                    }
+                                }
+                            }
+                            progressBar.post(() -> {
+                                progressBar.setVisibility(View.GONE);
                                 busy = false;
                             });
                         } catch (IOException e) {
@@ -561,7 +637,6 @@ public class CourseStructure extends AppCompatActivity {
         } else {
             Toast.makeText(getApplicationContext(), "Your device is too old to do the task", Toast.LENGTH_SHORT).show();
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public RectF fillBounds(Rectangle2D rect) {
