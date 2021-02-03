@@ -88,7 +88,8 @@
                                     <Space
                                         android:layout_width="0dp"
                                         android:layout_height="match_parent"
-                                        android:layout_weight="4" />
+                                        android:layout_weight="4"
+                                        tools:ignore="NestedWeights" />
 
                                     <de.hdodenhof.circleimageview.CircleImageView
                                         android:layout_width="0dp"
@@ -408,7 +409,8 @@
 
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <androidx.cardview.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -419,7 +421,6 @@
                 card_view:cardCornerRadius="4dp"
                 card_view:cardElevation="5dp">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -429,7 +430,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="17dp"
-                        android:onClick="currentLocation"
                         android:orientation="horizontal">
 
                         <TextView
@@ -505,7 +505,6 @@
                 android:layout_marginBottom="10dp"
                 card_view:cardBackgroundColor="#FAFAFA"
                 card_view:cardCornerRadius="4dp"
-                android:visibility="gone"
                 card_view:cardElevation="5dp">
 
                 <LinearLayout
@@ -517,7 +516,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="17dp"
-                        android:onClick="currentLocation"
                         android:orientation="horizontal">
 
                         <TextView
@@ -548,10 +546,9 @@
             </androidx.cardview.widget.CardView>
 
             <ListView
-                android:id="@+id/editGradlistView"
+                android:id="@+id/editGradeListView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:divider="@null" />
@@ -629,6 +626,19 @@
 
     </RelativeLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:onClick="save"
+        android:src="@drawable/ic_save_black_24dp"
+        app:fabCustomSize="50dp"
+        tools:ignore="RtlHardcoded"
+        tools:targetApi="lollipop" />
 
     <ProgressBar
         android:id="@+id/progressBar"

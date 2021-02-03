@@ -26,7 +26,7 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
      * Holds variables in a View
      */
     private static class ViewHolder {
-        TextView SubjectName, SubjectCode, SubjectRate, SubjectUsers;
+        TextView SubjectName,SubjectCategory, SubjectCode, SubjectRate, SubjectUsers;
         LinearLayout subjectFinished, subjectFinished2;
     }
 
@@ -47,12 +47,13 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         String SubjectName = getItem(position).getSubjectName();
+        String SubjectCategory = getItem(position).getCategory();
         String SubjectCode = getItem(position).getSubjectCode();
         String SubjectRate = getItem(position).getSubjectRate();
         String SubjectUsers = getItem(position).getSubjectUsers();
         boolean isFinished = getItem(position).isFinished();
 
-        SubjectReviews subject = new SubjectReviews(SubjectName, SubjectCode, SubjectRate, SubjectUsers, isFinished);
+        SubjectReviews subject = new SubjectReviews(SubjectName,SubjectCategory, SubjectCode, SubjectRate, SubjectUsers, isFinished);
         //ViewHolder object
         final ViewHolder holder;
 
@@ -61,6 +62,7 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
             convertView = inflater.inflate(mResource, parent, false);
             holder = new ViewHolder();
             holder.SubjectName = convertView.findViewById(R.id.SubjectName);
+            holder.SubjectCategory = convertView.findViewById(R.id.SubjectCategory);
             holder.SubjectCode = convertView.findViewById(R.id.SubjectCode);
             holder.SubjectRate = convertView.findViewById(R.id.SubjectRate);
             holder.SubjectUsers = convertView.findViewById(R.id.SubjectUsers);
@@ -74,6 +76,7 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
 
         holder.SubjectName.setText(subject.getSubjectName());
         holder.SubjectCode.setText(subject.getSubjectCode());
+        holder.SubjectCategory.setText(subject.getCategory());
 
         if (subject.isFinished()) {
             holder.subjectFinished.setVisibility(View.VISIBLE);

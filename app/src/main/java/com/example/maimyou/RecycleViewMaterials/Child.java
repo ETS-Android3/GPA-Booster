@@ -8,17 +8,9 @@ import com.example.maimyou.Activities.CourseStructure;
 
 public class Child implements Parcelable {
     public final String Title;
-    CourseStructure courseStructure;
 
-    public void viewCourse(String str, View view){
-        if(courseStructure!=null){
-            courseStructure.viewCourse(str.trim(),view);
-        }
-    }
-
-    public Child(String title, CourseStructure courseStructure) {
+    public Child(String title) {
         this.Title = title;
-        this.courseStructure = courseStructure;
     }
 
     protected Child(Parcel in) {

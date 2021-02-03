@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.maimyou.Classes.ActionListener;
 import com.example.maimyou.Fragments.FragmentEdit;
 import com.example.maimyou.Fragments.FragmentHome;
 import com.example.maimyou.Fragments.FragmentProfile;
@@ -31,13 +33,23 @@ import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
 public class DashBoardActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     FragmentProfile fragmentProfile;
+    FragmentEdit fragmentEdit;
+    public static String Intake="";
+    public static TextView IntakeView;
+    public static ActionListener actionListener=new ActionListener();
+
+
     DashBoardActivity dashBoardActivity=this;
     Context context = this;
     public static BottomNavigationView bottomNav;
 
     public void FragEdit(View view){
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new FragmentEdit()).commit();
+        if(fragmentEdit.finishedLoading) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    fragmentEdit).commit();
+        }else {
+            Toast.makeText(context,"Loading!",LENGTH_SHORT).show();
+        }
     }
 
     public void setManually(View view){
@@ -98,6 +110,7 @@ public class DashBoardActivity extends AppCompatActivity {
         bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         fragmentProfile = new FragmentProfile(loadData("Id"),context,dashBoardActivity);
+        fragmentEdit = new FragmentEdit(loadData("Id"),context,dashBoardActivity);
 
         if (savedInstanceState == null) {
             if (loadData("Selection").compareTo("0") == 0) {

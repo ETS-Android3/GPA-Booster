@@ -21,12 +21,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.maimyou.Adapters.AdapterDisplayCourse;
+import com.example.maimyou.Classes.ActionListener;
 import com.example.maimyou.Classes.DisplayCourse;
 import com.example.maimyou.Classes.FileUtils;
 import com.example.maimyou.Libraries.PdfBoxFinder;
@@ -71,6 +73,9 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.example.maimyou.Activities.DashBoardActivity.Intake;
+import static com.example.maimyou.Activities.DashBoardActivity.actionListener;
+
 public class CourseStructure extends AppCompatActivity {
 
     //Views
@@ -81,9 +86,9 @@ public class CourseStructure extends AppCompatActivity {
     ProgressBar progressBar;
     LinearLayout title;
     TextView Title;
-    View temp;
+//    View temp;
 
-    //Vars
+    //Vars-
     Context context = this;
     String FileName = "", path = "";
     CourseStructure courseStructure = this;
@@ -193,6 +198,8 @@ public class CourseStructure extends AppCompatActivity {
         RecNA = findViewById(R.id.RecNA);
         InflateRec(RecNA, "na");
 
+        actionListener.setOnActionPerformed(() -> viewCourse(Intake));
+
         CourseStructureList = findViewById(R.id.CourseStructureList);
         progressBar = findViewById(R.id.progressBar);
         title = findViewById(R.id.title);
@@ -213,11 +220,11 @@ public class CourseStructure extends AppCompatActivity {
                         if (child.getKey().toLowerCase().contains(Major)) {
                             int trim = getTrim(child.getKey().toLowerCase());
                             if (trim == 1) {
-                                ChildTrim1.add(new Child(child.getKey(), courseStructure));
+                                ChildTrim1.add(new Child(child.getKey()));
                             } else if (trim == 2) {
-                                ChildTrim2.add(new Child(child.getKey(), courseStructure));
+                                ChildTrim2.add(new Child(child.getKey()));
                             } else if (trim == 3) {
-                                ChildTrim3.add(new Child(child.getKey(), courseStructure));
+                                ChildTrim3.add(new Child(child.getKey()));
                             }
                         }
                     }
@@ -254,16 +261,7 @@ public class CourseStructure extends AppCompatActivity {
         return 1;
     }
 
-    public void viewCourse(String str, View view) {
-        if (temp != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                temp.setBackgroundColor(Color.TRANSPARENT);
-            }
-        }
-        temp = view;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            view.setBackgroundColor(view.getContext().getColor(R.color.colorRipple));
-        }
+    public void viewCourse(String str) {
         Title.setText(str);
         FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(str).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -570,6 +568,7 @@ public class CourseStructure extends AppCompatActivity {
                 };
                 thread.start();
             } else if (requestCode == 2 && resultCode == RESULT_OK && data != null) {
+
                 progressBar.setVisibility(View.VISIBLE);
                 busy = true;
                 path = FileUtils.getPath(context, data.getData());
@@ -582,6 +581,7 @@ public class CourseStructure extends AppCompatActivity {
                     public void run() {
                         try (PDDocument document = PDDocument.load(new File(path))) {
                             String CodeIndex = "", SubjectNameIndex = "", HoursIndex = "", Category = "";
+                            boolean link = false;
                             for (PDPage page : document.getDocumentCatalog().getPages()) {
 
                                 PdfBoxFinder boxFinder = new PdfBoxFinder(page);
@@ -601,23 +601,37 @@ public class CourseStructure extends AppCompatActivity {
                                 });
 
                                 for (String name : names) {
-                                    if (!CodeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !HoursIndex.isEmpty() && !Category.isEmpty() && !stripperByArea.getTextForRegion(name).isEmpty()) {
-                                        String Code = stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex);
-                                        String Name = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex);
-                                        String Hour = stripperByArea.getTextForRegion(name.charAt(0) + HoursIndex);
-
-
-                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectName").setValue(Name);
-                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectHours").setValue(Hour);
-                                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("Category").setValue(Category);
-                                    } else if (stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex).isEmpty() && !stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).isEmpty() && stripperByArea.getTextForRegion(name.charAt(0) + HoursIndex).isEmpty()) {
-                                        Category = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex);
-                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("code") && CodeIndex.isEmpty()) {
-                                        CodeIndex = name.substring(1);
-                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("subject") && SubjectNameIndex.isEmpty()) {
-                                        SubjectNameIndex = name.substring(1);
-                                    } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("credit hour") && HoursIndex.isEmpty()) {
-                                        HoursIndex = name.substring(1);
+                                    if (link) {
+                                        if (name.compareTo(name.charAt(0) + CodeIndex) == 0 && !stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex).replaceAll("\n", "").isEmpty() && !stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "").isEmpty()) {
+                                            String Code = stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex).replaceAll("\n", "");
+                                            String Link = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
+                                            FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectLink").setValue(Link);
+                                        }
+                                    } else {
+                                        if (!CodeIndex.isEmpty() && !SubjectNameIndex.isEmpty() && !HoursIndex.isEmpty() && name.compareTo(name.charAt(0) + CodeIndex) == 0) {
+                                            if (stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).toLowerCase().contains("link")) {
+                                                link = true;
+                                            } else if (stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex).replaceAll("\n", "").isEmpty() && !stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "").isEmpty() && stripperByArea.getTextForRegion(name.charAt(0) + HoursIndex).replaceAll("\n", "").isEmpty()) {
+                                                Category = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
+                                            } else {
+                                                String Code = stripperByArea.getTextForRegion(name.charAt(0) + CodeIndex).replaceAll("\n", "");
+                                                String Name = stripperByArea.getTextForRegion(name.charAt(0) + SubjectNameIndex).replaceAll("\n", "");
+                                                String Hour = stripperByArea.getTextForRegion(name.charAt(0) + HoursIndex).replaceAll("\n", "");
+//                                                System.out.println(Name);
+                                                if (!Code.isEmpty() && !Name.isEmpty() && !Hour.isEmpty() && !Category.isEmpty()) {
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectName").setValue(Name);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("SubjectHours").setValue(Hour);
+                                                    FirebaseDatabase.getInstance().getReference().child("Subjects").child(Code).child("Category").setValue(Category);
+                                                }
+                                            }
+                                        } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("code") && CodeIndex.isEmpty()) {
+                                            CodeIndex = name.substring(1);
+                                        } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("subject") && SubjectNameIndex.isEmpty()) {
+                                            SubjectNameIndex = name.substring(1);
+                                        } else if (stripperByArea.getTextForRegion(name).toLowerCase().contains("credit") && HoursIndex.isEmpty()) {
+                                            HoursIndex = name.substring(1);
+                                        }
+//                                        System.out.println("Category index:  " + Category);
                                     }
                                 }
                             }

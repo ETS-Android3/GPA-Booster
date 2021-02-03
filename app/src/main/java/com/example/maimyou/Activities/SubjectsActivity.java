@@ -69,7 +69,7 @@ public class SubjectsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot child : snapshot.getChildren()) {
-                        subjects.add(new SubjectReviews(child.child("SubjectName").getValue(), child.getKey(), getRatings(), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("Id")).exists()));
+                        subjects.add(new SubjectReviews(child.child("SubjectName").getValue(),child.child("Category").getValue(), child.getKey(), getRatings(), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("Id")).exists()));
                     }
                     SubjectReviewsAdapter adapter = new SubjectReviewsAdapter(context, R.layout.subject_review, subjects);
                     SubjectsList.setAdapter(adapter);

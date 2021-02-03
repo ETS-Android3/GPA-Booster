@@ -44,15 +44,15 @@ import java.util.Objects;
 
 public class FragmentProfile extends Fragment {
     //vars
-    String id = "", Name = "", StudentId = "";
+    String id , Name = "", StudentId = "";
+    ArrayList<Trimester> trimesters;
     int y = -1;
     Context context;
-    ArrayList<Trimester> trimesters;
     DashBoardActivity dashBoardActivity;
     boolean buttonOut = false, containerOut = false, UserDataPrinted = false, collapsed = false;
 
     //views
-    ListView gradlistView;
+    ListView gradeListView;
     TextView TotalHours, CGPA, userName, userName2, ID, ID2;
     ImageView profilePictureAdmin, profilePictureAdmin2;
     ProgressBar progressBar;
@@ -96,7 +96,7 @@ public class FragmentProfile extends Fragment {
             ID = getView().findViewById(R.id.ID);
             ID2 = getView().findViewById(R.id.ID2);
 //            Degree = getView().findViewById(R.id.Degree);
-            gradlistView = getView().findViewById(R.id.gradlistView);
+            gradeListView = getView().findViewById(R.id.gradeListView);
             profilePictureAdmin = getView().findViewById(R.id.profilePictureAdmin);
             profilePictureAdmin2 = getView().findViewById(R.id.profilePictureAdmin2);
             userInfo = getView().findViewById(R.id.userInfo);
@@ -196,7 +196,6 @@ public class FragmentProfile extends Fragment {
                     }
 
                     printUserData();
-
                 }
             }
 
@@ -205,8 +204,6 @@ public class FragmentProfile extends Fragment {
             }
         });
     }
-
-
 
     public void printUserData() {
         if (!UserDataPrinted && getView() != null) {
@@ -220,8 +217,8 @@ public class FragmentProfile extends Fragment {
                 CGPA.setText(trimesters.get(trimesters.size() - 1).getCGPA());
                 TotalHours.setText(trimesters.get(trimesters.size() - 1).getTotalHours());
                 AdapterTrimester adapter = new AdapterTrimester(context, R.layout.trimester, trimesters);
-                gradlistView.setAdapter(adapter);
-                setListViewHeightBasedOnChildren(gradlistView);
+                gradeListView.setAdapter(adapter);
+                setListViewHeightBasedOnChildren(gradeListView);
 
             }
             progressBar.setVisibility(View.GONE);
