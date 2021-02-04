@@ -46,7 +46,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.maimyou.Adapters.AdapterDisplayCourse;
-import com.example.maimyou.Classes.ActionListener;
 import com.example.maimyou.Classes.DisplayCourse;
 import com.example.maimyou.Classes.FileUtils;
 import com.example.maimyou.Libraries.PdfBoxFinder;
@@ -89,6 +88,7 @@ public class CourseStructure extends AppCompatActivity {
 //    View temp;
 
     //Vars-
+    int FirstTrim;
     Context context = this;
     String FileName = "", path = "";
     CourseStructure courseStructure = this;
@@ -240,7 +240,7 @@ public class CourseStructure extends AppCompatActivity {
                 }
                 if (parent.size() > 0) {
                     recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                    recyclerView.setAdapter(new ChildAdapter(parent));
+                    recyclerView.setAdapter(new ChildAdapter(parent, R.layout.recycle_parent, R.layout.recycle_child));
                 }
             }
 
@@ -270,6 +270,7 @@ public class CourseStructure extends AppCompatActivity {
                     title.setVisibility(View.VISIBLE);
                     ArrayList<DisplayCourse> displayCourses = new ArrayList<>();
                     int firstTrim = getTrim(str);
+                    FirstTrim = firstTrim;
                     for (DataSnapshot trimester : snapshot.child("Trimesters").getChildren()) {
                         displayCourses.add(new DisplayCourse(getTitle(firstTrim), 0));
                         firstTrim++;
@@ -298,10 +299,12 @@ public class CourseStructure extends AppCompatActivity {
     }
 
     public String getTitle(int trimInt) {
+        int year = ((trimInt - FirstTrim) / 3);
+        year++;
         while (trimInt > 3) {
             trimInt -= 3;
         }
-        return "Trimester " + trimInt;
+        return "Trimester " + trimInt + " - Year " + year;
     }
 
     public boolean isNumeric(String strNum) {

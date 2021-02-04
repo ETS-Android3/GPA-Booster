@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -17,6 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maimyou.Activities.DashBoardActivity;
+import com.example.maimyou.Adapters.AdapterDisplayCourse;
+import com.example.maimyou.Adapters.AdapterDisplayCourseForEdit;
+import com.example.maimyou.Classes.DisplayCourse;
+import com.example.maimyou.Classes.DisplayCourseForEdit;
+import com.example.maimyou.Classes.Helper;
 import com.example.maimyou.Classes.Trimester;
 import com.example.maimyou.R;
 import com.example.maimyou.RecycleViewMaterials.Child;
@@ -26,9 +31,19 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.Objects;
+
+import static com.example.maimyou.Activities.DashBoardActivity.Intake;
+import static com.example.maimyou.Activities.DashBoardActivity.actionListener;
 
 public class FragmentEdit extends Fragment {
+    //Views
+    ListView editGradeListView;
+
+    //vars
+    int FirstTrim;
     Context context;
     String id, Name = "", StudentId = "";
     ArrayList<Trimester> trimesters;
@@ -54,14 +69,58 @@ public class FragmentEdit extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         if (getView() != null) {
             UserDataPrinted = false;
+            editGradeListView = getView().findViewById(R.id.editGradeListView);
+            actionListener.setOnActionPerformed(() -> viewCourse(Intake));
             RadioGroup radioGroup = getView().findViewById(R.id.radio);
             radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
                 RadioButton radioButton = getView().findViewById(checkedId);
                 InflateRec(getView().findViewById(R.id.RecIntake), radioButton.getText().toString().toLowerCase());
-//                Toast.makeText(context,radioButton.getText().toString(),Toast.LENGTH_SHORT).show();
             });
-
         }
+    }
+
+
+    public void viewCourse(String str) {
+        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(str).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("Trimesters").exists()) {
+                    ArrayList<DisplayCourseForEdit> editCourse = new ArrayList<>();
+                    int firstTrim = getTrim(str);
+                    FirstTrim = firstTrim;
+                    for (DataSnapshot trimester : snapshot.child("Trimesters").getChildren()) {
+                        editCourse.add(new DisplayCourseForEdit(getTitle(firstTrim), 0));
+                        firstTrim++;
+                        for (DataSnapshot subject : trimester.getChildren()) {
+                            if (subject.child("Elective").exists() && subject.child("PreRequisite").exists() && subject.child("SubjectHours").exists() && subject.child("SubjectName").exists()) {
+                                editCourse.add(new DisplayCourseForEdit("A", subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString()));
+                            }
+                        }
+                    }
+                    editCourse.add(new DisplayCourseForEdit());
+                    editCourse.add(new DisplayCourseForEdit());
+                    AdapterDisplayCourseForEdit adapter = new AdapterDisplayCourseForEdit(context, R.layout.edit_course, editCourse);
+//                    adapter.setCourseStructure(courseStructure);
+                    editGradeListView.setAdapter(adapter);
+                    Helper.getListViewSize(editGradeListView);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public String getTitle(int trimInt) {
+        int year = ((trimInt - FirstTrim) / 3);
+        year++;
+        while (trimInt > 3) {
+            trimInt -= 3;
+        }
+        return "Trimester " + trimInt + " - Year " + year;
     }
 
     public void InflateRec(RecyclerView recyclerView, String Major) {
@@ -73,6 +132,7 @@ public class FragmentEdit extends Fragment {
                 ArrayList<Child> ChildTrim2 = new ArrayList<>();
                 ArrayList<Child> ChildTrim3 = new ArrayList<>();
                 ArrayList<Parent> parent = new ArrayList<>();
+
                 for (DataSnapshot child : snapshot.getChildren()) {
                     if (child.getKey() != null) {
                         if (child.getKey().toLowerCase().contains(Major)) {
@@ -87,6 +147,7 @@ public class FragmentEdit extends Fragment {
                         }
                     }
                 }
+
                 if (ChildTrim1.size() > 0) {
                     parent.add(new Parent("Trimester 1 (june)", ChildTrim1));
                 }
@@ -96,9 +157,10 @@ public class FragmentEdit extends Fragment {
                 if (ChildTrim3.size() > 0) {
                     parent.add(new Parent("Trimester 3 (february-march)", ChildTrim3));
                 }
+
                 if (parent.size() > 0) {
                     recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                    recyclerView.setAdapter(new ChildAdapter(parent));
+                    recyclerView.setAdapter(new ChildAdapter(parent, R.layout.recycle_parent_edit, R.layout.recycle_child_edit));
                 }
             }
 

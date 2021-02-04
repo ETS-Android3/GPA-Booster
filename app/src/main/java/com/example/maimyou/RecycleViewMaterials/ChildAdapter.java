@@ -1,6 +1,5 @@
 package com.example.maimyou.RecycleViewMaterials;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +11,22 @@ import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import java.util.List;
 
 public class ChildAdapter extends ExpandableRecyclerViewAdapter<ParentViewHolder,ChildViewHolder> {
-    public ChildAdapter(List<? extends ExpandableGroup> groups) {
+    int resChild,resParent;
+    public ChildAdapter(List<? extends ExpandableGroup> groups,int resParent,int resChild) {
         super(groups);
+        this.resChild=resChild;
+        this.resParent=resParent;
     }
 
     @Override
     public ParentViewHolder onCreateGroupViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_parent,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(resParent,parent,false);
         return new ParentViewHolder(v);
     }
 
     @Override
     public ChildViewHolder onCreateChildViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_child,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(resChild,parent,false);
         return new ChildViewHolder(v);
     }
 
