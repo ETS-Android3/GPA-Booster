@@ -149,13 +149,23 @@
             app:cardCornerRadius="20dp"
             app:cardElevation="5dp">
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.1"
+                android:background="@drawable/ripple" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.5"
+                android:background="@drawable/ripple2" />
 
             <LinearLayout
                 android:layout_width="200dp"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:background="@drawable/ripple"
-                android:baselineAligned="false">
+                android:baselineAligned="false"
+                android:orientation="horizontal">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -234,6 +244,7 @@
 
             </LinearLayout>
 
+
         </androidx.cardview.widget.CardView>
     </FrameLayout>
 
@@ -257,18 +268,18 @@
         </FrameLayout>
 
         <LinearLayout
-            android:layout_toLeftOf="@+id/pin"
-            android:layout_toRightOf="@+id/picContainer"
             android:id="@+id/userInfo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="-5dp"
             android:layout_marginRight="-5dp"
-            android:orientation="vertical"
-            android:layout_toEndOf="@+id/picContainer"
+            android:layout_marginBottom="5dp"
             android:layout_toStartOf="@+id/pin"
-            android:layout_marginEnd="-5dp">
+            android:layout_toLeftOf="@+id/pin"
+            android:layout_toEndOf="@+id/picContainer"
+            android:layout_toRightOf="@+id/picContainer"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/userName2"
@@ -276,15 +287,15 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="bottom"
-                android:text=""
-                android:textSize="12sp"
                 android:maxLines="1"
+                android:text=""
+                android:textColor="#FAFAFA"
+                android:textSize="12sp"
+                android:textStyle="bold"
                 app:autoSizeMaxTextSize="100sp"
                 app:autoSizeMinTextSize="6sp"
                 app:autoSizeStepGranularity="2sp"
                 app:autoSizeTextType="uniform"
-                android:textStyle="bold"
-                android:textColor="#FAFAFA"
                 tools:ignore="NestedWeights" />
 
             <TextView
@@ -294,8 +305,8 @@
                 android:layout_weight="1"
                 android:gravity="top"
                 android:text=""
-                android:textSize="11sp"
                 android:textColor="#FAFAFA"
+                android:textSize="11sp"
                 tools:ignore="NestedWeights" />
 
         </LinearLayout>
@@ -304,39 +315,41 @@
             android:id="@+id/pin"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:layout_toLeftOf="@+id/menu"
-            android:layout_toStartOf="@+id/menu"
+            android:layout_marginEnd="-15dp"
             android:layout_marginRight="-15dp"
-            android:layout_marginEnd="-15dp">
+            android:layout_toStartOf="@+id/menu"
+            android:layout_toLeftOf="@+id/menu">
+
             <ImageButton
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
-                android:padding="5dp"
                 android:alpha="0.6"
-                android:onClick="FragEdit"
-                android:scaleType="fitXY"
                 android:background="@drawable/ripple_effect_oval_no_background"
-                android:src="@drawable/ic_edit_white"/>
+                android:onClick="FragEdit"
+                android:padding="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_edit_white" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/menu"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="-5dp"
-            android:layout_marginEnd="-5dp">
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="-5dp"
+            android:layout_marginRight="-5dp">
+
             <ImageButton
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
-                android:padding="5dp"
-                android:scaleType="fitXY"
                 android:alpha="0.6"
                 android:background="@drawable/ripple_effect_oval_no_background"
-                android:src="@drawable/ic_baseline_more_vert_24"/>
+                android:padding="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_baseline_more_vert_24" />
         </FrameLayout>
     </RelativeLayout>
 
@@ -347,11 +360,12 @@
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="17dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:onClick="edit"
+        android:onClick="OpenCamsys"
         android:scaleType="fitXY"
-        app:maxImageSize="50dp"
         android:src="@drawable/camsys2"
+        android:theme="@style/CustomTheme1"
         app:fabCustomSize="50dp"
+        app:maxImageSize="50dp"
         tools:ignore="RtlHardcoded"
         tools:targetApi="lollipop" />
 

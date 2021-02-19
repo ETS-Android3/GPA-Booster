@@ -571,12 +571,13 @@
             android:layout_height="?attr/actionBarSize">
 
             <ImageButton
+                android:id="@+id/backB"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="7dp"
                 android:alpha="0.6"
+                android:onClick="DashBack"
                 android:background="@drawable/ripple_effect_oval_no_background"
-                android:onClick="back"
                 android:scaleType="centerInside"
                 android:src="@drawable/abc_vector_test"
                 tools:ignore="ContentDescription" />
@@ -634,6 +635,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
+        android:theme="@style/CustomTheme1"
         android:backgroundTint="@color/colorPrimary"
         android:onClick="save"
         android:src="@drawable/ic_save_black_24dp"
@@ -646,5 +648,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:visibility="gone"
         android:background="@drawable/progress" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

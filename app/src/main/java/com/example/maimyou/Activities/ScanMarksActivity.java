@@ -33,16 +33,14 @@ import androidx.core.content.ContextCompat;
 
 import com.example.maimyou.Classes.FileUtils;
 import com.example.maimyou.Classes.subjects;
-import com.example.maimyou.Libraries.CustomTabActivityHelper;
-import com.example.maimyou.Libraries.WebviewFallback;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+//import com.itextpdf.text.pdf.PdfReader;
+//import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
 
 import java.io.File;
@@ -155,47 +153,47 @@ public class ScanMarksActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
 
-            String path = FileUtils.getPath(context, data.getData());
-            String FileName = "";
-            if (new File(data.getData().getPath()).getAbsolutePath() != null) {
-                Uri uri = data.getData();
+//            String path = FileUtils.getPath(context, data.getData());
+//            String FileName = "";
+//            if (new File(data.getData().getPath()).getAbsolutePath() != null) {
+//                Uri uri = data.getData();
+//
+//                String filename;
+//                Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+//
+//                if (cursor == null) filename = uri.getPath();
+//                else {
+//                    cursor.moveToFirst();
+//                    int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+//                    filename = cursor.getString(idx);
+//                    cursor.close();
+//                }
+//
+//                String[] arr = filename.split("[.]");
+//                if (arr.length > 0) {
+//                    FileName = arr[0];
+//                }
+//            }
+//
+////            System.out.println("PAAAAAAAAAAAAAAAAAAAAAATTTTTTHHHHHHHHHHHHHHHHH:     "+path);
+//            if (path != null && !path.isEmpty() && !FileName.isEmpty()) {
+//                try {
+//                    StringBuilder parsedText = new StringBuilder();
+//                    PdfReader reader = new PdfReader(FileUtils.getPath(context, data.getData()));
+//                    int n = reader.getNumberOfPages();
+//
+//                    for (int i = 0; i < n; i++) {
+//                        parsedText.append(PdfTextExtractor.getTextFromPage(reader, i + 1).trim()).append("\n"); //Extracting the content from the different pages
+//                    }
+//                    reader.close();
+//                    scan(parsedText.toString());
+//                    saveData("0", "Selection");
+//                    bottomNav.setSelectedItemId(R.id.profile);
+//                    finish();
+//                } catch (Exception ignored) {
+//                }
 
-                String filename;
-                Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-
-                if (cursor == null) filename = uri.getPath();
-                else {
-                    cursor.moveToFirst();
-                    int idx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
-                    filename = cursor.getString(idx);
-                    cursor.close();
-                }
-
-                String[] arr = filename.split("[.]");
-                if (arr.length > 0) {
-                    FileName = arr[0];
-                }
-            }
-
-//            System.out.println("PAAAAAAAAAAAAAAAAAAAAAATTTTTTHHHHHHHHHHHHHHHHH:     "+path);
-            if (path != null && !path.isEmpty() && !FileName.isEmpty()) {
-                try {
-                    StringBuilder parsedText = new StringBuilder();
-                    PdfReader reader = new PdfReader(path);
-                    int n = reader.getNumberOfPages();
-
-                    for (int i = 0; i < n; i++) {
-                        parsedText.append(PdfTextExtractor.getTextFromPage(reader, i + 1).trim()).append("\n"); //Extracting the content from the different pages
-                    }
-                    reader.close();
-                    scan(parsedText.toString());
-                    saveData("0", "Selection");
-                    bottomNav.setSelectedItemId(R.id.profile);
-                    finish();
-                } catch (Exception ignored) {
-                }
-
-            }
+//            }
         } else {
             Toast.makeText(getApplicationContext(), "Please select a file.", Toast.LENGTH_SHORT).show();
         }

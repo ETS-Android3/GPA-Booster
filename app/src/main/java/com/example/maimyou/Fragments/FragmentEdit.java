@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -17,9 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maimyou.Activities.DashBoardActivity;
-import com.example.maimyou.Adapters.AdapterDisplayCourse;
 import com.example.maimyou.Adapters.AdapterDisplayCourseForEdit;
-import com.example.maimyou.Classes.DisplayCourse;
 import com.example.maimyou.Classes.DisplayCourseForEdit;
 import com.example.maimyou.Classes.Helper;
 import com.example.maimyou.Classes.Trimester;
@@ -35,8 +34,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static com.example.maimyou.Activities.DashBoardActivity.InfoAvail;
 import static com.example.maimyou.Activities.DashBoardActivity.Intake;
 import static com.example.maimyou.Activities.DashBoardActivity.actionListener;
+import static com.example.maimyou.Activities.DashBoardActivity.fragmentIndex;
 
 public class FragmentEdit extends Fragment {
     //Views
@@ -61,6 +62,7 @@ public class FragmentEdit extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        fragmentIndex = 1;
         return inflater.inflate(R.layout.fragment_edit, container, false);
     }
 
@@ -68,6 +70,23 @@ public class FragmentEdit extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getView() != null) {
+            ImageButton backB= getView().findViewById(R.id.backB);
+            if(!InfoAvail){
+                backB.setVisibility(View.GONE);
+            }
+            FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("Profile").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.exists()){
+                        backB.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
             UserDataPrinted = false;
             editGradeListView = getView().findViewById(R.id.editGradeListView);
             actionListener.setOnActionPerformed(() -> viewCourse(Intake));

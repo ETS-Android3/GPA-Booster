@@ -93,7 +93,7 @@
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
                     android:layout_margin="6dp"
-                    android:onClick="UpdateMarks"
+                    android:onClick="UploadCourse"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
                     android:clickable="true"
@@ -133,8 +133,8 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
+                    android:onClick="UpdateMarks"
                     android:layout_margin="6dp"
-                    android:onClick="UploadCourse"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
                     android:clickable="true"
@@ -152,13 +152,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/upload"
+                            android:src="@drawable/result"
                             tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Your course structure"
+                            android:text="Trimester Planner"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"
@@ -175,7 +175,6 @@
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
                     android:layout_margin="6dp"
-                    android:onClick="Progress"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
                     android:clickable="true"
@@ -193,54 +192,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/growth"
+                            android:src="@drawable/result"
                             tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Your progress"
-                            android:gravity="center"
-                            android:layout_marginTop="12dp"
-                            android:textColor="#000000"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-                <androidx.cardview.widget.CardView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_rowWeight="1"
-                    app:cardElevation="6dp"
-                    app:cardCornerRadius="12dp"
-                    android:layout_margin="6dp"
-                    android:onClick="Calculator"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:stateListAnimator="@anim/animation"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="17dp"
-                        android:gravity="center"
-                        android:layout_gravity="center">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/calculator"
-                            tools:ignore="ContentDescription" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Calculator"
+                            android:text="Degree planner"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"
@@ -282,6 +240,46 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Log out"
+                            android:gravity="center"
+                            android:layout_marginTop="12dp"
+                            android:textColor="#000000"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_rowWeight="1"
+                    app:cardElevation="6dp"
+                    app:cardCornerRadius="12dp"
+                    android:layout_margin="6dp"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:stateListAnimator="@anim/animation"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="17dp"
+                        android:gravity="center"
+                        android:layout_gravity="center">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/calculator"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calculator"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"

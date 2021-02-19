@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#276588</color>
-    <color name="colorPrimaryDark">#215470</color>
+    <color name="colorPrimaryDark">#1B475E</color>
     <color name="backGroundColour">#E3E3E9</color>
     <color name="mmuColourSecondary">#ed1c24</color>
 

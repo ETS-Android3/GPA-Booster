@@ -31,7 +31,6 @@ import com.example.maimyou.Activities.DashBoardActivity;
 import com.example.maimyou.Adapters.AdapterTrimester;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
@@ -39,12 +38,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.example.maimyou.Activities.DashBoardActivity.fragmentIndex;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class FragmentProfile extends Fragment {
     //vars
-    String id , Name = "", StudentId = "";
+    String id, Name = "", StudentId = "";
     ArrayList<Trimester> trimesters;
     int y = -1;
     Context context;
@@ -73,7 +74,8 @@ public class FragmentProfile extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Fresco.initialize(context);
+//        Fresco.initialize(context);
+        fragmentIndex = 2;
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -161,18 +163,22 @@ public class FragmentProfile extends Fragment {
 
 
             if (!Name.isEmpty() && !StudentId.isEmpty()) {
-                printUserData();
+                try {
+                    printUserData();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     public void downLoadData() {
-        if(!dashBoardActivity.isConnected()){
-            Toast.makeText(context,"No internet connection!",Toast.LENGTH_LONG).show();
+        if (!dashBoardActivity.isConnected()) {
+            Toast.makeText(context, "No internet connection!", Toast.LENGTH_LONG).show();
             return;
         }
 
-        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.child("Name").getValue() != null) {

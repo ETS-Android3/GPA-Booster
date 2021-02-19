@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
 import android.Manifest;
 import android.animation.Animator;
@@ -25,9 +26,12 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +52,8 @@ import android.widget.Toast;
 import com.example.maimyou.Adapters.AdapterDisplayCourse;
 import com.example.maimyou.Classes.DisplayCourse;
 import com.example.maimyou.Classes.FileUtils;
+import com.example.maimyou.Classes.UriUtils;
+//import com.example.maimyou.Libraries.PdfBoxFinder;
 import com.example.maimyou.Libraries.PdfBoxFinder;
 import com.example.maimyou.R;
 import com.example.maimyou.RecycleViewMaterials.Child;
@@ -58,6 +64,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.itextpdf.awt.geom.Rectangle2D;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 import com.tom_roush.pdfbox.text.PDFTextStripperByArea;
@@ -199,6 +206,13 @@ public class CourseStructure extends AppCompatActivity {
         InflateRec(RecNA, "na");
 
         actionListener.setOnActionPerformed(() -> viewCourse(Intake));
+
+        SlidingUpPanelLayout slidingPanel = findViewById(R.id.slidingPanel);
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(() -> {
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
+        }, 2000);
 
         CourseStructureList = findViewById(R.id.CourseStructureList);
         progressBar = findViewById(R.id.progressBar);
@@ -441,7 +455,7 @@ public class CourseStructure extends AppCompatActivity {
 
                 progressBar.setVisibility(View.VISIBLE);
                 busy = true;
-                path = FileUtils.getPath(context, data.getData());
+                path = FileUtils.getPath(context,data.getData());
                 FileName = "";
                 Uri uri = data.getData();
 
@@ -565,7 +579,11 @@ public class CourseStructure extends AppCompatActivity {
                                 busy = false;
                             });
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Log.i("TAG",e.getMessage());
+                            progressBar.post(() -> {
+                                progressBar.setVisibility(View.GONE);
+                                busy = false;
+                            });
                         }
                     }
                 };
