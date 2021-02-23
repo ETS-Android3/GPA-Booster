@@ -1,13 +1,13 @@
 package com.example.maimyou.Fragments;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,12 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
+import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -24,52 +29,48 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+
 import com.example.maimyou.Activities.DashBoardActivity;
 import com.example.maimyou.Adapters.camsysWebsitesAdapter;
-import com.example.maimyou.CarouselLayout.CoverFlowAdapter;
-import com.example.maimyou.CarouselLayout.Game;
+import com.example.maimyou.CarouselLayout.Tip;
 import com.example.maimyou.Classes.camsysPage;
+import com.example.maimyou.Dialogs.TipContainerDialog;
 import com.example.maimyou.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.just.agentweb.AgentWeb;
+
+import static android.content.Context.DOWNLOAD_SERVICE;
 import static com.example.maimyou.Activities.DashBoardActivity.InfoAvail;
 import static com.example.maimyou.Activities.DashBoardActivity.fragmentIndex;
-import java.util.ArrayList;
-import im.delight.android.webview.AdvancedWebView;
-import it.moondroid.coverflow.components.ui.containers.FeatureCoverFlow;
 
-public class FragmentCamsys extends Fragment{
+import java.util.ArrayList;
+
+import im.delight.android.webview.AdvancedWebView;
+
+public class FragmentCamsys extends Fragment {
 
     //Vars
-    private FeatureCoverFlow coverFlow;
-    private ArrayList<Game> games;
-    int currentPage = 0;
     boolean tipOpened = false, showUpload = true;
     DashBoardActivity dashBoardActivity;
+    TipContainerDialog cdd;
 
     public FragmentCamsys(DashBoardActivity dashBoardActivity) {
         this.dashBoardActivity = dashBoardActivity;
     }
 
     //views
-    Button back, next;
-    TextView pageNumber;
-    CardView cardView;
     FrameLayout arrow;
     PopupWindow mypopupWindow;
-    ImageButton closeTip, lightBulb, openMenu;
-    RelativeLayout tipContainer;
-    LinearLayout Container;
+    ImageButton lightBulb, openMenu;
     FloatingActionButton edit;
-    CheckBox checkBox;
     public static AdvancedWebView webView;
 
     @Nullable
@@ -79,19 +80,19 @@ public class FragmentCamsys extends Fragment{
         return inflater.inflate(R.layout.fagment_camsys, container, false);
     }
 
-    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
+    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility", "SetJavaScriptEnabled"})
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getView() != null) {
-            ImageButton backB= getView().findViewById(R.id.backB);
-            if(!InfoAvail){
+            ImageButton backB = getView().findViewById(R.id.backB);
+            if (!InfoAvail) {
                 backB.setVisibility(View.GONE);
             }
             FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("Profile").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(!snapshot.exists()){
+                    if (!snapshot.exists()) {
                         backB.setVisibility(View.GONE);
                     }
                 }
@@ -103,24 +104,105 @@ public class FragmentCamsys extends Fragment{
             });
             openMenu = getView().findViewById(R.id.openMenu);
             edit = getView().findViewById(R.id.edit);
-            Container = getView().findViewById(R.id.Container);
-            checkBox = getView().findViewById(R.id.checkBox);
+
+//            Container = getView().findViewById(R.id.Container);
+//            checkBox = getView().findViewById(R.id.checkBox);
+//            closeTip = getView().findViewById(R.id.closeTip);
+//            back = getView().findViewById(R.id.back);
+//            next = getView().findViewById(R.id.next);
+//            pageNumber = getView().findViewById(R.id.pageNumber);
+//            cardView = getView().findViewById(R.id.cardView);
+
             lightBulb = getView().findViewById(R.id.lightBulb);
-            tipContainer = getView().findViewById(R.id.tipContainer);
-            fadeOutNoDelay(tipContainer);
-            closeTip = getView().findViewById(R.id.closeTip);
-            back = getView().findViewById(R.id.back);
-            next = getView().findViewById(R.id.next);
-            pageNumber = getView().findViewById(R.id.pageNumber);
-            cardView = getView().findViewById(R.id.cardView);
+//            tipContainer = getView().findViewById(R.id.tipContainer);
+//            fadeOutNoDelay(tipContainer);
+            cdd = new TipContainerDialog(dashBoardActivity);
+            ArrayList<Tip> tips = new ArrayList<>();
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            cdd.setTips(tips);
+
+            cdd.setCanceledOnTouchOutside(true);
+            cdd.setOnDismissListener(dialog -> {
+                tipOpened = false;
+                webView.onResume();
+            });
+//            cdd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
             arrow = getView().findViewById(R.id.arrow);
             fadeOutNoDelay(arrow);
             webView = getView().findViewById(R.id.webView);
             webView.setListener(dashBoardActivity, dashBoardActivity);
             webView.setMixedContentAllowed(true);
             webView.setThirdPartyCookiesEnabled(true);
-            webView.setDesktopMode(true);
+//            webView.setDesktopMode(true);
 
+            WebSettings webSettings= webView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setPluginState(WebSettings.PluginState.ON);
+//            webSettings.setGeolocationEnabled(true);
+//            webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+            webSettings.setBuiltInZoomControls(true);
+//            webSettings.setSaveFormData(true);
+//            webSettings.setAppCacheEnabled(true);
+//            webSettings.setDatabaseEnabled(true);
+//            webSettings.setDomStorageEnabled(true);
+//            webSettings.setLoadsImagesAutomatically(true);
+//            webSettings.setAllowFileAccess(true);
+//            webSettings.setAllowFileAccessFromFileURLs(true);
+//            webSettings.setAllowUniversalAccessFromFileURLs(true);
+//            webSettings.setUseWideViewPort(true);
+//            webSettings.setBuiltInZoomControls(true);
+//            webSettings.setSupportMultipleWindows(true);
+
+//            webSettings.setGeolocationDatabasePath(getFilesDir().getPath());
+//            webSettings.setAllowFileAccess(true);
+//            webSettings.setAllowUniversalAccessFromFileURLs(true);
+//            webView.getSettings().setLoadsImagesAutomatically(true);
+            webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+//            webView.setWebViewClient(new WebViewClient() {
+//                @Override
+//                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                    if (url.endsWith(".pdf")) {
+//                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+//                        CookieManager cookieManager = CookieManager.getInstance();
+//                        String cookie = cookieManager.getCookie("https://cms.mmu.edu.my");     // which is "http://bookboon.com"
+//                        request.addRequestHeader("Cookie", cookie);
+//                        request.setNotificationVisibility(1);
+//                        request.allowScanningByMediaScanner();
+//                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/camsys.pdf");
+//                        request.setMimeType("application/pdf");
+//                        DownloadManager dm = (DownloadManager) dashBoardActivity.getSystemService(DOWNLOAD_SERVICE);
+//                        dm.enqueue(request);
+//                        new Handler().postDelayed(() -> {
+//                            dashBoardActivity.scanResFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/camsys.pdf");
+//                        }, 2000);
+//                    }
+//                    return true;
+//                }
+//            });
+
+//            FrameLayout WebCon=getView().findViewById(R.id.WebCon);
+//            AgentWeb  mAgentWeb = AgentWeb.with(this)//传入Activity or Fragment
+//                    .setAgentWebParent(WebCon, new FrameLayout.LayoutParams(-1, -1))//Incoming AgentWeb parent control, if the parent control is RelativeLayout, then the second parameter needs to be passed RelativeLayout.LayoutParams, the first parameter and the second parameter should correspond.
+//                    .useDefaultIndicator()// use the default onProgress bar
+////                    .defaultProgressBarColor() // Use default onProgress bar color
+////                    .setWebViewClient(mWebViewClient) //Set the Web page title callback
+//
+//                    .createAgentWeb()//
+//                    .ready()
+//                    .go("https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes");
             FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DefaultWeb").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -155,13 +237,6 @@ public class FragmentCamsys extends Fragment{
                 }
             });
 
-            coverFlow = getView().findViewById(R.id.coverflow);
-
-            settingDummyData();
-            CoverFlowAdapter adapter = new CoverFlowAdapter(getContext(), games);
-            coverFlow.setAdapter(adapter);
-            coverFlow.setOnScrollPositionListener(onScrollListener());
-            pageNumber.setText((currentPage + 1) + "/" + games.size());
 
             FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -178,7 +253,7 @@ public class FragmentCamsys extends Fragment{
                         }, 1000);
 
                     } else {
-                        checkBox.setChecked(true);
+                        cdd.setCheckBox(true);
                     }
                 }
 
@@ -188,33 +263,34 @@ public class FragmentCamsys extends Fragment{
                 }
             });
 
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DoNotShowUploadTip").setValue("1");
-                } else {
-                    FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DoNotShowUploadTip").removeValue();
-                }
-            });
-            tipContainer.setOnTouchListener((v, event) -> {
-                CloseTip(200);
-                return false;
-            });
-            back.setOnClickListener(v -> {
-                currentPage--;
-                if (currentPage < 0) {
-                    currentPage = games.size() - 1;
-                }
-                pageNumber.setText((currentPage + 1) + "/" + games.size());
-                coverFlow.scrollToPosition(currentPage);
-            });
-            next.setOnClickListener(v -> {
-                currentPage++;
-                if (currentPage >= games.size()) {
-                    currentPage = 0;
-                }
-                pageNumber.setText((currentPage + 1) + "/" + games.size());
-                coverFlow.scrollToPosition(currentPage);
-            });
+//            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//                if (isChecked) {
+//                    FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DoNotShowUploadTip").setValue("1");
+//                } else {
+//                    FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DoNotShowUploadTip").removeValue();
+//                }
+//            });
+//            tipContainer.setOnTouchListener((v, event) -> {
+//                CloseTip(200);
+//                return false;
+//            });
+//            back.setOnClickListener(v -> {
+//                currentPage--;
+//                if (currentPage < 0) {
+//                    currentPage = games.size() - 1;
+//                }
+//                pageNumber.setText((currentPage + 1) + "/" + games.size());
+//                coverFlow.scrollToPosition(currentPage);
+//            });
+//            next.setOnClickListener(v -> {
+//                currentPage++;
+//                if (currentPage >= games.size()) {
+//                    currentPage = 0;
+//                }
+//                pageNumber.setText((currentPage + 1) + "/" + games.size());
+//                coverFlow.scrollToPosition(currentPage);
+//            });
+//            closeTip.setOnClickListener(v -> CloseTip(200));
 
             try {
                 setPopUpWindow();
@@ -267,7 +343,6 @@ public class FragmentCamsys extends Fragment{
 
 
             });
-            closeTip.setOnClickListener(v -> CloseTip(200));
             lightBulb.setOnClickListener(v -> OpenCloseTip(200));
         }
     }
@@ -342,7 +417,7 @@ public class FragmentCamsys extends Fragment{
 //        String url = "https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes";
         try {
             webView.loadUrl(url);
-            webView.clearFocus();
+//            webView.clearFocus();
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //                webView.zoomBy((float) 50);
 //            }
@@ -371,48 +446,49 @@ public class FragmentCamsys extends Fragment{
 //                dm.enqueue(request);
 //                Toast.makeText(getContext(), "Downloading File", Toast.LENGTH_LONG).show();
 //            });
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private FeatureCoverFlow.OnScrollPositionListener onScrollListener() {
-        return new FeatureCoverFlow.OnScrollPositionListener() {
-            @Override
-            public void onScrolledToPosition(int position) {
-                Log.v("MainActiivty", "position: " + position);
-                currentPage = position;
-                pageNumber.setText((currentPage + 1) + "/" + games.size());
-            }
-
-            @Override
-            public void onScrolling() {
-                Log.i("MainActivity", "scrolling");
-                pageNumber.setText("-/" + games.size());
-            }
-        };
-    }
-
-    private void settingDummyData() {
-        games = new ArrayList<>();
-        games.add(new Game(R.mipmap.ic_launcher, "Assassin Creed 3"));
-        games.add(new Game(R.mipmap.ic_launcher, "Avatar 3D"));
-        games.add(new Game(R.mipmap.ic_launcher, "Call Of Duty Black Ops 3"));
-        games.add(new Game(R.mipmap.ic_launcher, "DotA 2"));
-        games.add(new Game(R.mipmap.ic_launcher, "Halo 5"));
-        games.add(new Game(R.mipmap.ic_launcher, "Left 4 Dead 2"));
-        games.add(new Game(R.mipmap.ic_launcher, "StarCraft"));
-        games.add(new Game(R.mipmap.ic_launcher, "The Witcher 3"));
-        games.add(new Game(R.mipmap.ic_launcher, "Tom raider 3"));
-        games.add(new Game(R.mipmap.ic_launcher, "Need for Speed Most Wanted"));
-    }
+//    @SuppressLint("SetTextI18n")
+//    private FeatureCoverFlow.OnScrollPositionListener onScrollListener() {
+//        return new FeatureCoverFlow.OnScrollPositionListener() {
+//            @Override
+//            public void onScrolledToPosition(int position) {
+//                Log.v("MainActiivty", "position: " + position);
+//                currentPage = position;
+//                pageNumber.setText((currentPage + 1) + "/" + games.size());
+//            }
+//
+//            @Override
+//            public void onScrolling() {
+//                Log.i("MainActivity", "scrolling");
+//                pageNumber.setText("-/" + games.size());
+//            }
+//        };
+//    }
+//
+//    private void settingDummyData() {
+//        games = new ArrayList<>();
+//        games.add(new Game(R.mipmap.ic_launcher, "Assassin Creed 3"));
+//        games.add(new Game(R.mipmap.ic_launcher, "Avatar 3D"));
+//        games.add(new Game(R.mipmap.ic_launcher, "Call Of Duty Black Ops 3"));
+//        games.add(new Game(R.mipmap.ic_launcher, "DotA 2"));
+//        games.add(new Game(R.mipmap.ic_launcher, "Halo 5"));
+//        games.add(new Game(R.mipmap.ic_launcher, "Left 4 Dead 2"));
+//        games.add(new Game(R.mipmap.ic_launcher, "StarCraft"));
+//        games.add(new Game(R.mipmap.ic_launcher, "The Witcher 3"));
+//        games.add(new Game(R.mipmap.ic_launcher, "Tom raider 3"));
+//        games.add(new Game(R.mipmap.ic_launcher, "Need for Speed Most Wanted"));
+//    }
 
     public void OpenTip(int duration) {
         if (!tipOpened) {
-            expand(cardView, duration);
-            fadeIn(tipContainer, duration);
-            animationOutDOWN(edit, duration);
+//            expand(cardView, duration);
+//            fadeIn(tipContainer, duration);
+//            animationOutDOWN(edit, duration);
+            cdd.show();
             tipOpened = true;
             webView.onPause();
         }
@@ -420,9 +496,10 @@ public class FragmentCamsys extends Fragment{
 
     public void CloseTip(int duration) {
         if (tipOpened) {
-            contract(cardView, duration);
-            fadeOut(tipContainer, duration);
-            animationInUP(edit, duration);
+//            contract(cardView, duration);
+//            fadeOut(tipContainer, duration);
+//            animationInUP(edit, duration);
+            cdd.dismiss();
             tipOpened = false;
             webView.onResume();
         }
@@ -430,92 +507,109 @@ public class FragmentCamsys extends Fragment{
 
     public void OpenCloseTip(int duration) {
         if (tipOpened) {
-            contract(cardView, duration / 2);
-            fadeOut(tipContainer, duration);
-            animationInUP(edit, duration / 2);
+//            contract(cardView, duration / 2);
+//            fadeOut(tipContainer, duration);
+//            animationInUP(edit, duration / 2);
+            webView.onResume();
             tipOpened = false;
             webView.onResume();
         } else {
-            expand(cardView, duration / 2);
-            fadeIn(tipContainer, duration);
-            animationOutDOWN(edit, duration / 2);
+//            expand(cardView, duration / 2);
+//            fadeIn(tipContainer, duration);
+//            animationOutDOWN(edit, duration / 2);
+            cdd.show();
             tipOpened = true;
             webView.onPause();
         }
     }
 
-    public void expand(final View view, int duration) {
-        Container.setVisibility(View.INVISIBLE);
-        view.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        final int targetHeight = view.getMeasuredHeight();
-        final int targetWidth = view.getMeasuredWidth();
-
-        view.getLayoutParams().height = 0;
-        view.getLayoutParams().width = 0;
-        view.setVisibility(View.VISIBLE);
-
-        ValueAnimator anim = ValueAnimator.ofInt(view.getMeasuredHeight(), targetHeight);
-
-        anim.setInterpolator(new AccelerateInterpolator());
-        anim.setDuration(duration);
-        anim.addUpdateListener(animation -> {
-            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-            layoutParams.height = (int) (targetHeight * animation.getAnimatedFraction());
-            layoutParams.width = (int) (targetWidth * animation.getAnimatedFraction());
-            view.setLayoutParams(layoutParams);
-        });
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // At the end of animation, set the height to wrap content
-                // This fix is for long views that are not shown on screen
-                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                Container.setVisibility(View.VISIBLE);
-            }
-        });
-        anim.start();
-    }
-
-    public void contract(final View view, long duration) {
-        Container.setVisibility(View.INVISIBLE);
-        view.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        final int targetHeight = view.getMeasuredHeight();
-        final int targetWidth = view.getMeasuredWidth();
-
-//        view.getLayoutParams().height = targetHeight;
-//        view.getLayoutParams().width = targetWidth;
-        view.setVisibility(View.VISIBLE);
-
-        ValueAnimator anim = ValueAnimator.ofInt(0, 1);
-
-        anim.setInterpolator(new AccelerateInterpolator());
-        anim.setDuration(duration);
-        anim.addUpdateListener(animation -> {
-            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-            layoutParams.height = (int) (targetHeight * (1 - animation.getAnimatedFraction()));
-            layoutParams.width = (int) (targetWidth * (1 - animation.getAnimatedFraction()));
-            view.setLayoutParams(layoutParams);
-        });
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // At the end of animation, set the height to wrap content
-                // This fix is for long views that are not shown on screen
-                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-                layoutParams.height = 0;
-                layoutParams.width = 0;
-            }
-        });
-        anim.start();
-    }
+//    public void expand(final View view, int duration) {
+//        Container.setVisibility(View.INVISIBLE);
+//        view.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+//        final int targetHeight = view.getMeasuredHeight();
+//        final int targetWidth = view.getMeasuredWidth();
+//
+//        view.getLayoutParams().height = 0;
+//        view.getLayoutParams().width = 0;
+//        view.setVisibility(View.VISIBLE);
+//
+//        ValueAnimator anim = ValueAnimator.ofInt(view.getMeasuredHeight(), targetHeight);
+//
+//        anim.setInterpolator(new AccelerateInterpolator());
+//        anim.setDuration(duration);
+//        anim.addUpdateListener(animation -> {
+//            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//            layoutParams.height = (int) (targetHeight * animation.getAnimatedFraction());
+//            layoutParams.width = (int) (targetWidth * animation.getAnimatedFraction());
+//            view.setLayoutParams(layoutParams);
+//        });
+//        anim.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                // At the end of animation, set the height to wrap content
+//                // This fix is for long views that are not shown on screen
+//                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//                layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+//                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+//                Container.setVisibility(View.VISIBLE);
+//            }
+//        });
+//        anim.start();
+//    }
+//
+//    public void contract(final View view, long duration) {
+//        Container.setVisibility(View.INVISIBLE);
+//        view.measure(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+//        final int targetHeight = view.getMeasuredHeight();
+//        final int targetWidth = view.getMeasuredWidth();
+//
+////        view.getLayoutParams().height = targetHeight;
+////        view.getLayoutParams().width = targetWidth;
+//        view.setVisibility(View.VISIBLE);
+//
+//        ValueAnimator anim = ValueAnimator.ofInt(0, 1);
+//
+//        anim.setInterpolator(new AccelerateInterpolator());
+//        anim.setDuration(duration);
+//        anim.addUpdateListener(animation -> {
+//            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//            layoutParams.height = (int) (targetHeight * (1 - animation.getAnimatedFraction()));
+//            layoutParams.width = (int) (targetWidth * (1 - animation.getAnimatedFraction()));
+//            view.setLayoutParams(layoutParams);
+//        });
+//        anim.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                // At the end of animation, set the height to wrap content
+//                // This fix is for long views that are not shown on screen
+//                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//                layoutParams.height = 0;
+//                layoutParams.width = 0;
+//            }
+//        });
+//        anim.start();
+//    }
 
     public void fadeIn(View view, int duration) {
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new DecelerateInterpolator()); //add this
         fadeIn.setDuration(duration);
         fadeIn.setFillAfter(true);
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
         view.startAnimation(fadeIn);
     }
 
@@ -524,6 +618,21 @@ public class FragmentCamsys extends Fragment{
         fadeOut.setInterpolator(new DecelerateInterpolator()); //and this
         fadeOut.setDuration(duration);
         fadeOut.setFillAfter(true);
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
         view.startAnimation(fadeOut);
     }
 

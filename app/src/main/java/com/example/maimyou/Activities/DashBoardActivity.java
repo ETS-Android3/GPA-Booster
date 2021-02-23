@@ -3,6 +3,7 @@ package com.example.maimyou.Activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,20 +11,29 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.maimyou.Classes.ActionListener;
+import com.example.maimyou.Classes.MyJavaScriptInterface;
 import com.example.maimyou.Classes.Trimester;
 import com.example.maimyou.Classes.UriUtils;
 import com.example.maimyou.Classes.subjects;
@@ -41,6 +51,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +83,10 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     public static boolean InfoAvail = true;
     public static int fragmentIndex = 0;
     public static BottomNavigationView bottomNav;
+    public static String content = "";
+    public static int signin = 0;
+    public static int LoadRes = 0;
+    public static AdvancedWebView ProfileWebView;
 
     public void DashBack(View view) {
         onBackPressed();
@@ -83,7 +101,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         }
     }
 
-    public void setManually(View view) {
+    public void setManually() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new FragmentEdit(loadData("Id"), context, dashBoardActivity)).commit();
     }
@@ -95,6 +113,12 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     public void OpenCamsys(View view) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new FragmentCamsys(this)).commit();
+    }
+
+    public void Camsys(View view) {
+        bottomNav.setSelectedItemId(R.id.profile);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new FragmentCamsys(dashBoardActivity)).commit();
     }
 
     public void uploadPdf(View view) {
@@ -184,6 +208,10 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        InfoAvail = getIntent().getBooleanExtra("InfoAvail", true);
+
 
 //        DisplayMetrics displayMetrics = new DisplayMetrics();
 //        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -193,7 +221,9 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         bottomNav.setOnNavigationItemSelectedListener(navListener);
         fragmentProfile = new FragmentProfile(loadData("Id"), context, dashBoardActivity);
         fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+        setWebView();
 
+//        StartLoop();
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("Profile").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -204,9 +234,11 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
                         InfoAvail = false;
                         if (fragmentIndex != 0) {
                             try {
+//                                if (!loadData("Auto").isEmpty()) {
                                 bottomNav.setSelectedItemId(R.id.profile);
                                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                                         new FragmentCamsys(dashBoardActivity)).commit();
+//                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -245,6 +277,55 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         }
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
+    public void setWebView() {
+        ProfileWebView = findViewById(R.id.ProfileWebView);
+        ProfileWebView.setListener(this, this);
+        ProfileWebView.setMixedContentAllowed(true);
+        ProfileWebView.setThirdPartyCookiesEnabled(true);
+        ProfileWebView.getSettings().setAllowContentAccess(true);
+        ProfileWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        ProfileWebView.getSettings().setJavaScriptEnabled(true);
+        ProfileWebView.addJavascriptInterface(new MyJavaScriptInterface(dashBoardActivity), "HTMLOUT");
+
+        ProfileWebView.setWebViewClient(new WebViewClient() {
+//                    @Override
+//                    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                            Toast.makeText(context,error.getDescription(),Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (dashBoardActivity.loadData("Auto").isEmpty()) {
+                    if (url.endsWith(".pdf")) {
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        String cookie = cookieManager.getCookie("https://cms.mmu.edu.my");     // which is "http://bookboon.com"
+                        request.addRequestHeader("Cookie", cookie);
+                        request.setNotificationVisibility(1);
+                        request.allowScanningByMediaScanner();
+                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/camsys.pdf");
+                        request.setMimeType("application/pdf");
+                        DownloadManager dm = (DownloadManager) dashBoardActivity.getSystemService(DOWNLOAD_SERVICE);
+                        dm.enqueue(request);
+                        new Handler().postDelayed(() -> {
+                            dashBoardActivity.scanResFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/camsys.pdf");
+                        }, 3000);
+                    }
+                }
+                return true;
+            }
+        });
+//        new Handler().postDelayed(() -> {
+//            ProfileWebView.loadUrl("https://cms.mmu.edu.my/psp/csprd_1/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL");
+        ProfileWebView.loadUrl("https://cms.mmu.edu.my/psc/csprd/EMPLOYEE/HRMS/c/N_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL?PORTALPARAM_PTCNAV=ONLINE_RESULT&amp;EOPP.SCNode=HRMS&amp;EOPP.SCPortal=EMPLOYEE&amp;EOPP.SCName=CO_EMPLOYEE_SELF_SERVICE&amp;EOPP.SCLabel=Self%20Service&amp;EOPP.SCPTfname=CO_EMPLOYEE_SELF_SERVICE&amp;FolderPath=PORTAL_ROOT_OBJECT.CO_EMPLOYEE_SELF_SERVICE.HCCC_ACADEMIC_RECORDS.ONLINE_RESULT&amp;IsFolder=false&amp;PortalActualURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentURL=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2fEMPLOYEE%2fHRMS%2fc%2fN_SR_STUDENT_RECORDS.N_ON_RSLT_PNL.GBL&amp;PortalContentProvider=HRMS&amp;PortalCRefLabel=Academic%20Achievement&amp;PortalRegistryName=EMPLOYEE&amp;PortalServletURI=https%3a%2f%2fcms.mmu.edu.my%2fpsp%2fcsprd%2f&amp;PortalURI=https%3a%2f%2fcms.mmu.edu.my%2fpsc%2fcsprd%2f&amp;PortalHostNode=HRMS&amp;NoCrumbs=yes&amp;PortalKeyStruct=yes");
+//        }, 3000);
+
+        //        ProfileWebView.loadUrl("javascript:HTMLOUT.processHTML(document.documentElement.outerHTML);");
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 1212 && resultCode == RESULT_OK && data != null) {
@@ -258,6 +339,11 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         if (webView != null) {
 
             webView.onActivityResult(requestCode, resultCode, data);
+        }
+
+        if (ProfileWebView != null) {
+
+            ProfileWebView.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -289,6 +375,11 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
             webView.onResume();
         }
+
+        if (ProfileWebView != null) {
+
+            ProfileWebView.onResume();
+        }
         // ...
     }
 
@@ -298,6 +389,11 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         if (webView != null) {
 
             webView.onPause();
+        }
+
+        if (ProfileWebView != null) {
+
+            ProfileWebView.onPause();
         }
         // ...
         super.onPause();
@@ -309,6 +405,11 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
             webView.onDestroy();
         }
+
+        if (ProfileWebView != null) {
+
+            ProfileWebView.onDestroy();
+        }
         // ...
         super.onDestroy();
     }
@@ -319,14 +420,219 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
     @Override
     public void onPageFinished(String url) {
+        if (Build.VERSION.SDK_INT >= 19) {
+
+            if (ProfileWebView != null) {
+//                ProfileWebView.loadUrl("javascript:window.INTERFACE.processContent(document.getElementsByTagName('body')[0].innerText);");
+                ProfileWebView.loadUrl("javascript:HTMLOUT.processHTML(document.documentElement.outerHTML);");
+            }
+
+            if (webView != null) {
+//                String js1 = "javascript:document.getElementById('userid').value='1161104336';" +
+//                        "javascript:document.getElementById('pwd').value='5Lq##KTESJ4';" +
+
+                String js1 = "javascript:document.getElementById('userid').value='" + loadData("camsysId") + "';" +
+                        "javascript:document.getElementById('pwd').value='" + loadData("camsysPassword") + "';" +
+                        "javascript:document.getElementsByName('Submit')[0].click();";
+                webView.evaluateJavascript(js1, s -> {
+
+                });
+            }
+
+
+//            webView.loadUrl("javascript: (function() {document.getElementById('userid').value= '"+"1161104336"+"';  document.getElementById('pwd').value='"+"5Lq##KTESJ4"+"';  }) ();" );
+
+        }
     }
+//
+//    public void StartLoop() {
+//
+//        new Handler().postDelayed(() -> {
+//            if (webView != null) {
+//
+//                String js3 = "javascript:document.getElementsByName('N_REPORT_WRK_BUTTON')[0].click();";
+//                webView.evaluateJavascript(js3, s -> {
+//                });
+//            }
+//            StartLoop();
+//        }, 10000);
+//    }
 
     @Override
     public void onPageError(int errorCode, String description, String failingUrl) {
+//        Toast.makeText(context,description,Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
+//        Toast.makeText(context, "onDownloadRequested", Toast.LENGTH_LONG).show();
+
+
+//        DownloadManager.Request request = new DownloadManager.Request(
+//                Uri.parse(url));
+//        request.setMimeType(mimeType);
+//        String cookies = CookieManager.getInstance().getCookie(url);
+//        request.addRequestHeader("cookie", cookies);
+//        request.addRequestHeader("User-Agent", userAgent);
+//        request.setDescription("Downloading file...");
+//        request.setTitle(URLUtil.guessFileName(url, contentDisposition,
+//                mimeType));
+//        request.allowScanningByMediaScanner();
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setDestinationInExternalPublicDir(
+//                Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(
+//                        url, contentDisposition, mimeType));
+//        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//        dm.enqueue(request);
+//        Toast.makeText(getApplicationContext(), "Downloading File",
+//                Toast.LENGTH_LONG).show();
+
+//        DownloadManager.Request request = new DownloadManager.Request(
+//                Uri.parse(url));
+//        request.setMimeType(mimeType);
+//        String cookies = CookieManager.getInstance().getCookie(url);
+//        request.addRequestHeader("cookie", cookies);
+//        request.addRequestHeader("User-Agent", userAgent);
+//        request.setDescription("Downloading File...");
+//        request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimeType));
+//        request.allowScanningByMediaScanner();
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setDestinationInExternalPublicDir(
+//                Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(
+//                        url, contentDisposition, mimeType));
+//        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//        dm.enqueue(request);
+
+
+//
+//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+//        CookieManager cookieManager = CookieManager.getInstance();
+//        String cookie = cookieManager.getCookie("https://cms.mmu.edu.my");     // which is "http://bookboon.com"
+//        request.addRequestHeader("Cookie", cookie);
+//        request.setTitle(suggestedFilename);
+//        request.setNotificationVisibility(1);
+//        request.allowScanningByMediaScanner();
+//        request.setMimeType("application/pdf");
+////        Log.e("Extension with ","UpperCase-->"+"\""+fileName.split("\\.")[0]+"."+fileName.split("\\.")[1].toUpperCase()+"\"");
+////        downloadId = downloadManager.enqueue(request);
+//        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//        dm.enqueue(request);
+
+//        Map<String, String> headers = new HashMap<>();
+//        headers.put("Authorization", "Basic" + Base64.encodeToString("1161104336" + ':' + "5Lq##KTESJ4"), Base64.DEFAULT);
+
+
+//        HashMap<String, String> headers = new HashMap<>();
+//        String basicAuthHeader = android.util.Base64.encodeToString(("1161104336" + ":" + "5Lq##KTESJ4").getBytes(), android.util.Base64.NO_WRAP);
+//        headers.put("Authorization", "Basic " + basicAuthHeader);
+//        webView.loadUrl("http://docs.google.com/viewer?url=" + url + "&embedded=true", headers);
+
+
+//        DownloadManager.Request request = new DownloadManager.Request( Uri.parse(url));
+//        request.allowScanningByMediaScanner();
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "myPDFfile.pdf");
+//        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//        dm.enqueue(request);
+        Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
+
+
+//        openCustomTab(url);
+//
+//        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+//
+//        //This three lines will do your work
+//
+//        CookieManager cookieManager = CookieManager.getInstance();
+//        String cookie = cookieManager.getCookie("https://cms.mmu.edu.my");     // which is "http://bookboon.com"
+//        request.addRequestHeader("Cookie", cookie);
+//        //................................................
+//        request.allowScanningByMediaScanner();
+//        Environment.getExternalStorageDirectory();
+//        getApplicationContext().getFilesDir().getPath(); //which returns the internal app files directory path
+//        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+//        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "download");
+//        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//        dm.enqueue(request);
+
+//        new DownloadFileFromURL().execute(url);
+
+//
+//        try
+//        {
+//            Intent intentUrl = new Intent(Intent.ACTION_VIEW);
+//            intentUrl.setDataAndType(Uri.parse(url), "application/pdf");
+//            intentUrl.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            dashBoardActivity.startActivity(intentUrl);
+//        }
+//        catch (ActivityNotFoundException e)
+//        {
+//            e.printStackTrace();
+//            Toast.makeText(dashBoardActivity, "No PDF Viewer Installed", Toast.LENGTH_LONG).show();
+//        }
+
+//        try {
+//            System.out.println("opening connection");
+//            URL urll = null;
+//            urll = new URL(url);
+//
+//            InputStream in = urll.openStream();
+//            FileOutputStream fos = new FileOutputStream(new File("yourFile.pdf"));
+//
+//            System.out.println("reading from resource and writing to file...");
+//            int length = -1;
+//            byte[] buffer = new byte[1024];// buffer for portion of data from connection
+//            while ((length = in.read(buffer)) > -1) {
+//                fos.write(buffer, 0, length);
+//            }
+//            fos.close();
+//            in.close();
+//            System.out.println("File downloaded");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (webView != null) {
+//
+//            webView.loadUrl( url );
+//        }
+//        Intent i = new Intent(Intent.ACTION_VIEW);
+//        i.setData(Uri.parse(url));
+//        startActivity(i);
+//        //        readPdfFileVerify(url);
+    }
+
+    void openCustomTab(String url) {
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+
+        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        builder.addDefaultShareMenuItem();
+        builder.addDefaultShareMenuItem();
+        builder.setShowTitle(true);
+        builder.setStartAnimations(this, R.anim.load_up_anim, R.anim.stable);
+        builder.setExitAnimations(this, R.anim.load_down_anim, R.anim.stable);
+
+        CustomTabsIntent customTabsIntent = builder.build();
+        customTabsIntent.launchUrl(this, Uri.parse("https://cms.mmu.edu.my/psp/csprd/?cmd=login?&languageCd=ENG&"));
+        customTabsIntent.launchUrl(this, Uri.parse("javascript:document.getElementById('userid').value='1161104336';" +
+                "javascript:document.getElementById('pwd').value='5Lq##KTESJ4';" +
+                "javascript:document.getElementsByName('Submit')[0].click();"));
+        customTabsIntent.launchUrl(this, Uri.parse(url));
+
+    }
+
+    public void readPdfFileVerify(String pdfUrl) {
+
+        try (BufferedInputStream inputStream = new BufferedInputStream(new URL(pdfUrl).openStream());
+             FileOutputStream fileOS = new FileOutputStream(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/file_name.txt")) {
+            byte data[] = new byte[1024];
+            int byteContent;
+            while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
+                fileOS.write(data, 0, byteContent);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -411,7 +717,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             SaveTo("Profile", Name, Id, Degree);
             SetSubjectsReviews(Id);
             InfoAvail = true;
-
+            saveData("camsys", "Auto");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new FragmentProfile(loadData("Id"), context, dashBoardActivity)).commit();
             Toast.makeText(context, "Your profile has been updated successfully!", Toast.LENGTH_LONG).show();

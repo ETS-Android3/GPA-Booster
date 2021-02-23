@@ -49,6 +49,11 @@ dependencies {
     implementation 'com.android.support:support-annotations:29.0.0'
     implementation 'com.github.delight-im:Android-AdvancedWebView:v3.2.1'
 
+
+
+    implementation 'com.just.agentweb:agentweb:4.0.2'
+    implementation 'com.just.agentweb:download:4.0.2'
+    implementation 'com.just.agentweb:filechooser:4.0.2'
 //
     implementation 'com.itextpdf:itext-pdfa:5.5.13'
     implementation 'com.itextpdf:itextg:5.5.10'

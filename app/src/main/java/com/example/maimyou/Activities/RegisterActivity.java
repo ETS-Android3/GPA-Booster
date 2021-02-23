@@ -1,27 +1,41 @@
 package com.example.maimyou.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.maimyou.Classes.UriUtils;
 import com.example.maimyou.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -31,22 +45,25 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import maes.tech.intentanim.CustomIntent;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 public class RegisterActivity extends AppCompatActivity {
 
     public static final String TAG = "TAG";
     long maxId = 0;
-    LinearLayout linearLayout, forLogin;
-    TextView enterTitle, RegistrationTitle2,forgotText;
-    EditText nameE, emailE, passE, confirmPassE, focused;
-    FrameLayout name, email, pass, confirmPass, forReg;
+    LinearLayout linearLayout, forLogin, Container;
+    TextView enterTitle, RegistrationTitle2, forgotText;
+    EditText idE, CamsysPassE, emailE, passE, confirmPassE, focused;
+    FrameLayout id, CamsysPass, email, pass, confirmPass, forReg;
     ScrollView scrollView;
-    ImageView back;
+    ImageView back, logoImg;
 
     //    ImageView background;
     DatabaseReference reff;
@@ -55,30 +72,49 @@ public class RegisterActivity extends AppCompatActivity {
     ProgressBar progressBar;
     FirebaseFirestore fStore;
     String userID;
-    boolean fail = false;
+    boolean fail = false, doubleBackToExitPressedOnce = false;
     public static final String SHARED_PREFS = "sharedPrefs";
     DocumentReference noteRef;
-    Activity activity=this;
+    public static final int STARTUP_DELAY = 300;
+    public static final int ANIM_ITEM_DURATION = 1000;
+    public static final int EDITTEXT_DELAY = 300;
+    public static final int BUTTON_DELAY = 300;
+    public static final int VIEW_DELAY = 400;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     public void onback(View view) {
         onBackPressed();
     }
 
-    public void Forgot(View view){
+    public void Forgot(View view) {
         Intent intent = new Intent(getBaseContext(), ForgotPasswordActivity.class);
         intent.putExtra("EmailAddress", emailE.getText().toString());
         startActivity(intent);
     }
 
     public void Register(View view) {
+        register();
+    }
+
+    public void register() {
         if (register) {
-            final String name = nameE.getText().toString().trim();
-            final String email = emailE.getText().toString().trim();
+            String id = idE.getText().toString().trim();
+            String camsysPassword = CamsysPassE.getText().toString().trim();
+            String email = emailE.getText().toString().trim();
             String password = passE.getText().toString().trim();
             String ConfinrmPassword = confirmPassE.getText().toString().trim();
 
-            if (TextUtils.isEmpty(name)) {
-                nameE.setError("Id is Required.");
+            if (TextUtils.isEmpty(id)) {
+                idE.setError("Id is Required.");
+                return;
+            }
+
+            if (TextUtils.isEmpty(camsysPassword)) {
+                idE.setError("Camsys password is Required.");
                 return;
             }
 
@@ -101,42 +137,48 @@ public class RegisterActivity extends AppCompatActivity {
                 confirmPassE.setError("Password is not similar.");
                 return;
             }
+            if (checkPermission(this)) {
 
-            progressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
 
-            // register the user in firebase
+                // register the user in firebase
 
-            fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
-                    userID = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
-                    DocumentReference documentReference = fStore.collection("users").document(userID);
-                    Map<String, Object> user = new HashMap<>();
-                    reff.child(String.valueOf(maxId + 1)).child("Id").setValue(name);
-                    reff.child(String.valueOf(maxId + 1)).child("email").setValue(email);
+                fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
+                        userID = Objects.requireNonNull(fAuth.getCurrentUser()).getUid();
+                        DocumentReference documentReference = fStore.collection("users").document(userID);
+                        Map<String, Object> user = new HashMap<>();
+                        reff.child(String.valueOf(maxId + 1)).child("camsysId").setValue(id);
+                        reff.child(String.valueOf(maxId + 1)).child("camsysPassword").setValue(camsysPassword);
+                        reff.child(String.valueOf(maxId + 1)).child("email").setValue(email);
 
-                    user.put("Id", Long.toString(maxId + 1));
-                    saveData(Long.toString(maxId + 1), "Id");
+                        user.put("Id", Long.toString(maxId + 1));
+                        saveData(Long.toString(maxId + 1), "Id");
+                        saveData(camsysPassword, "camsysPassword");
+                        saveData(id, "camsysId");
 
-                    documentReference.set(user).addOnSuccessListener(aVoid -> {
-                        fail = false;
-                        Log.d(TAG, "onSuccess: user Profile is created for " + userID);
-                    }).addOnFailureListener(e -> {
-                        Log.d(TAG, "onFailure: " + e.toString());
+                        documentReference.set(user).addOnSuccessListener(aVoid -> {
+                            fail = false;
+                            Log.d(TAG, "onSuccess: user Profile is created for " + userID);
+                        }).addOnFailureListener(e -> {
+                            Log.d(TAG, "onFailure: " + e.toString());
+                            progressBar.setVisibility(View.GONE);
+                            fail = true;
+                        });
+                        if (!fail) {
+                            saveData("0", "Selection");
+                            Intent intent = new Intent(getBaseContext(), DashBoardActivity.class);
+                            intent.putExtra("InfoAvail", false);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Error ! " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
-                        fail = true;
-                    });
-                    if (!fail) {
-                        saveData("0", "Selection");
-                        startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-                        startActivity(new Intent(getApplicationContext(), ScanMarksActivity.class));
-                        finish();
                     }
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Error ! " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                }
-            });
+                });
+            }
         } else {
 
             final String email = emailE.getText().toString().trim();
@@ -157,20 +199,22 @@ public class RegisterActivity extends AppCompatActivity {
                 passE.setError("Password Must be >= 6 Characters");
                 return;
             }
+            if (checkPermission(this)) {
 
-            progressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
 
-            // authenticate the user
+                // authenticate the user
 
-            fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    saveId();
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Error ! " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
-                    progressBar.setVisibility(View.GONE);
-                }
+                fAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        saveId();
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Error ! " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
 
-            });
+                });
+            }
         }
     }
 
@@ -178,7 +222,8 @@ public class RegisterActivity extends AppCompatActivity {
     public void Login(View view) {
         clearFocus();
         if (register) {
-            name.setVisibility(View.GONE);
+            id.setVisibility(View.GONE);
+            CamsysPass.setVisibility(View.GONE);
             confirmPass.setVisibility(View.GONE);
             forgotText.setVisibility(View.VISIBLE);
             emailE.setText("");
@@ -196,25 +241,29 @@ public class RegisterActivity extends AppCompatActivity {
             register = false;
 
         } else {
-            name.setVisibility(View.VISIBLE);
+            id.setVisibility(View.VISIBLE);
+            CamsysPass.setVisibility(View.VISIBLE);
             confirmPass.setVisibility(View.VISIBLE);
             forgotText.setVisibility(View.GONE);
             linearLayout.setVisibility(View.GONE);
 
-            nameE.setText("");
+            idE.setText("");
+            CamsysPassE.setText("");
             emailE.setText("");
             passE.setText("");
             confirmPassE.setText("");
-            nameE.setError(null);
+            idE.setError(null);
+            CamsysPassE.setError(null);
             emailE.setError(null);
             passE.setError(null);
             confirmPassE.setError(null);
-            nameE.clearFocus();
+            idE.clearFocus();
+            CamsysPassE.clearFocus();
             emailE.clearFocus();
             passE.clearFocus();
             confirmPassE.clearFocus();
 
-            passE.setHint("Camsys Password");
+            passE.setHint("Password");
             forReg.setVisibility(View.VISIBLE);
             forLogin.setVisibility(View.GONE);
             enterTitle.setText("CREATE");
@@ -235,10 +284,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         iniFunc();
         initBackground();
-
+        animationFunc();
         if (fAuth.getCurrentUser() != null) {
-            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-            finish();
+            if (checkPermission(this)) {
+                startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                finish();
+            }
         }
 
 //            if (!loadData("log").isEmpty()) {
@@ -255,53 +306,27 @@ public class RegisterActivity extends AppCompatActivity {
 //        return sharedPreferences.getString(name, "");
 //    }
 
-    @SuppressLint("ClickableViewAccessibility")
-    public void initBackground() {
-        back = findViewById(R.id.scrollView2);
-        scrollView = findViewById(R.id.scrole);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        scrollView.setOnTouchListener((v, event) -> {
-            clearFocus();
-            return false;
-        });
-        back.setOnTouchListener((v, event) -> {
-            clearFocus();
-            return false;
-        });
-    }
-
-    public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (view != null) {
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
-    public void clearFocus() {
-        if (focused != null) {
-            focused.clearFocus();
-            hideKeyboard(focused);
-        }
-    }
-
     public void iniFunc() {
         RegistrationTitle2 = findViewById(R.id.RegistrationTitle2);
         RegistrationTitle2.setShadowLayer(5, 3, 3, Color.BLACK);
+        logoImg = findViewById(R.id.logoImg);
+        Container = findViewById(R.id.Container);
         forgotText = findViewById(R.id.forgotText);
         forLogin = findViewById(R.id.forLoginTitle);
         forReg = findViewById(R.id.forRegisTiltle);
         enterTitle = findViewById(R.id.enterTitle);
         enterTitle.setShadowLayer(5, 3, 3, Color.BLACK);
         linearLayout = findViewById(R.id.forLogin);
-        name = findViewById(R.id.Id);
+        id = findViewById(R.id.Id);
+        CamsysPass = findViewById(R.id.CamsysPass);
+        CamsysPassE = findViewById(R.id.CamsysPassE);
         email = findViewById(R.id.email);
         pass = findViewById(R.id.pass);
         confirmPass = findViewById(R.id.conPass);
-        nameE = findViewById(R.id.studentId);
-        nameE.setOnFocusChangeListener((view, hasFocus) -> {
+        idE = findViewById(R.id.studentId);
+        idE.setOnFocusChangeListener((view, hasFocus) -> {
             if (hasFocus) {
-                focused = nameE;
+                focused = idE;
             }
         });
         emailE = findViewById(R.id.emailadress);
@@ -339,6 +364,81 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    public void initBackground() {
+        back = findViewById(R.id.scrollView2);
+        scrollView = findViewById(R.id.scrole);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        scrollView.setOnTouchListener((v, event) -> {
+            clearFocus();
+            return false;
+        });
+        back.setOnTouchListener((v, event) -> {
+            clearFocus();
+            return false;
+        });
+    }
+
+    public void animationFunc() {
+        logoImg.post(() -> {
+            Animation animation2 = new TranslateAnimation(0, 0, logoImg.getHeight(), 0);
+            animation2.setStartTime(STARTUP_DELAY);
+            animation2.setDuration(ANIM_ITEM_DURATION);
+            animation2.setInterpolator(new DecelerateInterpolator(1.2f));
+            animation2.setFillAfter(true);
+            logoImg.startAnimation(animation2);
+        });
+        RegistrationTitle2.post(() -> {
+            Animation animation2 = new TranslateAnimation(0, 0, -RegistrationTitle2.getHeight(), 0);
+            animation2.setStartTime(STARTUP_DELAY);
+            animation2.setDuration(ANIM_ITEM_DURATION);
+            animation2.setInterpolator(new DecelerateInterpolator(1.2f));
+            animation2.setFillAfter(true);
+            RegistrationTitle2.startAnimation(animation2);
+        });
+
+        for (int i = 0; i < Container.getChildCount(); i++) {
+            View v = Container.getChildAt(i);
+            ViewPropertyAnimatorCompat viewAnimator;
+
+            if (v instanceof FrameLayout) {
+                viewAnimator = ViewCompat.animate(v)
+                        .scaleY(1).scaleX(1)
+                        .setStartDelay((EDITTEXT_DELAY * i) + 500)
+                        .setDuration(500);
+            } else if (v instanceof RelativeLayout) {
+                viewAnimator = ViewCompat.animate(v)
+                        .scaleY(1).scaleX(1)
+                        .setStartDelay((BUTTON_DELAY * i) + 500)
+                        .setDuration(500);
+            } else {
+                viewAnimator = ViewCompat.animate(v)
+                        .translationY(0).alpha(1)
+                        .setStartDelay((VIEW_DELAY * i) + 500)
+                        .setDuration(1000);
+            }
+
+            viewAnimator.setInterpolator(new DecelerateInterpolator()).start();
+        }
+
+
+    }
+
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public void clearFocus() {
+        if (focused != null) {
+            focused.clearFocus();
+            hideKeyboard(focused);
+        }
+    }
+
     public void saveData(String data, String name) {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -351,21 +451,54 @@ public class RegisterActivity extends AppCompatActivity {
         noteRef = fStore.collection("users").document(userID);
         noteRef.addSnapshotListener(this, (documentSnapshot, e) -> {
             if (e != null) {
-                Toast.makeText(RegisterActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, e.toString());
-                FirebaseAuth.getInstance().signOut();//logout
-                progressBar.setVisibility(View.GONE);
+                Error(e.toString());
                 return;
             }
-
             if (Objects.requireNonNull(documentSnapshot).exists()) {
+
                 String Id = documentSnapshot.getString("Id");
-                saveData(Id, "Id");
-                Toast.makeText(RegisterActivity.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
-                finish();
+
+                if (Id != null) {
+                    reff.child(Id).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            saveData(Id, "Id");
+                            if (snapshot.child("camsysPassword").exists()) {
+                                saveData(snapshot.child("camsysPassword").getValue().toString(), "camsysPassword");
+                            } else {
+                                Error("Camsys Password not found!");
+                                return;
+                            }
+                            if (snapshot.child("camsysId").exists()) {
+                                saveData(snapshot.child("camsysId").getValue().toString(), "camsysId");
+                            } else {
+                                Error("Camsys Id not found!");
+                                return;
+                            }
+                            saveData("0", "Selection");
+                            Toast.makeText(RegisterActivity.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                            finish();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                } else {
+                    Error("Something went Wrong!");
+                }
+            } else {
+                Error("Something went Wrong!");
             }
         });
+    }
+
+    public void Error(String msg) {
+        Toast.makeText(RegisterActivity.this, msg, Toast.LENGTH_SHORT).show();
+        FirebaseAuth.getInstance().signOut();//logout
+        progressBar.setVisibility(View.GONE);
     }
 
 //    public int dpToPx(int dip) {
@@ -377,6 +510,42 @@ public class RegisterActivity extends AppCompatActivity {
 //        );
 //        return (int) px;
 //    }
+
+    public boolean checkPermission(Activity activity) {
+        // Check if we have write permission
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_EXTERNAL_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission accepted", Toast.LENGTH_SHORT).show();
+                if (fAuth.getCurrentUser() != null) {
+                    startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                    finish();
+                } else {
+                    register();
+                }
+            } else {
+                Toast.makeText(this, "permissions are required", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "permissions are required", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -393,6 +562,16 @@ public class RegisterActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (register) {
             Login(null);
+        } else {
+            if (doubleBackToExitPressedOnce) {
+                super.onBackPressed();
+                return;
+            }
+
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please click BACK again to exit", LENGTH_SHORT).show();
+
+            new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
         }
     }
 }

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:coverflow="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/backGround"
+    android:background="@android:color/transparent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_marginBottom="?attr/actionBarSize"
+            android:onClick="empty"
+            app:cardBackgroundColor="@color/colorPrimary"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            app:cardCornerRadius="5dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:alpha="0.6"
+                    android:padding="5dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/light_bulb__1_" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:alpha="0.8"
+                    android:text="Tips"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/closeTip"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:alpha="0.6"
+                    android:background="@drawable/ripple_effect_rec_no_background"
+                    android:padding="5dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_close_white_24dp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_gravity="bottom"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:alpha="0.8"
+                    android:buttonTint="#FFFFFF"
+                    android:gravity="center_vertical"
+                    android:text="Don't show again"
+                    android:textColor="#FFFFFF" />
+
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="30dp"
+                android:background="@color/backGroundColour" />
+
+            <LinearLayout
+                android:id="@+id/Container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="30dp"
+                android:background="@color/backGroundColour"
+                android:orientation="vertical">
+
+                <it.moondroid.coverflow.components.ui.containers.FeatureCoverFlow
+                    android:id="@+id/coverflow"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/pageNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_margin="10dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                android:text="or"
+                                android:textColor="#000000"
+                                android:textSize="14sp" />
+
+                            <TextView
+                              android:id="@+id/Manually"
+                                android:layout_width="wrap_content"
+                                android:layout_height="0dp"
+                                android:layout_marginEnd="20dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/ripple_effect_rec_no_background"
+                                android:text="@string/manually"
+                                android:textColor="@color/mmuColourSecondary"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/back"
+                            android:layout_width="0dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:layout_margin="5dp"
+                            android:layout_weight="0.5"
+                            android:background="@drawable/tip_button"
+                            android:text="back"
+                            android:textColor="@color/colorPrimary" />
+
+                        <Button
+                            android:id="@+id/next"
+                            android:layout_width="0dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:layout_weight="0.5"
+                            android:background="@drawable/tip_button"
+                            android:text="Next"
+                            android:textColor="@color/colorPrimary" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
+</RelativeLayout>

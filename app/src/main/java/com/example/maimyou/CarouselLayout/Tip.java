@@ -1,12 +1,17 @@
 package com.example.maimyou.CarouselLayout;
 
-public class Game {
-    private String name;
+public class Tip {
+    private String name,des;
     private int imageSource;
 
-    public Game (int imageSource, String name) {
+    public Tip(int imageSource, String name,String des) {
         this.name = name;
         this.imageSource = imageSource;
+        this.des=des;
+    }
+
+    public String getDes() {
+        return des;
     }
 
     public String getName() {

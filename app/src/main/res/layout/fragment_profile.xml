@@ -375,6 +375,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@drawable/progress" />
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 

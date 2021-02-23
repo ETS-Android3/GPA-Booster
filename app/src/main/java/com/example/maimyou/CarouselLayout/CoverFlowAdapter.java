@@ -14,10 +14,10 @@ import java.util.ArrayList;
 
 public class CoverFlowAdapter extends BaseAdapter {
 
-    private ArrayList<Game> data;
+    private ArrayList<Tip> data;
     private Context activity;
 
-    public CoverFlowAdapter(Context context, ArrayList<Game> objects) {
+    public CoverFlowAdapter(Context context, ArrayList<Tip> objects) {
         this.activity = context;
         this.data = objects;
     }
@@ -28,7 +28,7 @@ public class CoverFlowAdapter extends BaseAdapter {
     }
 
     @Override
-    public Game getItem(int position) {
+    public Tip getItem(int position) {
         return data.get(position);
     }
 
