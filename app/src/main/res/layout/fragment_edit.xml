@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -154,8 +153,7 @@
             android:orientation="vertical"
             android:paddingBottom="20dp">
 
-            <androidx.cardview.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -206,7 +204,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="17dp"
-                                android:layout_marginRight="17dp"
                                 android:fontFamily="sans-serif-light"
                                 android:text="Your name"
                                 android:textColor="@color/colorPrimaryDark"
@@ -220,9 +217,7 @@
                             android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:layout_marginStart="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginEnd="7dp"
-                            android:layout_marginRight="7dp"
                             android:background="@drawable/ripple_effect_oval_no_background"
                             android:padding="5dp"
                             android:scaleType="centerInside"
@@ -249,7 +244,7 @@
                             android:layout_gravity="center"
                             android:layout_marginLeft="17dp"
                             android:layout_marginRight="17dp"
-                            android:src="@drawable/ic_email_black_24dp" />
+                            android:src="@drawable/user" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -261,31 +256,30 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="ID"
+                                android:text="Camsys Id"
                                 android:textColor="@color/colorPrimary"
                                 android:textSize="13sp" />
 
                             <TextView
-                                android:id="@+id/Email"
+                                android:id="@+id/CamsysId"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="17dp"
                                 android:layout_marginRight="17dp"
                                 android:fontFamily="sans-serif-light"
-                                android:text="Your ID"
+                                android:text="Your Id"
                                 android:textColor="@color/colorPrimaryDark"
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
                         <ImageButton
+                            android:id="@+id/editCamsysId"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:layout_marginStart="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginEnd="7dp"
-                            android:layout_marginRight="7dp"
                             android:background="@drawable/ripple_effect_oval_no_background"
                             android:padding="5dp"
                             android:scaleType="centerInside"
@@ -312,7 +306,70 @@
                             android:layout_gravity="center"
                             android:layout_marginLeft="17dp"
                             android:layout_marginRight="17dp"
-                            android:src="@drawable/ic_email_black_24dp" />
+                            android:src="@drawable/lock" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Camsys password"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/CamsysPass"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="17dp"
+                                android:fontFamily="sans-serif-light"
+                                android:inputType="textPassword"
+                                android:text="Your Camsys password"
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText,TextViewEdits" />
+                        </LinearLayout>
+
+                        <ImageButton
+                            android:id="@+id/editCamsysPass"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="7dp"
+                            android:background="@drawable/ripple_effect_oval_no_background"
+                            android:padding="5dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_edit_black_24dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="54dp"
+                        android:layout_marginLeft="54dp"
+                        android:layout_marginTop="17dp"
+                        android:layout_marginBottom="17dp"
+                        android:background="@color/grey" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="17dp"
+                            android:layout_marginRight="17dp"
+                            android:src="@drawable/gpa_calculator" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -329,6 +386,7 @@
                                 android:textSize="13sp" />
 
                             <TextView
+                                android:id="@+id/CGPA"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="17dp"
@@ -341,14 +399,12 @@
                         </LinearLayout>
 
                         <ImageButton
-                            android:id="@+id/emailB"
+                            android:id="@+id/editCGPA"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:layout_marginStart="12dp"
-                            android:layout_marginLeft="12dp"
                             android:layout_marginEnd="7dp"
-                            android:layout_marginRight="7dp"
                             android:background="@drawable/ripple_effect_oval_no_background"
                             android:padding="5dp"
                             android:scaleType="centerInside"
@@ -376,10 +432,10 @@
                             android:layout_gravity="center"
                             android:layout_marginLeft="17dp"
                             android:layout_marginRight="17dp"
-                            android:src="@drawable/ic_email_black_24dp" />
+                            android:src="@drawable/ic_baseline_hourglass_bottom_24" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1"
@@ -393,10 +449,10 @@
                                 android:textSize="13sp" />
 
                             <TextView
+                                android:id="@+id/totalHours"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="17dp"
-                                android:layout_marginRight="17dp"
                                 android:fontFamily="sans-serif-light"
                                 android:text="Your total hours"
                                 android:textColor="@color/colorPrimaryDark"
@@ -410,8 +466,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -458,35 +513,35 @@
 
                         <RadioButton
                             android:id="@+id/radioElectronics"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="EE" />
 
                         <RadioButton
                             android:id="@+id/radioComputer"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="CE" />
 
                         <RadioButton
                             android:id="@+id/radioTelecom"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="TE" />
 
                         <RadioButton
                             android:id="@+id/radioElectrical"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="LE" />
 
                         <RadioButton
                             android:id="@+id/radioNano"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Nano" />
@@ -497,8 +552,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -561,9 +615,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
         android:elevation="20dp"
-        tools:targetApi="lollipop"
-        android:layout_alignParentTop="true">
+        tools:targetApi="lollipop">
 
         <FrameLayout
             android:id="@+id/backButton"
@@ -576,43 +630,116 @@
                 android:layout_height="match_parent"
                 android:layout_margin="7dp"
                 android:alpha="0.6"
-                android:onClick="DashBack"
                 android:background="@drawable/ripple_effect_oval_no_background"
+                android:onClick="DashBack"
                 android:scaleType="centerInside"
                 android:src="@drawable/abc_vector_test"
                 tools:ignore="ContentDescription" />
         </FrameLayout>
 
+        <LinearLayout
+            android:id="@+id/Title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@+id/pin"
+            android:layout_toEndOf="@id/backButton"
+            android:orientation="horizontal">
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-        <FrameLayout
-            android:id="@+id/menu"
-            android:layout_width="?attr/actionBarSize"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginEnd="-5dp"
-            android:layout_marginRight="-5dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
 
-            <ImageButton
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:alpha="0.6"
-                android:background="@drawable/ripple_effect_oval_no_background"
-                android:padding="5dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/ic_baseline_more_vert_24" />
-        </FrameLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:alpha="0.8"
+                    android:text="Total Hours"
+                    android:textColor="@color/backGroundColour"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/TotalHoursTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:alpha="0.8"
+                    android:textColor="@color/backGroundColour"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:alpha="0.8"
+                    android:text="CGPA"
+                    android:textColor="@color/backGroundColour"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/CGPAA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:alpha="0.8"
+                    android:textColor="@color/backGroundColour"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize">
+
+                <ImageButton
+                    android:id="@+id/editCGPAB"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="7dp"
+                    android:alpha="0.6"
+                    android:background="@drawable/ripple_effect_oval_no_background"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_edit_white"
+                    tools:ignore="ContentDescription" />
+            </FrameLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
 
         <FrameLayout
             android:id="@+id/pin"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginEnd="-15dp"
-            android:layout_marginRight="-15dp"
-            android:layout_toStartOf="@+id/menu"
-            android:layout_toLeftOf="@+id/menu">
+            android:layout_toStartOf="@+id/menu">
 
             <ImageButton
                 android:id="@+id/lightBulb"
@@ -626,6 +753,23 @@
                 android:src="@drawable/light_bulb__1_" />
         </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/menu"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="-5dp">
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:alpha="0.6"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                android:padding="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_baseline_more_vert_24" />
+        </FrameLayout>
     </RelativeLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -635,10 +779,10 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
-        android:theme="@style/CustomTheme1"
         android:backgroundTint="@color/colorPrimary"
         android:onClick="save"
         android:src="@drawable/ic_save_black_24dp"
+        android:theme="@style/CustomTheme2"
         app:fabCustomSize="50dp"
         tools:ignore="RtlHardcoded"
         tools:targetApi="lollipop" />
@@ -648,6 +792,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"
         android:background="@drawable/progress" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

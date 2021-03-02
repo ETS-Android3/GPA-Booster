@@ -47,6 +47,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.CustomTheme1);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
         emailAddress = findViewById(R.id.emailAddress);

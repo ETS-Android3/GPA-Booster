@@ -37,6 +37,7 @@ import androidx.fragment.app.Fragment;
 import com.example.maimyou.Activities.DashBoardActivity;
 import com.example.maimyou.Adapters.camsysWebsitesAdapter;
 import com.example.maimyou.CarouselLayout.Tip;
+import com.example.maimyou.Classes.MyJavaScriptInterface;
 import com.example.maimyou.Classes.camsysPage;
 import com.example.maimyou.Dialogs.TipContainerDialog;
 import com.example.maimyou.R;
@@ -94,6 +95,8 @@ public class FragmentCamsys extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (!snapshot.exists()) {
                         backB.setVisibility(View.GONE);
+                    } else {
+                        backB.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -137,7 +140,6 @@ public class FragmentCamsys extends Fragment {
             });
 //            cdd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-
             arrow = getView().findViewById(R.id.arrow);
             fadeOutNoDelay(arrow);
             webView = getView().findViewById(R.id.webView);
@@ -145,8 +147,9 @@ public class FragmentCamsys extends Fragment {
             webView.setMixedContentAllowed(true);
             webView.setThirdPartyCookiesEnabled(true);
 //            webView.setDesktopMode(true);
+            webView.addJavascriptInterface(new MyJavaScriptInterface(dashBoardActivity), "HTMLOUT");
 
-            WebSettings webSettings= webView.getSettings();
+            WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             webSettings.setPluginState(WebSettings.PluginState.ON);
 //            webSettings.setGeolocationEnabled(true);
@@ -171,28 +174,31 @@ public class FragmentCamsys extends Fragment {
             webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
             webView.getSettings().setJavaScriptEnabled(true);
             webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-//            webView.setWebViewClient(new WebViewClient() {
-//                @Override
-//                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                    if (url.endsWith(".pdf")) {
-//                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-//                        CookieManager cookieManager = CookieManager.getInstance();
-//                        String cookie = cookieManager.getCookie("https://cms.mmu.edu.my");     // which is "http://bookboon.com"
-//                        request.addRequestHeader("Cookie", cookie);
-//                        request.setNotificationVisibility(1);
-//                        request.allowScanningByMediaScanner();
-//                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/camsys.pdf");
-//                        request.setMimeType("application/pdf");
-//                        DownloadManager dm = (DownloadManager) dashBoardActivity.getSystemService(DOWNLOAD_SERVICE);
-//                        dm.enqueue(request);
-//                        new Handler().postDelayed(() -> {
-//                            dashBoardActivity.scanResFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/camsys.pdf");
-//                        }, 2000);
-//                    }
-//                    return true;
-//                }
-//            });
+            webView.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    if (url.endsWith(".pdf")) {
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        String cookie = cookieManager.getCookie("https://cms.mmu.edu.my");     // which is "http://bookboon.com"
+                        request.addRequestHeader("Cookie", cookie);
+                        request.setNotificationVisibility(1);
+                        request.allowScanningByMediaScanner();
+                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/camsys.pdf");
+                        request.setMimeType("application/pdf");
+                        DownloadManager dm = (DownloadManager) dashBoardActivity.getSystemService(DOWNLOAD_SERVICE);
+                        dm.enqueue(request);
+                        new Handler().postDelayed(() -> {
+                            dashBoardActivity.scanResFromPath(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/camsys.pdf");
+                        }, 2000);
+                    }
+                    return true;
+                }
+            });
 
+            getView().findViewById(R.id.refresh).setOnClickListener(v -> {
+                webView.loadUrl(webView.getUrl());
+            });
 //            FrameLayout WebCon=getView().findViewById(R.id.WebCon);
 //            AgentWeb  mAgentWeb = AgentWeb.with(this)//传入Activity or Fragment
 //                    .setAgentWebParent(WebCon, new FrameLayout.LayoutParams(-1, -1))//Incoming AgentWeb parent control, if the parent control is RelativeLayout, then the second parameter needs to be passed RelativeLayout.LayoutParams, the first parameter and the second parameter should correspond.

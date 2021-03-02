@@ -160,8 +160,8 @@
                                 android:background="@drawable/edit_text_with_shadow"
                                 android:hint="Camsys Id"
                                 android:inputType="textPersonName"
-                                android:paddingLeft="40dp"
-                                android:paddingRight="15dp"
+                                android:paddingStart="40dp"
+                                android:paddingEnd="15dp"
                                 android:textColor="@color/colorPrimaryDark"
                                 android:textColorHint="@color/grey" />
 
@@ -192,10 +192,10 @@
                                 android:layout_gravity="center"
                                 android:background="@drawable/edit_text_with_shadow"
                                 android:hint="Camsys Password"
-                                android:inputType="textPersonName"
-                                android:paddingLeft="40dp"
-                                android:paddingRight="15dp"
-                                android:textColor="@color/colorPrimaryDark"
+                                android:inputType="textPassword"
+                                android:paddingStart="40dp"
+                                android:paddingEnd="15dp"
+                                android:textColor="?colorPrimaryDark"
                                 android:textColorHint="@color/grey" />
 
                             <ImageView
@@ -203,7 +203,7 @@
                                 android:layout_height="25dp"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="10dp"
-                                android:background="@drawable/ic_person_black_24dp" />
+                                android:background="@drawable/lock" />
                         </FrameLayout>
 
                     </LinearLayout>
@@ -224,9 +224,9 @@
                             android:background="@drawable/edit_text_with_shadow"
                             android:hint="Email"
                             android:inputType="textEmailAddress"
-                            android:paddingLeft="40dp"
-                            android:paddingRight="15dp"
-                            android:textColor="@color/colorPrimaryDark"
+                            android:paddingStart="40dp"
+                            android:paddingEnd="15dp"
+                            android:textColor="?colorPrimaryDark"
                             android:textColorHint="@color/grey" />
 
                         <ImageView
@@ -254,9 +254,9 @@
                             android:background="@drawable/edit_text_with_shadow"
                             android:hint="Password"
                             android:inputType="textPassword"
-                            android:paddingLeft="40dp"
-                            android:paddingRight="15dp"
-                            android:textColor="@color/colorPrimaryDark"
+                            android:paddingStart="40dp"
+                            android:paddingEnd="15dp"
+                            android:textColor="?colorPrimaryDark"
                             android:textColorHint="@color/grey" />
 
                         <ImageView
@@ -287,9 +287,9 @@
                                 android:background="@drawable/edit_text_with_shadow"
                                 android:hint="Confirm password"
                                 android:inputType="textPassword"
-                                android:paddingLeft="40dp"
-                                android:paddingRight="15dp"
-                                android:textColor="@color/colorPrimaryDark"
+                                android:paddingStart="40dp"
+                                android:paddingEnd="15dp"
+                                android:textColor="?colorPrimaryDark"
                                 android:textColorHint="@color/grey" />
 
                             <ImageView

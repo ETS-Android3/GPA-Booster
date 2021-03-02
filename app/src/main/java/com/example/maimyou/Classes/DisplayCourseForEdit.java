@@ -2,8 +2,12 @@ package com.example.maimyou.Classes;
 
 public class DisplayCourseForEdit {
     String trimesterTitle;
-    String Code, Subject, Grade, Hours;
+    String Code, Subject, Grade, Hours, elective,sem;
     int colour, mode = 0;
+
+    public String getSem() {
+        return sem;
+    }
 
     public int getMode() {
         return mode;
@@ -29,6 +33,10 @@ public class DisplayCourseForEdit {
         return Hours;
     }
 
+    public String getElective() {
+        return elective;
+    }
+
     public int getColour() {
         return colour;
     }
@@ -39,13 +47,29 @@ public class DisplayCourseForEdit {
         this.mode = 1;
     }
 
-    public DisplayCourseForEdit(String grade, String code, String subject, String hours) {
+    public DisplayCourseForEdit(String grade, String code, String subject, String hours, String elective,String sem) {
+//        if(isNumeric(code)){
+//            this.Code ="";
+//        }else {
         this.Code = code;
+//        }
         this.Subject = subject;
         this.Hours = hours;
         this.Grade = grade;
+        this.elective = elective;
+        this.sem=sem;
         this.mode = 2;
     }
 
-    public DisplayCourseForEdit() {}
+//    public boolean isNumeric(String str) {
+//        try {
+//            Integer.parseInt(str);
+//            return true;
+//        } catch (Exception ignored) {
+//            return false;
+//        }
+//    }
+
+    public DisplayCourseForEdit() {
+    }
 }

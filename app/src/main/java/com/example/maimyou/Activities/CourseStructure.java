@@ -211,7 +211,6 @@ public class CourseStructure extends AppCompatActivity {
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(() -> {
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-
         }, 2000);
 
         CourseStructureList = findViewById(R.id.CourseStructureList);

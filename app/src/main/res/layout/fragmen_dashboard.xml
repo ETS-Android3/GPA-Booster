@@ -254,6 +254,7 @@
                     android:layout_columnWeight="1"
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
+                    android:onClick="Calculator"
                     app:cardCornerRadius="12dp"
                     android:layout_margin="6dp"
                     android:foreground="?attr/selectableItemBackground"

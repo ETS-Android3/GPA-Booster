@@ -8,6 +8,7 @@ import com.example.maimyou.Activities.DashBoardActivity;
 
 import static com.example.maimyou.Activities.DashBoardActivity.InfoAvail;
 import static com.example.maimyou.Activities.DashBoardActivity.LoadRes;
+import static com.example.maimyou.Activities.DashBoardActivity.SignIn;
 import static com.example.maimyou.Activities.DashBoardActivity.signin;
 import static com.example.maimyou.Activities.DashBoardActivity.ProfileWebView;
 
@@ -40,7 +41,7 @@ public class MyJavaScriptInterface {
     }
 
     public void refresh() {
-        dashBoardActivity.runOnUiThread(() -> new Handler().postDelayed(() -> ProfileWebView.loadUrl(ProfileWebView.getUrl()), 1000));
+        dashBoardActivity.runOnUiThread(() -> new Handler().postDelayed(() -> ProfileWebView.loadUrl(ProfileWebView.getUrl()), 2000));
     }
 
     @JavascriptInterface
@@ -50,10 +51,12 @@ public class MyJavaScriptInterface {
 
         if (html.contains("Your User ID and/or Password are invalid.")) {
             toast("Your User ID and/or Password are invalid!");
+            signin = 10;
+            SignIn=false;
         } else if (html.contains("Sign In")) {
             signin++;
-            String js = "javascript:document.getElementById('userid').value='"+dashBoardActivity.loadData("camsysId")+"';" +
-                    "javascript:document.getElementById('pwd').value='"+dashBoardActivity.loadData("camsysPassword")+"';" +
+            String js = "javascript:document.getElementById('userid').value='" + dashBoardActivity.loadData("camsysId") + "';" +
+                    "javascript:document.getElementById('pwd').value='" + dashBoardActivity.loadData("camsysPassword") + "';" +
                     "javascript:document.getElementsByName('Submit')[0].click();";
             loadJs(js);
             if (1 < signin && signin < 10) {
@@ -61,7 +64,8 @@ public class MyJavaScriptInterface {
             }
         } else if (html.contains("You have been barred due to outstanding fees.")) {
             toast("You have been barred due to outstanding fees.");
-            if(!InfoAvail) toast("please set your info manually.");
+            if (!InfoAvail) toast("please set your info manually.");
+            SignIn=true;
             dashBoardActivity.saveData("Barred", "Auto");
         } else if (html.contains("Academic Achievement")) {
             if (LoadRes < 1) {
@@ -74,6 +78,7 @@ public class MyJavaScriptInterface {
                     loadJs(js3);
                 }, 500);
             }
+            SignIn=true;
             LoadRes++;
         }
     }

@@ -42,14 +42,22 @@ import com.example.maimyou.Fragments.FragmentHome;
 import com.example.maimyou.Fragments.FragmentProfile;
 import com.example.maimyou.Fragments.FragmentCamsys;
 import com.example.maimyou.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -81,6 +89,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     DashBoardActivity dashBoardActivity = this;
     Context context = this;
     public static boolean InfoAvail = true;
+    public static boolean SignIn = true;
     public static int fragmentIndex = 0;
     public static BottomNavigationView bottomNav;
     public static String content = "";
@@ -93,21 +102,24 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     }
 
     public void FragEdit(View view) {
-        if (fragmentEdit.finishedLoading) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    fragmentEdit).commit();
-        } else {
-            Toast.makeText(context, "Loading!", LENGTH_SHORT).show();
-        }
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                fragmentEdit).commit();
     }
 
     public void setManually() {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new FragmentEdit(loadData("Id"), context, dashBoardActivity)).commit();
+                fragmentEdit).commit();
     }
 
     public void empty(View view) {
 
+    }
+
+    public void addPic(View view) {
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1, 1)
+                .start(DashBoardActivity.this);
     }
 
     public void OpenCamsys(View view) {
@@ -119,6 +131,26 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         bottomNav.setSelectedItemId(R.id.profile);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new FragmentCamsys(dashBoardActivity)).commit();
+    }
+
+    public void save(View view) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id"));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ref.child("Profile").setValue(snapshot.child("ModifiedInfo").getValue()).addOnCompleteListener(task -> {
+                    fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            fragmentProfile).commit();
+                    Toast.makeText(context, "Your profile has been updated successfully!", Toast.LENGTH_LONG).show();
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void uploadPdf(View view) {
@@ -198,6 +230,14 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
     public void logout(View view) {
         saveData("", "Id");
+        saveData("", "camsysPassword");
+        saveData("", "camsysId");
+        if (webView != null) {
+            webView.loadUrl("https://cms.mmu.edu.my/psp/csprd/EMPLOYEE/HRMS/?cmd=logout");
+        }
+        if (ProfileWebView != null) {
+            ProfileWebView.loadUrl("https://cms.mmu.edu.my/psp/csprd/EMPLOYEE/HRMS/?cmd=logout");
+        }
         FirebaseAuth.getInstance().signOut();//logout
         startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
         finish();
@@ -332,6 +372,24 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             String path = UriUtils.getPathFromUri(context, data.getData());
 
             scanResFromPath(path);
+        } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+//                cropImageView.setImageUriAsync(resultUri);
+                Picasso.get().load(resultUri).into(fragmentEdit.profilePictureAdmin);
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(context,error.getMessage(),Toast.LENGTH_LONG).show();
+            }
+//            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+//            if (result != null) {
+//                Picasso.get().load(result.getUri()).into(fragmentEdit.profilePictureAdmin);
+//
+////                profile.setURI(result.getUri());
+////                uploadProfilePic(result.getUri());
+//            }
         } else {
             Toast.makeText(getApplicationContext(), "Please select the pdf file.", Toast.LENGTH_SHORT).show();
         }
@@ -428,15 +486,15 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             }
 
             if (webView != null) {
-//                String js1 = "javascript:document.getElementById('userid').value='1161104336';" +
-//                        "javascript:document.getElementById('pwd').value='5Lq##KTESJ4';" +
+                if (SignIn) {
+                    String js1 = "javascript:document.getElementById('userid').value='" + loadData("camsysId") + "';" +
+                            "javascript:document.getElementById('pwd').value='" + loadData("camsysPassword") + "';" +
+                            "javascript:document.getElementsByName('Submit')[0].click();";
+                    webView.evaluateJavascript(js1, s -> {
+                    });
+                    webView.loadUrl("javascript:HTMLOUT.processHTML(document.documentElement.outerHTML);");
 
-                String js1 = "javascript:document.getElementById('userid').value='" + loadData("camsysId") + "';" +
-                        "javascript:document.getElementById('pwd').value='" + loadData("camsysPassword") + "';" +
-                        "javascript:document.getElementsByName('Submit')[0].click();";
-                webView.evaluateJavascript(js1, s -> {
-
-                });
+                }
             }
 
 
@@ -602,42 +660,82 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 //        //        readPdfFileVerify(url);
     }
 
-    void openCustomTab(String url) {
-        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//    void openCustomTab(String url) {
+//        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//
+//        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+//        builder.addDefaultShareMenuItem();
+//        builder.addDefaultShareMenuItem();
+//        builder.setShowTitle(true);
+//        builder.setStartAnimations(this, R.anim.load_up_anim, R.anim.stable);
+//        builder.setExitAnimations(this, R.anim.load_down_anim, R.anim.stable);
+//
+//        CustomTabsIntent customTabsIntent = builder.build();
+//        customTabsIntent.launchUrl(this, Uri.parse("https://cms.mmu.edu.my/psp/csprd/?cmd=login?&languageCd=ENG&"));
+//        customTabsIntent.launchUrl(this, Uri.parse("javascript:document.getElementById('userid').value='1161104336';" +
+//                "javascript:document.getElementById('pwd').value='5Lq##KTESJ4';" +
+//                "javascript:document.getElementsByName('Submit')[0].click();"));
+//        customTabsIntent.launchUrl(this, Uri.parse(url));
+//
+//    }
 
-        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        builder.addDefaultShareMenuItem();
-        builder.addDefaultShareMenuItem();
-        builder.setShowTitle(true);
-        builder.setStartAnimations(this, R.anim.load_up_anim, R.anim.stable);
-        builder.setExitAnimations(this, R.anim.load_down_anim, R.anim.stable);
-
-        CustomTabsIntent customTabsIntent = builder.build();
-        customTabsIntent.launchUrl(this, Uri.parse("https://cms.mmu.edu.my/psp/csprd/?cmd=login?&languageCd=ENG&"));
-        customTabsIntent.launchUrl(this, Uri.parse("javascript:document.getElementById('userid').value='1161104336';" +
-                "javascript:document.getElementById('pwd').value='5Lq##KTESJ4';" +
-                "javascript:document.getElementsByName('Submit')[0].click();"));
-        customTabsIntent.launchUrl(this, Uri.parse(url));
-
-    }
-
-    public void readPdfFileVerify(String pdfUrl) {
-
-        try (BufferedInputStream inputStream = new BufferedInputStream(new URL(pdfUrl).openStream());
-             FileOutputStream fileOS = new FileOutputStream(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/file_name.txt")) {
-            byte data[] = new byte[1024];
-            int byteContent;
-            while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
-                fileOS.write(data, 0, byteContent);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void readPdfFileVerify(String pdfUrl) {
+//
+//        try (BufferedInputStream inputStream = new BufferedInputStream(new URL(pdfUrl).openStream());
+//             FileOutputStream fileOS = new FileOutputStream(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/file_name.txt")) {
+//            byte data[] = new byte[1024];
+//            int byteContent;
+//            while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
+//                fileOS.write(data, 0, byteContent);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public void onExternalPageRequest(String url) {
     }
+
+//    private void uploadFile() {
+//        if (mImageUri != null) {
+//            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
+//                    + "." + getFileExtension(mImageUri));
+//            mUploadTask = fileReference.putFile(mImageUri)
+//                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                            Handler handler = new Handler();
+//                            handler.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    mProgressBar.setProgress(0);
+//                                }
+//                            }, 500);
+//                            Toast.makeText(MainActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+//                            Upload upload = new Upload(mEditTextFileName.getText().toString().trim(),
+//                                    taskSnapshot.getDownloadUrl().toString());
+//                            String uploadId = mDatabaseRef.push().getKey();
+//                            mDatabaseRef.child(uploadId).setValue(upload);
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//                        }
+//                    })
+//                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+//                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+//                            mProgressBar.setProgress((int) progress);
+//                        }
+//                    });
+//        } else {
+//            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     public void scan(String res) {
         trimesters.clear();
@@ -684,18 +782,23 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
                         if (lines[x].toLowerCase().contains("code")) {
                             x++;
                             for (int y = x; y < lines.length; y++) {
-
-                                if (!containCode(lines[y])) {
+                                if (y < lines.length - 1) {
+                                    if (!containCode(lines[y + 1]) && !containCode(lines[y])) {
+                                        breakk = true;
+                                        break;
+                                    }
+                                } else if (!containCode(lines[y])) {
                                     breakk = true;
-                                }
-                                if (breakk) {
                                     break;
                                 }
+
                                 String code = getCode(lines[y]);
                                 String name = getName(lines[y]);
                                 String grade = getGrade(lines[y]);
-                                trimester.addSubject(code, name, grade);
-                                subjects.add(new subjects(code, name, grade));
+                                if (containCode(code) && !name.isEmpty() && !grade.isEmpty()) {
+                                    trimester.addSubject(code, name, grade);
+                                    subjects.add(new subjects(code, name, grade));
+                                }
                             }
                         }
                         if (breakk) {
@@ -713,25 +816,34 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             Toast.makeText(context, "Couldn't recognise pdf!", Toast.LENGTH_LONG).show();
 
         } else {
-            SaveTo("CamsysInfo", Name, Id, Degree);
-            SaveTo("Profile", Name, Id, Degree);
+            SaveTo("ModifiedInfo", Name, Id, Degree, "Modified");
+            SaveTo("CamsysInfo", Name, Id, Degree, "Camsys");
+            SaveTo("Profile", Name, Id, Degree, "Camsys");
             SetSubjectsReviews(Id);
             InfoAvail = true;
             saveData("camsys", "Auto");
+            fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new FragmentProfile(loadData("Id"), context, dashBoardActivity)).commit();
             Toast.makeText(context, "Your profile has been updated successfully!", Toast.LENGTH_LONG).show();
         }
     }
 
-    public void SaveTo(String slotName, String Name, String Id, String Degree) {
+    public void resetProfileFrag() {
+        fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                fragmentEdit).commit();
+    }
+
+    public void SaveTo(String slotName, String Name, String Id, String Degree, String modifiedFrom) {
         updateFromCamsys = true;
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).removeValue();
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("Name").setValue(Name);
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("Id").setValue(Id);
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("Degree").setValue(Degree);
-        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("UpdatedFrom").setValue("Camsys");
+        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("UpdatedFrom").setValue(modifiedFrom);
         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("Trimesters").setValue(trimesters);
+        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child(slotName).child("Intake").setValue(trimesters.get(0).getSemesterName());
     }
 
     public void SetSubjectsReviews(final String Id) {
@@ -775,10 +887,18 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             arr[0] = "";
             arr[arr.length - 1] = "";
             for (String word : arr) {
-                name.append(word);
+                name.append(format(word.trim())).append(" ");
             }
         }
-        return name.toString();
+        return name.toString().trim();
+    }
+
+    public String format(String word) {
+        if (word.length() > 3) {
+            return WordUtils.capitalizeFully(word);
+        } else {
+            return word.toLowerCase();
+        }
     }
 
     public String getGrade(String subject) {

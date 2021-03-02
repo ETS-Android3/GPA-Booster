@@ -38,10 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:layout_toStartOf="@+id/pin"
-            android:layout_toLeftOf="@+id/pin"
+            android:layout_toStartOf="@+id/ref"
             android:layout_toEndOf="@+id/backButton"
-            android:layout_toRightOf="@+id/backButton"
             android:alpha="0.8"
             android:gravity="center_vertical"
             android:maxLines="1"
@@ -61,9 +59,7 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginEnd="-5dp"
-            android:layout_marginRight="-5dp">
+            android:layout_marginEnd="-5dp">
 
             <ImageButton
                 android:id="@+id/openMenu"
@@ -104,9 +100,7 @@
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginEnd="-15dp"
-            android:layout_marginRight="-15dp"
-            android:layout_toStartOf="@+id/menu"
-            android:layout_toLeftOf="@+id/menu">
+            android:layout_toStartOf="@+id/menu">
 
             <ImageButton
                 android:id="@+id/lightBulb"
@@ -118,6 +112,25 @@
                 android:padding="5dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/light_bulb__1_" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/ref"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_toStartOf="@+id/pin"
+            android:layout_marginEnd="-15dp">
+
+            <ImageButton
+                android:id="@+id/refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:alpha="0.6"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                android:padding="5dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_baseline_refresh_24" />
         </FrameLayout>
 
     </RelativeLayout>
@@ -151,7 +164,7 @@
         android:backgroundTint="@color/colorPrimary"
         android:onClick="uploadPdf"
         android:src="@drawable/ic_baseline_cloud_upload_24"
-        android:theme="@style/CustomTheme1"
+        android:theme="@style/CustomTheme2"
         app:fabCustomSize="50dp"
         tools:ignore="RtlHardcoded"
         tools:targetApi="lollipop" />

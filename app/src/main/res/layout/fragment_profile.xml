@@ -363,7 +363,7 @@
         android:onClick="OpenCamsys"
         android:scaleType="fitXY"
         android:src="@drawable/camsys2"
-        android:theme="@style/CustomTheme1"
+        android:theme="@style/CustomTheme2"
         app:fabCustomSize="50dp"
         app:maxImageSize="50dp"
         tools:ignore="RtlHardcoded"
