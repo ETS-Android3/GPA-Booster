@@ -439,6 +439,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
                         Handler handler = new Handler();
                         handler.postDelayed(() -> fragmentEdit.progressBar.setProgress(0), 500);
                         FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("ModifiedInfo").child("PersonalImage").setValue(uri.toString());
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("CamsysInfo").child("PersonalImage").setValue(uri.toString());
                         Toast.makeText(context, "Upload successful", Toast.LENGTH_LONG).show();
                         fragmentEdit.progressBar.setVisibility(View.GONE);
 
