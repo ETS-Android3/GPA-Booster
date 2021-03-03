@@ -89,6 +89,14 @@
                         android:text="Your ID"
                         android:textColor="@color/backGroundColour"
                         android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/updatedFrom"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:paddingTop="5dp"
+                        android:textSize="14sp" />
                 </LinearLayout>
 
             </RelativeLayout>
@@ -342,6 +350,7 @@
             android:layout_marginRight="-5dp">
 
             <ImageButton
+                android:id="@+id/optionMenu"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"

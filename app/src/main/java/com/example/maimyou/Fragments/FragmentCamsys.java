@@ -395,12 +395,16 @@ public class FragmentCamsys extends Fragment {
                                 }
                             }
                             if (pages.size() > 1) {
-                                camsysWebsitesAdapter adapter = new camsysWebsitesAdapter(getContext(), R.layout.websites, pages);
-                                webSites.setAdapter(adapter);
-                                webSites.setOnItemClickListener((parent, view1, position, id) -> {
-                                    FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DefaultWeb").setValue(pages.get(position).getPageAdd());
-                                    setWebView(pages.get(position).getPageAdd());
-                                });
+                                try {
+                                    camsysWebsitesAdapter adapter = new camsysWebsitesAdapter(getContext(), R.layout.websites, pages);
+                                    webSites.setAdapter(adapter);
+                                    webSites.setOnItemClickListener((parent, view1, position, id) -> {
+                                        FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).child("DefaultWeb").setValue(pages.get(position).getPageAdd());
+                                        setWebView(pages.get(position).getPageAdd());
+                                    });
+                                }catch (Exception ignored){
+
+                                }
                             }
                         }
                     } catch (Exception e) {

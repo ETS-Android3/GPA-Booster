@@ -2,11 +2,12 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="203dp"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
 
         <ListView
@@ -14,8 +15,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:background="@color/white"
             android:divider="@color/grey"
             android:dividerHeight="1dp" />
+
 
 
 
@@ -23,15 +28,14 @@
             android:id="@+id/ShowUploadB"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:textSize="16sp"
-            android:background="@color/colorPrimaryDark"
+            android:textSize="12sp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:alpha="0.8"
+            android:background="@color/colorPrimary"
             android:checked="true"
-            android:buttonTint="#FFFFFF"
+            android:buttonTint="@color/white"
             android:text="Show Upload Button"
-            android:textColor="#FFFFFF" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="Delete Profile" />
+    <item android:title="Reset from Camsys" />
+    <item
+        android:title="Sort"
+        app:showAsAction="never">
+        <menu>
+            <item android:title="Ascending" />
+            <item android:title="Default" />
+            <item android:title="Descending" />
+        </menu>
+    </item>
+</menu>

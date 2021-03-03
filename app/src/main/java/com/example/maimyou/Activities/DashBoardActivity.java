@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +21,7 @@ import android.os.StrictMode;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
@@ -28,9 +30,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.maimyou.Classes.ActionListener;
 import com.example.maimyou.Classes.MyJavaScriptInterface;
@@ -42,6 +42,7 @@ import com.example.maimyou.Fragments.FragmentHome;
 import com.example.maimyou.Fragments.FragmentProfile;
 import com.example.maimyou.Fragments.FragmentCamsys;
 import com.example.maimyou.R;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -51,18 +52,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
-import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.apache.commons.lang3.text.WordUtils;
-
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -134,22 +131,29 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     }
 
     public void save(View view) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id"));
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ref.child("Profile").setValue(snapshot.child("ModifiedInfo").getValue()).addOnCompleteListener(task -> {
-                    fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            fragmentProfile).commit();
-                    Toast.makeText(context, "Your profile has been updated successfully!", Toast.LENGTH_LONG).show();
-                });
-            }
+        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("ModifiedInfo").child("UpdatedFrom").setValue("Modified").addOnCompleteListener(task -> {
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id"));
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    ref.child("Profile").setValue(snapshot.child("ModifiedInfo").getValue()).addOnCompleteListener(task -> {
+                        if (!loadData("camsysId").isEmpty() && fragmentEdit.subjects.size() > 0) {
+                            SetSubjectsReviewsArr(fragmentEdit.subjects, loadData("camsysId"));
+                        }
+                        fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+                        fragmentProfile = new FragmentProfile(loadData("Id"), context, dashBoardActivity);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                                fragmentProfile).commit();
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(context, "Your profile has been updated successfully!", Toast.LENGTH_LONG).show();
+                    });
+                }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         });
     }
 
@@ -366,6 +370,16 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
         //        ProfileWebView.loadUrl("javascript:HTMLOUT.processHTML(document.documentElement.outerHTML);");
     }
 
+    public void openProfile() {
+        fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                fragmentProfile).commit();
+    }
+
+    public void resetFragmentEdit() {
+        fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == 1212 && resultCode == RESULT_OK && data != null) {
@@ -373,15 +387,18 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
             scanResFromPath(path);
         } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                Uri resultUri = result.getUri();
+            if (result != null) {
+                if (resultCode == RESULT_OK) {
+                    Uri resultUri = result.getUri();
+                    uploadFile(resultUri);
 //                cropImageView.setImageUriAsync(resultUri);
-                Picasso.get().load(resultUri).into(fragmentEdit.profilePictureAdmin);
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
-                Toast.makeText(context,error.getMessage(),Toast.LENGTH_LONG).show();
+//                    Picasso.get().load(resultUri).error(R.drawable.avatar).into(fragmentEdit.profilePictureAdmin);
+//                    Picasso.get().load(resultUri).error(R.drawable.avatar).into(fragmentEdit.profilePictureAdmin);
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Exception error = result.getError();
+                    Toast.makeText(context, error.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
 //            CropImage.ActivityResult result = CropImage.getActivityResult(data);
 //            if (result != null) {
@@ -404,6 +421,38 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             ProfileWebView.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadFile(Uri mImageUri) {
+        fragmentEdit.progressBar.setVisibility(View.VISIBLE);
+        StorageReference fileReference = FirebaseStorage.getInstance().getReference("uploads").child(loadData("Id")
+                + ".jpg");
+        fileReference.putFile(mImageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+
+                        Handler handler = new Handler();
+                        handler.postDelayed(() -> fragmentEdit.progressBar.setProgress(0), 500);
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("ModifiedInfo").child("PersonalImage").setValue(uri.toString());
+                        Toast.makeText(context, "Upload successful", Toast.LENGTH_LONG).show();
+                        fragmentEdit.progressBar.setVisibility(View.GONE);
+
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        fragmentEdit.progressBar.setVisibility(View.GONE);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    fragmentEdit.progressBar.setVisibility(View.GONE);
+                });
+    }
+
 
     public void scanResFromPath(String path) {
         try {
@@ -851,6 +900,24 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (subjects subjects : subjects) {
+                    if (snapshot.child(subjects.getCode()).exists()) {
+                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(Id).setValue(subjects.getGrade());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void SetSubjectsReviewsArr(final ArrayList<subjects> subjectsArr, final String Id) {
+        FirebaseDatabase.getInstance().getReference().child("Subjects").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (subjects subjects : subjectsArr) {
                     if (snapshot.child(subjects.getCode()).exists()) {
                         FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(Id).setValue(subjects.getGrade());
                     }

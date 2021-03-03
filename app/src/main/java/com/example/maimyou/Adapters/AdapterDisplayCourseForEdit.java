@@ -9,8 +9,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatSpinner;
+
 import com.example.maimyou.Classes.DisplayCourseForEdit;
 import com.example.maimyou.Fragments.FragmentEdit;
 import com.example.maimyou.R;
@@ -59,12 +61,14 @@ public class AdapterDisplayCourseForEdit extends ArrayAdapter<DisplayCourseForEd
             holder.trimesterTitle = convertView.findViewById(R.id.trimesterTitle);
             holder.trimesterTitle.setText(trimesterTitle);
         } else if (mode == 2) {
-            String Grade = getItem(i).getGrade(), Code = getItem(i).getCode(), Subject = getItem(i).getSubject(), Hours = getItem(i).getHours(),Elective=getItem(i).getElective();
+            String Grade = getItem(i).getGrade(), Code = getItem(i).getCode(), Subject = getItem(i).getSubject(), Hours = getItem(i).getHours(), Elective = getItem(i).getElective();
             holder.subjectContainer = convertView.findViewById(R.id.subjectContainer);
             holder.subjectContainer.setVisibility(View.VISIBLE);
             holder.Grade = convertView.findViewById(R.id.Grade);
             ArrayList<String> list = new ArrayList<>();
-            if (Code.toLowerCase().contains("mpu")||isNumeric(Code)) {
+
+
+            if (Code.toLowerCase().contains("mpu") || isNumeric(Code) || Subject.toLowerCase().startsWith("mpu") || Subject.toLowerCase().contains("train") || Subject.toLowerCase().contains("management")) {
                 list.add("-");
                 list.add("PS");
                 list.add("FL");
@@ -78,6 +82,7 @@ public class AdapterDisplayCourseForEdit extends ArrayAdapter<DisplayCourseForEd
                 list.add("B-");
                 list.add("C+");
                 list.add("C");
+                list.add("U");
                 list.add("CON");
                 list.add("FL");
             }
@@ -93,7 +98,7 @@ public class AdapterDisplayCourseForEdit extends ArrayAdapter<DisplayCourseForEd
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     String text = parent.getItemAtPosition(position).toString();
-                    fragmentEdit.setGrade(getItem(i).getCode(),text,getItem(i).getHours(),getItem(i).getSem(),getItem(i).getSubject());
+                    fragmentEdit.setGrade(getItem(i).getCode(), text, getItem(i).getHours(), getItem(i).getSem(), getItem(i).getSubject());
                 }
 
                 @Override
@@ -102,11 +107,11 @@ public class AdapterDisplayCourseForEdit extends ArrayAdapter<DisplayCourseForEd
                 }
             });
             holder.Code = convertView.findViewById(R.id.Code);
-            if(isNumeric(Code)){
-                Code="";
+            if (isNumeric(Code)) {
+                Code = "";
             }
-            if(Elective.contains("true")){
-                Code+="\nElective";
+            if (Elective.contains("true")) {
+                Code += "\nElective";
             }
             holder.Code.setText(Code);
             holder.Subject = convertView.findViewById(R.id.Subject);
@@ -114,6 +119,7 @@ public class AdapterDisplayCourseForEdit extends ArrayAdapter<DisplayCourseForEd
         }
         return convertView;
     }
+
     public boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);

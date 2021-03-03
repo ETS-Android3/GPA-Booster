@@ -761,6 +761,7 @@
             android:layout_marginEnd="-5dp">
 
             <ImageButton
+                android:id="@+id/menuButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"

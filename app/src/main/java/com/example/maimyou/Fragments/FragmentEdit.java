@@ -11,6 +11,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -28,6 +29,7 @@ import com.example.maimyou.Adapters.AdapterDisplayCourseForEdit;
 import com.example.maimyou.Classes.DisplayCourseForEdit;
 import com.example.maimyou.Classes.Helper;
 import com.example.maimyou.Classes.Trimester;
+import com.example.maimyou.Classes.subjects;
 import com.example.maimyou.Dialogs.BottomSheetDialog;
 import com.example.maimyou.R;
 import com.example.maimyou.RecycleViewMaterials.Child;
@@ -38,6 +40,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -55,18 +58,20 @@ public class FragmentEdit extends Fragment {
     //Views
     ListView editGradeListView;
     TextView userNameT, NameT, IDT, CamsysIdT, CamsysPassT, CGPAT, totalHoursT, CGPAA, TotalHoursTitle;
-    ProgressBar progressBar;
+    public ProgressBar progressBar;
     LinearLayout Title;
     //    TextView NameTextView, CamsysIdTextView, CamsysPassTextView, CGPATextView, totalHoursTextView;
     RadioGroup radioGroup;
     BottomSheetDialog bottomSheet;
     AppBarLayout appBar;
     public CircleImageView profilePictureAdmin;
+//    PopupWindow mypopupWindow;
 
 
     //vars
     int FirstTrim;
     double range = 50;
+    String imageUri = "";
     Context context;
     String id, Name = "", CamsysId = "", CamsysPass = "", CGPAText = "", totalHours = "", intake = "", MaxCGPA = "", MinCGPA = "", CurCGPA = "";
     ArrayList<Trimester> trimesters = new ArrayList<>();
@@ -79,6 +84,7 @@ public class FragmentEdit extends Fragment {
     ArrayList<String> Hours = new ArrayList<>();
     ArrayList<String> Names = new ArrayList<>();
     ArrayList<Integer> Trims = new ArrayList<>();
+    public ArrayList<subjects> subjects = new ArrayList<>();
 
     public FragmentEdit(String id, Context context, DashBoardActivity dashBoardActivity) {
         this.id = id;
@@ -124,6 +130,8 @@ public class FragmentEdit extends Fragment {
             CGPAT = getView().findViewById(R.id.CGPA);
             totalHoursT = getView().findViewById(R.id.totalHours);
             appBar = getView().findViewById(R.id.appBar);
+            //                mypopupWindow.showAsDropDown(v, -153, 0);
+            getView().findViewById(R.id.menuButton).setOnClickListener(this::openPopUpWindow);
 
             fadeOutNoDelay(Title);
 
@@ -171,6 +179,11 @@ public class FragmentEdit extends Fragment {
 
                 }
             });
+//            try {
+//                setPopUpWindow();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             editGradeListView = getView().findViewById(R.id.editGradeListView);
             actionListener.setOnActionPerformed(() -> {
                 intake = Intake;
@@ -189,6 +202,44 @@ public class FragmentEdit extends Fragment {
             }
         }
     }
+
+    public void openPopUpWindow(View v) {
+        PopupMenu popup = new PopupMenu(getContext(), v);
+        popup.getMenuInflater().inflate(R.menu.edit_option_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getTitle().toString().toLowerCase().contains("delete")) {
+                FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").removeValue();
+                FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").removeValue();
+                dashBoardActivity.resetFragmentEdit();
+            } else if (item.getTitle().toString().toLowerCase().contains("reset")) {
+                FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").setValue(snapshot.getValue()).addOnCompleteListener(task -> {
+                            Toast.makeText(context, "Your profile has been reset successfully", Toast.LENGTH_LONG).show();
+                            dashBoardActivity.openProfile();
+                        }).addOnFailureListener(e -> {
+                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                        });
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").setValue(snapshot.getValue());
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").child("UpdatedFrom").setValue("Modified");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+            return true;
+
+        });
+        popup.show();
+
+
+//            mypopupWindow = new PopupWindow(view, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT, true);
+    }
+
 
     public void setRadioGroup(String major) {
         if (major.toLowerCase().contains("ce")) {
@@ -379,9 +430,11 @@ public class FragmentEdit extends Fragment {
                 trimesters[i].setRange(range);
             }
             double totalPoints = 0, MaxPoints = 0, MinPoints = 0, totalHoursCore = 0;
+            subjects.clear();
             for (String Code : Codes) {
                 if (Grades.get(Codes.indexOf(Code)).trim().compareTo("-") != 0) {
                     trimesters[Trims.get(Codes.indexOf(Code))].addSubjectComputeGPA(Code, Names.get(Codes.indexOf(Code)), Grades.get(Codes.indexOf(Code)), Hours.get(Codes.indexOf(Code)));
+                    subjects.add(new subjects(Code, Names.get(Codes.indexOf(Code)), Grades.get(Codes.indexOf(Code))));
                 }
             }
 //            Toast.makeText(getContext(),range+"",Toast.LENGTH_LONG).show();
@@ -520,13 +573,12 @@ public class FragmentEdit extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                if (snapshot.child("camsysId").exists()) {
-                    CamsysId = Objects.requireNonNull(snapshot.child("camsysId").getValue()).toString();
+                if (snapshot.child("ModifiedInfo").child("Id").exists()) {
+                    CamsysId = Objects.requireNonNull(snapshot.child("ModifiedInfo").child("Id").getValue()).toString();
                 }
                 if (snapshot.child("camsysPassword").exists()) {
                     CamsysPass = Objects.requireNonNull(snapshot.child("camsysPassword").getValue()).toString();
                 }
-
 
                 if (snapshot.child("ModifiedInfo").exists()) {
                     getDataFromSnap(snapshot.child("ModifiedInfo"));
@@ -570,6 +622,10 @@ public class FragmentEdit extends Fragment {
     }
 
     public void getDataFromSnap(DataSnapshot snapshot) {
+        if (snapshot.child("PersonalImage").exists()) {
+            imageUri = Objects.requireNonNull(snapshot.child("PersonalImage").getValue()).toString();
+        }
+
         if (snapshot.child("Degree").exists() && snapshot.child("Intake").exists()) {
             FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -599,6 +655,10 @@ public class FragmentEdit extends Fragment {
                 }
             });
         } else {
+            initData(snapshot);
+            if (getView() != null) {
+                printData();
+            }
             finishedLoading = true;
         }
     }
@@ -673,6 +733,9 @@ public class FragmentEdit extends Fragment {
         totalHoursT.setText(totalHours);
         setRadioGroup(intake);
         viewCourse(intake);
+        if (!imageUri.isEmpty()) {
+            Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin);
+        }
         progressBar.setVisibility(View.GONE);
         UserDataPrinted = true;
     }

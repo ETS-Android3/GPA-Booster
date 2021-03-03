@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -43,8 +46,11 @@ import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
+import com.example.maimyou.Activities.CourseStructure;
 import com.example.maimyou.Activities.DashBoardActivity;
+import com.example.maimyou.Adapters.AdapterSortSubjects;
 import com.example.maimyou.Adapters.AdapterTrimester;
+import com.example.maimyou.Classes.Gradedsubjects;
 import com.example.maimyou.Classes.MyJavaScriptInterface;
 import com.example.maimyou.R;
 import com.example.maimyou.Classes.Trimester;
@@ -54,21 +60,28 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
 import static com.example.maimyou.Activities.DashBoardActivity.fragmentIndex;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
 
 import im.delight.android.webview.AdvancedWebView;
 
 public class FragmentProfile extends Fragment {
     //vars
-    String id, Name = "", StudentId = "";
-    ArrayList<Trimester> trimesters;
+    String imageUri = "";
+    String id, Name = "", StudentId = "", UpdatedFrom = "";
+    ArrayList<Trimester> trimesters = new ArrayList<>();
     int y = -1;
     Context context;
     DashBoardActivity dashBoardActivity;
@@ -76,7 +89,7 @@ public class FragmentProfile extends Fragment {
 
     //views
     ListView gradeListView;
-    TextView TotalHours, CGPA, userName, userName2, ID, ID2;
+    TextView TotalHours, CGPA, userName, userName2, ID, ID2, updatedFrom;
     ImageView profilePictureAdmin, profilePictureAdmin2;
     ProgressBar progressBar;
     FloatingActionButton edit;
@@ -115,6 +128,7 @@ public class FragmentProfile extends Fragment {
             progressBar = getView().findViewById(R.id.progressBar);
             userName = getView().findViewById(R.id.userName);
             userName2 = getView().findViewById(R.id.userName2);
+            updatedFrom = getView().findViewById(R.id.updatedFrom);
             CGPA = getView().findViewById(R.id.CGPA);
             TotalHours = getView().findViewById(R.id.TotalHours);
 //            Name = getView().findViewById(R.id.Name);
@@ -128,6 +142,45 @@ public class FragmentProfile extends Fragment {
             cardView = getView().findViewById(R.id.cardView);
             fadeOutNoDelay(userInfo);
             fadeOutNoDelay(profilePictureAdmin2);
+            getView().findViewById(R.id.optionMenu).setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(getContext(), v);
+                popup.getMenuInflater().inflate(R.menu.profile_option_menu, popup.getMenu());
+                popup.setOnMenuItemClickListener(item -> {
+                    if (item.getTitle().toString().toLowerCase().contains("delete")) {
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").removeValue();
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").removeValue();
+                        dashBoardActivity.resetFragmentEdit();
+                    } else if (item.getTitle().toString().toLowerCase().contains("reset")) {
+                        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").setValue(snapshot.getValue()).addOnCompleteListener(task -> {
+                                    Toast.makeText(context, "Your profile has been reset successfully", Toast.LENGTH_LONG).show();
+                                    dashBoardActivity.openProfile();
+                                }).addOnFailureListener(e -> {
+                                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+                                });
+                                FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").setValue(snapshot.getValue());
+                                FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").child("UpdatedFrom").setValue("Modified");
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    } else if (item.getTitle().toString().toLowerCase().contains("ascending")) {
+                        Ascending();
+                    } else if (item.getTitle().toString().toLowerCase().contains("default")) {
+                        Default();
+                    } else if (item.getTitle().toString().toLowerCase().contains("descending")) {
+                        Descending();
+                    }
+                    return true;
+                });
+                popup.show();
+            });
+
 
             collapsed = false;
             if (y > 0) {
@@ -201,31 +254,45 @@ public class FragmentProfile extends Fragment {
             return;
         }
 
-        FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().child("Member").child(id).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("Name").getValue() != null) {
-                    Name = Objects.requireNonNull(snapshot.child("Name").getValue()).toString();
-                }
+            public void onDataChange(@NonNull DataSnapshot parentSnapshot) {
+                DataSnapshot snapshot = parentSnapshot.child("Profile");
+                if (snapshot.exists()) {
+                    if (snapshot.child("Name").getValue() != null) {
+                        Name = Objects.requireNonNull(snapshot.child("Name").getValue()).toString();
+                    }
 
-                if (snapshot.child("Id").getValue() != null) {
-                    StudentId = Objects.requireNonNull(snapshot.child("Id").getValue()).toString();
-                }
+                    if (snapshot.child("UpdatedFrom").getValue() != null) {
+                        UpdatedFrom = Objects.requireNonNull(snapshot.child("UpdatedFrom").getValue()).toString();
+                    }
+
+                    if (snapshot.child("PersonalImage").exists()) {
+                        imageUri = Objects.requireNonNull(snapshot.child("PersonalImage").getValue()).toString();
+                        if (!imageUri.isEmpty()) {
+                            Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin);
+                            Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin2);
+                        }
+                    }
+
+                    if (snapshot.child("Id").getValue() != null) {
+                        StudentId = Objects.requireNonNull(snapshot.child("Id").getValue()).toString();
+                    }
 
 //                    if (snapshot.child("Degree").getValue() != null) {
 //                        Degree.setText(snapshot.child("Degree").getValue().toString());
 //                    }
-                if (snapshot.child("Trimesters").getValue() != null) {
-                    trimesters = new ArrayList<>();
-                    Iterable<DataSnapshot> children = snapshot.child("Trimesters").getChildren();
-                    for (DataSnapshot child : children) {
-                        if (child.getValue() != null) {
-                            trimesters.add(getTrim(child));
+                    if (snapshot.child("Trimesters").getValue() != null) {
+                        trimesters = new ArrayList<>();
+                        Iterable<DataSnapshot> children = snapshot.child("Trimesters").getChildren();
+                        for (DataSnapshot child : children) {
+                            if (child.getValue() != null) {
+                                trimesters.add(getTrim(child));
+                            }
                         }
                     }
-
-                    printUserData();
                 }
+                printUserData();
             }
 
             @Override
@@ -234,21 +301,87 @@ public class FragmentProfile extends Fragment {
         });
     }
 
+    public void Ascending() {
+        if (trimesters.size() > 0) {
+            ArrayList<Gradedsubjects> gradedSubjects = new ArrayList<>();
+            for (Trimester trim : trimesters) {
+                for (Trimester.subjects subject : trim.getSubjects()) {
+                    gradedSubjects.add(new Gradedsubjects(subject.getSubjectCodes(), subject.getSubjectNames(), subject.getSubjectGades()));
+                }
+            }
+            Collections.sort(gradedSubjects, (o1, o2) -> (int) ((o1.getGpa() - o2.getGpa()) * 100d));
+            gradedSubjects.get(gradedSubjects.size() - 1).setEnd(true);
+            for (int i = 0; i < gradedSubjects.size(); i++) {
+                if (gradedSubjects.get(i).getGpa() > 0) {
+                    if (i > 0) {
+                        gradedSubjects.get(i - 1).setEnd(true);
+                    }
+                    break;
+                }
+            }
+            AdapterSortSubjects adapter = new AdapterSortSubjects(context, R.layout.graded_subject, gradedSubjects);
+            gradeListView.setAdapter(adapter);
+        }
+    }
+
+    public void Default() {
+        if (trimesters.size() > 0) {
+            AdapterTrimester adapter = new AdapterTrimester(context, R.layout.trimester, trimesters);
+            gradeListView.setAdapter(adapter);
+            setListViewHeightBasedOnChildren(gradeListView);
+        }
+    }
+
+    public void Descending() {
+        if (trimesters.size() > 0) {
+            ArrayList<Gradedsubjects> gradedSubjects = new ArrayList<>();
+            for (Trimester trim : trimesters) {
+                for (Trimester.subjects subject : trim.getSubjects()) {
+                    gradedSubjects.add(new Gradedsubjects(subject.getSubjectCodes(), subject.getSubjectNames(), subject.getSubjectGades()));
+                }
+            }
+            Collections.sort(gradedSubjects, (o1, o2) -> (int) ((o2.getGpa() - o1.getGpa()) * 100d));
+            gradedSubjects.get(gradedSubjects.size() - 1).setEnd(true);
+            for (int i = 0; i < gradedSubjects.size(); i++) {
+                if (gradedSubjects.get(i).getGpa() == 0) {
+                    if (i > 0) {
+                        gradedSubjects.get(i - 1).setEnd(true);
+                    }
+                    break;
+                }
+            }
+            AdapterSortSubjects adapter = new AdapterSortSubjects(context, R.layout.graded_subject, gradedSubjects);
+            gradeListView.setAdapter(adapter);
+        }
+    }
+
+
     public void printUserData() {
-        if (!UserDataPrinted && getView() != null) {
+        if (getView() != null) {
             UserDataPrinted = true;
             userName.setText(Name);
             userName2.setText(Name);
             ID.setText(StudentId);
             ID2.setText(StudentId);
-            if (trimesters.size() > 0) {
+            if (!UpdatedFrom.isEmpty()) {
+                if (UpdatedFrom.toLowerCase().contains("camsys")) {
+                    updatedFrom.setTextColor(Color.GREEN);
+                } else {
+                    updatedFrom.setTextColor(Color.RED);
+                }
+                updatedFrom.setText(UpdatedFrom);
+            }
 
+            if (!imageUri.isEmpty()) {
+                Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin);
+                Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin2);
+            }
+            if (trimesters.size() > 0) {
                 CGPA.setText(trimesters.get(trimesters.size() - 1).getCGPA());
                 TotalHours.setText(trimesters.get(trimesters.size() - 1).getTotalHours());
                 AdapterTrimester adapter = new AdapterTrimester(context, R.layout.trimester, trimesters);
                 gradeListView.setAdapter(adapter);
                 setListViewHeightBasedOnChildren(gradeListView);
-
             }
             progressBar.setVisibility(View.GONE);
         }
