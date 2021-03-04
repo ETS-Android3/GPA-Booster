@@ -1,6 +1,7 @@
 package com.example.maimyou.Adapters;
 
 import android.content.Context;
+import android.text.Spannable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 
+import com.example.maimyou.Activities.SubjectsActivity;
 import com.example.maimyou.Classes.SubjectReviews;
 import com.example.maimyou.Classes.Trimester;
 import com.example.maimyou.R;
@@ -20,7 +23,11 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
 
     private Context mContext;
     private int mResource;
+    SubjectsActivity subjectsActivity;
 
+    public void setSubjectsActivity(SubjectsActivity subjectsActivity) {
+        this.subjectsActivity = subjectsActivity;
+    }
 
     /**
      * Holds variables in a View
@@ -28,6 +35,7 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
     private static class ViewHolder {
         TextView SubjectName,SubjectCategory, SubjectCode, SubjectRate, SubjectUsers;
         LinearLayout subjectFinished, subjectFinished2;
+        CardView subject;
     }
 
     /**
@@ -46,14 +54,14 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        String SubjectName = getItem(position).getSubjectName();
+        Spannable SubjectName = getItem(position).getSubjectName();
         String SubjectCategory = getItem(position).getCategory();
-        String SubjectCode = getItem(position).getSubjectCode();
+        Spannable SubjectCode = getItem(position).getSubjectCode();
         String SubjectRate = getItem(position).getSubjectRate();
         String SubjectUsers = getItem(position).getSubjectUsers();
         boolean isFinished = getItem(position).isFinished();
 
-        SubjectReviews subject = new SubjectReviews(SubjectName,SubjectCategory, SubjectCode, SubjectRate, SubjectUsers, isFinished);
+        SubjectReviews subject = new SubjectReviews(SubjectName,SubjectCategory, SubjectCode.toString(), SubjectRate, SubjectUsers, isFinished);
         //ViewHolder object
         final ViewHolder holder;
 
@@ -68,15 +76,17 @@ public class SubjectReviewsAdapter extends ArrayAdapter<SubjectReviews> {
             holder.SubjectUsers = convertView.findViewById(R.id.SubjectUsers);
             holder.subjectFinished = convertView.findViewById(R.id.subjectFinished);
             holder.subjectFinished2 = convertView.findViewById(R.id.subjectFinished2);
+            holder.subject = convertView.findViewById(R.id.subject);
 
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.SubjectName.setText(subject.getSubjectName());
-        holder.SubjectCode.setText(subject.getSubjectCode());
+        holder.SubjectName.setText(SubjectName);
+        holder.SubjectCode.setText(SubjectCode);
         holder.SubjectCategory.setText(subject.getCategory());
+        holder.subject.setOnClickListener(v -> subjectsActivity.itemClicked(SubjectCode.toString()));
 
         if (subject.isFinished()) {
             holder.subjectFinished.setVisibility(View.VISIBLE);

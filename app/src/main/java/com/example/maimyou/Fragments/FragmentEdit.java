@@ -566,7 +566,6 @@ public class FragmentEdit extends Fragment {
     public void downLoadData() {
         if (!dashBoardActivity.isConnected()) {
             Toast.makeText(context, "No internet connection!", Toast.LENGTH_LONG).show();
-            return;
         }
 
         FirebaseDatabase.getInstance().getReference().child("Member").child(id).addValueEventListener(new ValueEventListener() {

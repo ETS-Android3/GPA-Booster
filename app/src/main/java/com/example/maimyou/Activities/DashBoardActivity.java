@@ -209,12 +209,12 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
     public void Subjects(View view) {
         startActivity(new Intent(getApplicationContext(), SubjectsActivity.class));
-        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
+//        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
     }
 
     public void UploadCourse(View view) {
         startActivity(new Intent(getApplicationContext(), CourseStructure.class));
-        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
+//        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
     }
 
     public void Progress(View view) {

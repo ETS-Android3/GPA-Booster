@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,7 @@ public class AdapterDisplayCourse extends ArrayAdapter<DisplayCourse> {
             holder.trimesterTitle = convertView.findViewById(R.id.trimesterTitle);
             holder.trimesterTitle.setText(trimesterTitle);
         } else if (mode == 2) {
-            String Grade = getItem(position).getGrade(), Code = getItem(position).getCode(), Subject = getItem(position).getSubject(), Hours = getItem(position).getHours(), preRequest = getItem(position).getPreRequest();
+            String Elective = getItem(position).getElective(), Grade = getItem(position).getGrade(), Code = getItem(position).getCode(), Subject = getItem(position).getSubject(), Hours = getItem(position).getHours(), preRequest = getItem(position).getPreRequest();
             holder.expand = convertView.findViewById(R.id.expand);
             holder.expand.setVisibility(View.VISIBLE);
             holder.preRequisite = convertView.findViewById(R.id.preRequisite);
@@ -78,13 +79,16 @@ public class AdapterDisplayCourse extends ArrayAdapter<DisplayCourse> {
             holder.Grade = convertView.findViewById(R.id.Grade);
             holder.Grade.setText(Grade);
             holder.Code = convertView.findViewById(R.id.Code);
+            if (Elective.toLowerCase().contains("true")) {
+                Code += "\nElective";
+            }
             holder.Code.setText(Code);
             holder.Subject = convertView.findViewById(R.id.Subject);
             holder.Subject.setText(Subject);
             holder.Hours = convertView.findViewById(R.id.Hours);
             holder.Hours.setText(Hours);
             holder.preRequest = convertView.findViewById(R.id.preRequest);
-            holder.preRequest.setText(preRequest);
+            holder.preRequest.setText(Html.fromHtml(preRequest), TextView.BufferType.SPANNABLE);
         } else if (mode == 3) {
             String TotalHours = getItem(position).getTotalHours();
             holder.Bottom = convertView.findViewById(R.id.Bottom);

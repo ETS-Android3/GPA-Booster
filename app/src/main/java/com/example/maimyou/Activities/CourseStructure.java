@@ -19,10 +19,13 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.RectF;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,6 +55,7 @@ import android.widget.Toast;
 import com.example.maimyou.Adapters.AdapterDisplayCourse;
 import com.example.maimyou.Classes.DisplayCourse;
 import com.example.maimyou.Classes.FileUtils;
+import com.example.maimyou.Classes.Trimester;
 import com.example.maimyou.Classes.UriUtils;
 //import com.example.maimyou.Libraries.PdfBoxFinder;
 import com.example.maimyou.Libraries.PdfBoxFinder;
@@ -81,6 +85,7 @@ import java.util.regex.Pattern;
 
 import static com.example.maimyou.Activities.DashBoardActivity.Intake;
 import static com.example.maimyou.Activities.DashBoardActivity.actionListener;
+import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
 
 public class CourseStructure extends AppCompatActivity {
 
@@ -88,10 +93,12 @@ public class CourseStructure extends AppCompatActivity {
     RelativeLayout RelEE, RelCE, RelTE, RelEL, RelNA;
     RecyclerView RecEE, RecCE, RecTE, RecEL, RecNA;
     ImageView ArrEE, ArrCE, ArrTE, ArrEL, ArrNA;
+    SlidingUpPanelLayout slidingPanel;
     ListView CourseStructureList;
     ProgressBar progressBar;
     LinearLayout title;
     TextView Title;
+
 //    View temp;
 
     //Vars-
@@ -99,9 +106,9 @@ public class CourseStructure extends AppCompatActivity {
     Context context = this;
     String FileName = "", path = "";
     CourseStructure courseStructure = this;
-    Boolean ExpandEE = false, ExpandCE = false, ExpandTE = false, ExpandEL = false, ExpandNA = false, busy = false;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static final String[] PERMISSIONS_STORAGE;
+    boolean ExpandEE = false, ExpandCE = false, ExpandTE = false, ExpandEL = false, ExpandNA = false, busy = false;
 
     static {
         PERMISSIONS_STORAGE = new String[]{
@@ -205,18 +212,121 @@ public class CourseStructure extends AppCompatActivity {
         RecNA = findViewById(R.id.RecNA);
         InflateRec(RecNA, "na");
 
-        actionListener.setOnActionPerformed(() -> viewCourse(Intake));
+        Init();
+    }
 
-        SlidingUpPanelLayout slidingPanel = findViewById(R.id.slidingPanel);
-        final Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(() -> {
-            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-        }, 2000);
-
+    public void Init(){
         CourseStructureList = findViewById(R.id.CourseStructureList);
         progressBar = findViewById(R.id.progressBar);
         title = findViewById(R.id.title);
         Title = findViewById(R.id.Title);
+        slidingPanel = findViewById(R.id.slidingPanel);
+        if (!isConnected()) {
+            Toast.makeText(context, "No internet connection!", Toast.LENGTH_LONG).show();
+        }
+        actionListener.setOnActionPerformed(() -> viewCourse(Intake));
+        getCourse();
+    }
+
+    public void getCourse() {
+        FirebaseDatabase.getInstance().getReference().child("Member").child(loadData("Id")).child("Profile").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("Degree").exists() && snapshot.child("Intake").exists()) {
+                    FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshotLocal) {
+                            for (DataSnapshot child : snapshotLocal.getChildren()) {
+                                if (checkIntake(child.getKey(), snapshot.child("Degree").getValue(), snapshot.child("Intake").getValue())) {
+                                    Intake = child.getKey();
+                                    viewCourse(child.getKey());
+                                    return;
+                                }
+                            }
+                            toast("Your course structure was not found!");
+                            notFound();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                } else {
+                    toast("Please Update Your Course Structure!");
+                    notFound();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void toast(String ms) {
+        this.runOnUiThread(() -> Toast.makeText(context, ms, Toast.LENGTH_LONG).show());
+    }
+
+    public boolean checkIntake(String courseStructure, Object Degree, Object Intake) {
+        if (Degree != null && Intake != null) {
+            int trim = getInt(Intake.toString().trim().substring(0, 1));
+            int courseTrim = getTrim(courseStructure);
+            String year = between(Intake.toString().trim(), "-", "/").trim();
+            String degree = getMajor(Degree.toString());
+            if (!degree.isEmpty() && !year.isEmpty() && trim > 0) {
+                return courseStructure.contains(year) && courseStructure.contains(degree) && courseTrim == trim;
+            }
+        }
+        return false;
+    }
+
+    public int getInt(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
+
+    public String getMajor(String str) {
+        if (str.toLowerCase().contains("electronics majoring in computer")) {
+            return "ce";
+        } else if (str.toLowerCase().contains("electronics majoring in electronics")) {
+            return "ee";
+        } else if (str.toLowerCase().contains("electronics majoring in telecommunications")) {
+            return "te";
+        } else if (str.toLowerCase().contains("electronics majoring in electrical")) {
+            return "le";
+        } else if (str.toLowerCase().contains("electronics majoring in nanotechnology")) {
+            return "nano";
+        } else {
+            return "";
+        }
+    }
+
+    public String between(String value, String a, String b) {
+        // Return a substring between the two strings.
+        int posA = value.indexOf(a);
+        if (posA == -1) {
+            return "";
+        }
+        int posB = value.lastIndexOf(b);
+        if (posB == -1) {
+            return "";
+        }
+        int adjustedPosA = posA + a.length();
+        if (adjustedPosA >= posB) {
+            return "";
+        }
+        return value.substring(adjustedPosA, posB);
+    }
+
+    public void notFound() {
+        progressBar.setVisibility(View.GONE);
+        slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
     }
 
     public void InflateRec(RecyclerView recyclerView, String Major) {
@@ -276,20 +386,45 @@ public class CourseStructure extends AppCompatActivity {
 
     public void viewCourse(String str) {
         Title.setText(str);
-        FirebaseDatabase.getInstance().getReference().child("UNDERGRADUATE PROGRAMMES").child(str).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot parentSnapshot) {
+                double totalHours = 0;
+                Trimester subjects = new Trimester();
+                ArrayList<String> codes = new ArrayList<>();
+                DataSnapshot snapshot2 = parentSnapshot.child("Member").child(loadData("Id")).child("Profile");
+                if (snapshot2.child("Trimesters").exists()) {
+                    ArrayList<Trimester> trimesters = new ArrayList<>();
+                    for (DataSnapshot child : snapshot2.child("Trimesters").getChildren()) {
+                        trimesters.add(getTrim(child));
+                    }
+
+                    for (Trimester trim : trimesters) {
+                        for (Trimester.subjects subject : trim.getSubjects()) {
+                            subjects.addSubjectComputeGPA(subject.getSubjectCodes(), subject.getSubjectNames(), subject.getSubjectGades(), getSubjectHours(parentSnapshot, subject.getSubjectCodes()));
+                            codes.add(subject.getSubjectCodes());
+                        }
+                    }
+                    totalHours = subjects.compTotalHours();
+                }
+
+
+                DataSnapshot snapshot = parentSnapshot.child("UNDERGRADUATE PROGRAMMES").child(str);
                 if (snapshot.child("Trimesters").exists()) {
                     title.setVisibility(View.VISIBLE);
                     ArrayList<DisplayCourse> displayCourses = new ArrayList<>();
                     int firstTrim = getTrim(str);
                     FirstTrim = firstTrim;
+                    ArrayList<String> codesC = new ArrayList<>();
+                    ArrayList<String> namesC = new ArrayList<>();
                     for (DataSnapshot trimester : snapshot.child("Trimesters").getChildren()) {
                         displayCourses.add(new DisplayCourse(getTitle(firstTrim), 0));
                         firstTrim++;
                         for (DataSnapshot subject : trimester.getChildren()) {
                             if (subject.child("Elective").exists() && subject.child("PreRequisite").exists() && subject.child("SubjectHours").exists() && subject.child("SubjectName").exists()) {
-                                displayCourses.add(new DisplayCourse("A", subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString(), Objects.requireNonNull(subject.child("PreRequisite").getValue()).toString()));
+                                codesC.add(subject.getKey());
+                                namesC.add(Objects.requireNonNull(subject.child("SubjectName").getValue()).toString());
+                                displayCourses.add(new DisplayCourse(subject.child("Elective").getValue().toString(),getGrade(subjects, codes, subject.getKey()), subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString(), Objects.requireNonNull(subject.child("PreRequisite").getValue()).toString(), subjects, codes, totalHours,codesC,namesC));
                             }
                         }
                         if (trimester.child("TotalHours").exists()) {
@@ -301,6 +436,7 @@ public class CourseStructure extends AppCompatActivity {
                     AdapterDisplayCourse adapter = new AdapterDisplayCourse(context, R.layout.display_course, displayCourses);
                     adapter.setCourseStructure(courseStructure);
                     CourseStructureList.setAdapter(adapter);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
@@ -309,6 +445,65 @@ public class CourseStructure extends AppCompatActivity {
 
             }
         });
+    }
+
+    public boolean isConnected() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
+    }
+
+
+    public String getSubjectHours(DataSnapshot parentSnapshot, String code) {
+        if (parentSnapshot.child("Subjects").child(code).child("SubjectHours").exists()) {
+            try {
+                return Objects.requireNonNull(parentSnapshot.child("Subjects").child(code).child("SubjectHours").getValue()).toString();
+            } catch (Exception ignored) {
+                return "3";
+            }
+        }
+        return "3";
+    }
+
+    public String getGrade(Trimester trim, ArrayList<String> codes, String code) {
+        if (codes.contains(code)) {
+            return trim.getSubjects().get(codes.indexOf(code)).getSubjectGades();
+        } else {
+            return "";
+        }
+    }
+
+    public Trimester getTrim(DataSnapshot dataSnapshot) {
+        String semesterName = "", GPA = "", CGPA = "", academicStatus = "", hours = "", totalHours = "", totalPoint = "";
+        if (dataSnapshot.child("semesterName").exists()) {
+            semesterName = dataSnapshot.child("semesterName").getValue().toString();
+        }
+        if (dataSnapshot.child("gpa").exists()) {
+            GPA = dataSnapshot.child("gpa").getValue().toString();
+        }
+        if (dataSnapshot.child("cgpa").exists()) {
+            CGPA = dataSnapshot.child("cgpa").getValue().toString();
+        }
+        if (dataSnapshot.child("academicStatus").exists()) {
+            academicStatus = dataSnapshot.child("academicStatus").getValue().toString();
+        }
+        if (dataSnapshot.child("hours").exists()) {
+            hours = dataSnapshot.child("hours").getValue().toString();
+        }
+        if (dataSnapshot.child("totalHours").exists()) {
+            totalHours = dataSnapshot.child("totalHours").getValue().toString();
+        }
+        if (dataSnapshot.child("totalPoint").exists()) {
+            totalPoint = dataSnapshot.child("totalPoint").getValue().toString();
+        }
+        Trimester trimester = new Trimester(semesterName, GPA, CGPA, academicStatus, hours, totalHours, totalPoint);
+        Iterable<DataSnapshot> subjectCodes = dataSnapshot.child("subjects").getChildren();
+        for (DataSnapshot child : subjectCodes) {
+            if (child.child("subjectCodes").getValue() != null && child.child("subjectNames").getValue() != null && child.child("subjectGades").getValue() != null) {
+                trimester.addSubject(child.child("subjectCodes").getValue().toString(), child.child("subjectNames").getValue().toString(), child.child("subjectGades").getValue().toString());
+            }
+        }
+        return trimester;
     }
 
     public String getTitle(int trimInt) {
@@ -320,17 +515,6 @@ public class CourseStructure extends AppCompatActivity {
         return "Trimester " + trimInt + " - Year " + year;
     }
 
-    public boolean isNumeric(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            Double.parseDouble(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
 
     public boolean ExpandView(ImageView imageView, RelativeLayout relativeLayout, boolean expanded) {
         if (!expanded) {
@@ -454,7 +638,7 @@ public class CourseStructure extends AppCompatActivity {
 
                 progressBar.setVisibility(View.VISIBLE);
                 busy = true;
-                path = FileUtils.getPath(context,data.getData());
+                path = FileUtils.getPath(context, data.getData());
                 FileName = "";
                 Uri uri = data.getData();
 
@@ -578,7 +762,7 @@ public class CourseStructure extends AppCompatActivity {
                                 busy = false;
                             });
                         } catch (IOException e) {
-                            Log.i("TAG",e.getMessage());
+                            Log.i("TAG", e.getMessage());
                             progressBar.post(() -> {
                                 progressBar.setVisibility(View.GONE);
                                 busy = false;
@@ -707,8 +891,21 @@ public class CourseStructure extends AppCompatActivity {
         }
     }
 
+    public String loadData(String name) {
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        if (sharedPreferences == null) {
+            return "";
+        }
+        return sharedPreferences.getString(name, "");
+    }
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(slidingPanel.getPanelState()==SlidingUpPanelLayout.PanelState.EXPANDED||slidingPanel.getPanelState()==SlidingUpPanelLayout.PanelState.ANCHORED){
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }else {
+            finish();
+            super.onBackPressed();
+        }
     }
 }

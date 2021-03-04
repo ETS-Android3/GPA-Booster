@@ -251,7 +251,6 @@ public class FragmentProfile extends Fragment {
     public void downLoadData() {
         if (!dashBoardActivity.isConnected()) {
             Toast.makeText(context, "No internet connection!", Toast.LENGTH_LONG).show();
-            return;
         }
 
         FirebaseDatabase.getInstance().getReference().child("Member").child(id).addValueEventListener(new ValueEventListener() {
@@ -269,7 +268,7 @@ public class FragmentProfile extends Fragment {
 
                     if (snapshot.child("PersonalImage").exists()) {
                         imageUri = Objects.requireNonNull(snapshot.child("PersonalImage").getValue()).toString();
-                        if (!imageUri.isEmpty()) {
+                        if (!imageUri.isEmpty()&&getView()!=null) {
                             Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin);
                             Picasso.get().load(imageUri).error(R.drawable.avatar).into(profilePictureAdmin2);
                         }

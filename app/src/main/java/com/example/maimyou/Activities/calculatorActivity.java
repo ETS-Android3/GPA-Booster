@@ -50,6 +50,7 @@ public class calculatorActivity extends AppCompatActivity implements PopupMenu.O
     SeekBar seekBar;
 
 
+
     public void radiob(View view){
         int radiobutton = rg.getCheckedRadioButtonId();
         rb=findViewById(radiobutton);

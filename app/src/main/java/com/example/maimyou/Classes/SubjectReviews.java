@@ -1,14 +1,18 @@
 package com.example.maimyou.Classes;
 
+import android.text.Spannable;
+import android.text.SpannableString;
+
 public class SubjectReviews {
-    String SubjectName, SubjectCode, SubjectRate, SubjectUsers,Category;
+    Spannable SubjectName, SubjectCode;
+    String SubjectRate, SubjectUsers, Category;
     boolean isFinished;
 
-    public String getSubjectName() {
+    public Spannable getSubjectName() {
         return SubjectName;
     }
 
-    public String getSubjectCode() {
+    public Spannable getSubjectCode() {
         return SubjectCode;
     }
 
@@ -28,18 +32,23 @@ public class SubjectReviews {
         return isFinished;
     }
 
-    public SubjectReviews(Object subjectName,Object category, String subjectCode, String subjectRate, String subjectUsers, boolean isFinished) {
-        if(subjectName!=null) {
-            this.SubjectName = subjectName.toString().trim();
-        }else{
-            this.SubjectName = "";
+    public void setSubjectSearch(Spannable subjectName, Spannable subjectCode) {
+        SubjectName = subjectName;
+        SubjectCode = subjectCode;
+    }
+
+    public SubjectReviews(Object subjectName, Object category, String subjectCode, String subjectRate, String subjectUsers, boolean isFinished) {
+        if (subjectName != null) {
+            this.SubjectName = new SpannableString(subjectName.toString().trim());
+        } else {
+            this.SubjectName = new SpannableString("");
         }
-        if(category!=null) {
+        if (category != null) {
             this.Category = category.toString().trim();
-        }else{
+        } else {
             this.Category = "";
         }
-        this.SubjectCode = subjectCode;
+        this.SubjectCode = new SpannableString(subjectCode);
         this.SubjectRate = subjectRate;
         this.SubjectUsers = subjectUsers;
         this.isFinished = isFinished;
