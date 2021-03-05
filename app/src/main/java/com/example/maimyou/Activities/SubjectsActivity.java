@@ -25,6 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.maimyou.Adapters.SubjectReviewsAdapter;
@@ -45,6 +46,7 @@ public class SubjectsActivity extends AppCompatActivity {
     FrameLayout SearchBarContainer;
     EditText inputSearch;
     ListView SubjectsList;
+    ProgressBar progressBar;
 
     //vars
     boolean searchIsOpened = false;
@@ -123,6 +125,7 @@ public class SubjectsActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(context, "Please update Syllabus!", Toast.LENGTH_LONG).show();
                 }
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
@@ -151,6 +154,7 @@ public class SubjectsActivity extends AppCompatActivity {
         SearchBarContainer = findViewById(R.id.SearchBarContainer);
         inputSearch = findViewById(R.id.inputSearch);
         SubjectsList = findViewById(R.id.SubjectsList);
+        progressBar = findViewById(R.id.progressBar);
         inputSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

@@ -97,5 +97,10 @@
         android:divider="@null"
         android:listSelector="@android:color/transparent"
         android:dividerHeight="0dp"/>
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/progress" />
 </RelativeLayout>
