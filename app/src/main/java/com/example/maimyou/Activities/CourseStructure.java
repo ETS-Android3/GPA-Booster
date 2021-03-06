@@ -9,8 +9,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.slidingpanelayout.widget.SlidingPaneLayout;
-
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -29,11 +27,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -56,8 +50,6 @@ import com.example.maimyou.Adapters.AdapterDisplayCourse;
 import com.example.maimyou.Classes.DisplayCourse;
 import com.example.maimyou.Classes.FileUtils;
 import com.example.maimyou.Classes.Trimester;
-import com.example.maimyou.Classes.UriUtils;
-//import com.example.maimyou.Libraries.PdfBoxFinder;
 import com.example.maimyou.Libraries.PdfBoxFinder;
 import com.example.maimyou.R;
 import com.example.maimyou.RecycleViewMaterials.Child;
@@ -98,8 +90,6 @@ public class CourseStructure extends AppCompatActivity {
     ProgressBar progressBar;
     LinearLayout title;
     TextView Title;
-
-//    View temp;
 
     //Vars-
     int FirstTrim;
@@ -253,7 +243,7 @@ public class CourseStructure extends AppCompatActivity {
                         }
                     });
                 } else {
-                    toast("Please Update Your Course Structure!");
+                    toast("Please update your profile!");
                     notFound();
                 }
 
@@ -424,7 +414,7 @@ public class CourseStructure extends AppCompatActivity {
                             if (subject.child("Elective").exists() && subject.child("PreRequisite").exists() && subject.child("SubjectHours").exists() && subject.child("SubjectName").exists()) {
                                 codesC.add(subject.getKey());
                                 namesC.add(Objects.requireNonNull(subject.child("SubjectName").getValue()).toString());
-                                displayCourses.add(new DisplayCourse(subject.child("Elective").getValue().toString(),getGrade(subjects, codes, subject.getKey()), subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString(), Objects.requireNonNull(subject.child("PreRequisite").getValue()).toString(), subjects, codes, totalHours,codesC,namesC));
+                                displayCourses.add(new DisplayCourse(Objects.requireNonNull(subject.child("Elective").getValue()).toString(),getGrade(subjects, codes, subject.getKey()), subject.getKey(), Objects.requireNonNull(subject.child("SubjectName").getValue()).toString(), Objects.requireNonNull(subject.child("SubjectHours").getValue()).toString(), Objects.requireNonNull(subject.child("PreRequisite").getValue()).toString(), subjects, codes, totalHours,codesC,namesC));
                             }
                         }
                         if (trimester.child("TotalHours").exists()) {
@@ -449,8 +439,8 @@ public class CourseStructure extends AppCompatActivity {
 
     public boolean isConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
+        return Objects.requireNonNull(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)).getState() == NetworkInfo.State.CONNECTED ||
+                Objects.requireNonNull(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)).getState() == NetworkInfo.State.CONNECTED;
     }
 
 
@@ -476,31 +466,31 @@ public class CourseStructure extends AppCompatActivity {
     public Trimester getTrim(DataSnapshot dataSnapshot) {
         String semesterName = "", GPA = "", CGPA = "", academicStatus = "", hours = "", totalHours = "", totalPoint = "";
         if (dataSnapshot.child("semesterName").exists()) {
-            semesterName = dataSnapshot.child("semesterName").getValue().toString();
+            semesterName = Objects.requireNonNull(dataSnapshot.child("semesterName").getValue()).toString();
         }
         if (dataSnapshot.child("gpa").exists()) {
-            GPA = dataSnapshot.child("gpa").getValue().toString();
+            GPA = Objects.requireNonNull(dataSnapshot.child("gpa").getValue()).toString();
         }
         if (dataSnapshot.child("cgpa").exists()) {
-            CGPA = dataSnapshot.child("cgpa").getValue().toString();
+            CGPA = Objects.requireNonNull(dataSnapshot.child("cgpa").getValue()).toString();
         }
         if (dataSnapshot.child("academicStatus").exists()) {
-            academicStatus = dataSnapshot.child("academicStatus").getValue().toString();
+            academicStatus = Objects.requireNonNull(dataSnapshot.child("academicStatus").getValue()).toString();
         }
         if (dataSnapshot.child("hours").exists()) {
-            hours = dataSnapshot.child("hours").getValue().toString();
+            hours = Objects.requireNonNull(dataSnapshot.child("hours").getValue()).toString();
         }
         if (dataSnapshot.child("totalHours").exists()) {
-            totalHours = dataSnapshot.child("totalHours").getValue().toString();
+            totalHours = Objects.requireNonNull(dataSnapshot.child("totalHours").getValue()).toString();
         }
         if (dataSnapshot.child("totalPoint").exists()) {
-            totalPoint = dataSnapshot.child("totalPoint").getValue().toString();
+            totalPoint = Objects.requireNonNull(dataSnapshot.child("totalPoint").getValue()).toString();
         }
         Trimester trimester = new Trimester(semesterName, GPA, CGPA, academicStatus, hours, totalHours, totalPoint);
         Iterable<DataSnapshot> subjectCodes = dataSnapshot.child("subjects").getChildren();
         for (DataSnapshot child : subjectCodes) {
             if (child.child("subjectCodes").getValue() != null && child.child("subjectNames").getValue() != null && child.child("subjectGades").getValue() != null) {
-                trimester.addSubject(child.child("subjectCodes").getValue().toString(), child.child("subjectNames").getValue().toString(), child.child("subjectGades").getValue().toString());
+                trimester.addSubject(Objects.requireNonNull(child.child("subjectCodes").getValue()).toString(), Objects.requireNonNull(child.child("subjectNames").getValue()).toString(), Objects.requireNonNull(child.child("subjectGades").getValue()).toString());
             }
         }
         return trimester;
@@ -762,7 +752,7 @@ public class CourseStructure extends AppCompatActivity {
                                 busy = false;
                             });
                         } catch (IOException e) {
-                            Log.i("TAG", e.getMessage());
+                            Log.i("TAG", Objects.requireNonNull(e.getMessage()));
                             progressBar.post(() -> {
                                 progressBar.setVisibility(View.GONE);
                                 busy = false;
@@ -772,14 +762,11 @@ public class CourseStructure extends AppCompatActivity {
                 };
                 thread.start();
             } else if (requestCode == 2 && resultCode == RESULT_OK && data != null) {
-
                 progressBar.setVisibility(View.VISIBLE);
                 busy = true;
                 path = FileUtils.getPath(context, data.getData());
 //                Uri uri = data.getData();
                 Toast.makeText(getApplicationContext(), "It will take a minute to scan the syllabus.\n please be patient!", Toast.LENGTH_LONG).show();
-
-
                 Thread thread = new Thread() {
                     @Override
                     public void run() {
@@ -901,7 +888,7 @@ public class CourseStructure extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(slidingPanel.getPanelState()==SlidingUpPanelLayout.PanelState.EXPANDED||slidingPanel.getPanelState()==SlidingUpPanelLayout.PanelState.ANCHORED){
+        if(slidingPanel.getPanelState()!=SlidingUpPanelLayout.PanelState.COLLAPSED){
             slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         }else {
             finish();

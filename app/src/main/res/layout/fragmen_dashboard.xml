@@ -133,7 +133,7 @@
                     android:layout_rowWeight="1"
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
-                    android:onClick="UpdateMarks"
+                    android:onClick="Planner"
                     android:layout_margin="6dp"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
@@ -158,7 +158,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Trimester Planner"
+                            android:text="CGPA Planner"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"
@@ -175,6 +175,7 @@
                     app:cardElevation="6dp"
                     app:cardCornerRadius="12dp"
                     android:layout_margin="6dp"
+                    android:onClick="Calculator"
                     android:foreground="?attr/selectableItemBackground"
                     android:stateListAnimator="@anim/animation"
                     android:clickable="true"
@@ -192,13 +193,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="100dp"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/result"
+                            android:src="@drawable/calculator"
                             tools:ignore="ContentDescription" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Degree planner"
+                            android:text="Calculator"
                             android:gravity="center"
                             android:layout_marginTop="12dp"
                             android:textColor="#000000"
@@ -248,47 +249,47 @@
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
-                <androidx.cardview.widget.CardView
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_rowWeight="1"
-                    app:cardElevation="6dp"
-                    android:onClick="Calculator"
-                    app:cardCornerRadius="12dp"
-                    android:layout_margin="6dp"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:stateListAnimator="@anim/animation"
-                    android:clickable="true"
-                    android:focusable="true">
+<!--                <androidx.cardview.widget.CardView-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_columnWeight="1"-->
+<!--                    android:layout_rowWeight="1"-->
+<!--                    app:cardElevation="6dp"-->
+<!--                    android:onClick="Calculator"-->
+<!--                    app:cardCornerRadius="12dp"-->
+<!--                    android:layout_margin="6dp"-->
+<!--                    android:foreground="?attr/selectableItemBackground"-->
+<!--                    android:stateListAnimator="@anim/animation"-->
+<!--                    android:clickable="true"-->
+<!--                    android:focusable="true">-->
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:padding="17dp"
-                        android:gravity="center"
-                        android:layout_gravity="center">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:padding="17dp"-->
+<!--                        android:gravity="center"-->
+<!--                        android:layout_gravity="center">-->
 
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="100dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/calculator"
-                            tools:ignore="ContentDescription" />
+<!--                        <ImageView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="100dp"-->
+<!--                            android:scaleType="fitCenter"-->
+<!--                            android:src="@drawable/calculator"-->
+<!--                            tools:ignore="ContentDescription" />-->
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Calculator"
-                            android:gravity="center"
-                            android:layout_marginTop="12dp"
-                            android:textColor="#000000"
-                            android:textSize="14sp" />
+<!--                        <TextView-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Calculator"-->
+<!--                            android:gravity="center"-->
+<!--                            android:layout_marginTop="12dp"-->
+<!--                            android:textColor="#000000"-->
+<!--                            android:textSize="14sp" />-->
 
-                    </LinearLayout>
+<!--                    </LinearLayout>-->
 
-                </androidx.cardview.widget.CardView>
+<!--                </androidx.cardview.widget.CardView>-->
             </GridLayout>
     </ScrollView>
 

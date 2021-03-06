@@ -43,8 +43,6 @@ import com.example.maimyou.Fragments.FragmentProfile;
 import com.example.maimyou.Fragments.FragmentCamsys;
 import com.example.maimyou.R;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -210,6 +208,10 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
     public void Subjects(View view) {
         startActivity(new Intent(getApplicationContext(), SubjectsActivity.class));
 //        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
+    }
+
+    public void Planner(View view){
+        startActivity(new Intent(getApplicationContext(), PlannerActivity.class));
     }
 
     public void UploadCourse(View view) {

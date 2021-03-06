@@ -5,14 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -26,16 +22,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.maimyou.Adapters.ReviewsAdapter;
-import com.example.maimyou.Classes.MyJavaScriptInterface;
-import com.example.maimyou.Classes.UriUtils;
 import com.example.maimyou.Classes.reviews;
 import com.example.maimyou.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,15 +39,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import im.delight.android.webview.AdvancedWebView;
 
 import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
-import static com.example.maimyou.Fragments.FragmentCamsys.webView;
 
-public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWebView.Listener{
+public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWebView.Listener {
 
     //views
     TextView subName, subCode, subCat, stars, stars2, reviews, reviews2, users, GPA, GRADE;
     ProgressBar Prog1, Prog2, Prog3, Prog4, Prog5;
+    SlidingUpPanelLayout slidingPanel;
     CircleImageView profilePicture;
     AdvancedWebView webView;
+    ProgressBar progressBar;
     ListView reviewsList;
     RatingBar ratingBar;
 
@@ -103,7 +98,7 @@ public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWe
         }
     }
 
-    public class review {
+    public static class review {
         String id, Time, Rate, Review;
 
         public String getRate() {
@@ -213,7 +208,7 @@ public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWe
                         Prog3.setProgress((int) reviewsHolder.getProg3());
                         Prog4.setProgress((int) reviewsHolder.getProg4());
                         Prog5.setProgress((int) reviewsHolder.getProg5());
-
+                        progressBar.setVisibility(View.GONE);
                     } else {
                         Toast.makeText(getApplicationContext(), "Subject was not found!", Toast.LENGTH_SHORT).show();
                         finish();
@@ -378,6 +373,8 @@ public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWe
         Prog4 = findViewById(R.id.Prog4);
         Prog5 = findViewById(R.id.Prog5);
         profilePicture = findViewById(R.id.profilePicture);
+        slidingPanel = findViewById(R.id.slidingPanel);
+        progressBar = findViewById(R.id.progressBar);
         reviewsList = findViewById(R.id.reviewsList);
         ratingBar = findViewById(R.id.ratingBar);
         webView = findViewById(R.id.webView);
@@ -390,7 +387,6 @@ public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWe
         webSettings.setJavaScriptEnabled(true);
         webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setBuiltInZoomControls(true);
-//        webSettings.setDomStorageEnabled(true);
     }
 
 
@@ -409,8 +405,6 @@ public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWe
             webView.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-
 
 
     @SuppressLint("NewApi")
@@ -455,21 +449,14 @@ public class ViewSubjectActivity extends AppCompatActivity implements AdvancedWe
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-            return;
+        if(slidingPanel.getPanelState()!=SlidingUpPanelLayout.PanelState.COLLAPSED){
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }else {
+            if (webView != null && webView.canGoBack()) {
+                webView.goBack();
+                return;
+            }
+            super.onBackPressed();
         }
-        super.onBackPressed();
     }
-
-
-    //    @Override
-//    public void onBackPressed() {
-//        if (searchIsOpened) {
-//            closeSearch();
-//        } else {
-//            finish();
-//            super.onBackPressed();
-//        }
-//    }
 }

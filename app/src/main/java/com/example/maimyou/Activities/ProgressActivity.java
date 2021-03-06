@@ -95,7 +95,7 @@ public class ProgressActivity extends AppCompatActivity {
         lineDataSet1.setColor(Color.BLUE);
 
         lineDataSets.add(lineDataSet1);
-        lineChart.setData(new LineData(xaxes,lineDataSets));
+//        lineChart.setData(new LineData(xaxes,lineDataSets));
         lineChart.setVisibleXRangeMaximum(65f);
     }
     public float getFloat(String s){

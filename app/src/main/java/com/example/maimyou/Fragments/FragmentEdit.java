@@ -690,31 +690,31 @@ public class FragmentEdit extends Fragment {
     public Trimester getTrim(DataSnapshot dataSnapshot) {
         String semesterName = "", GPA = "", CGPA = "", academicStatus = "", hours = "", totalHours = "", totalPoint = "";
         if (dataSnapshot.child("semesterName").exists()) {
-            semesterName = dataSnapshot.child("semesterName").getValue().toString();
+            semesterName = Objects.requireNonNull(dataSnapshot.child("semesterName").getValue()).toString();
         }
         if (dataSnapshot.child("gpa").exists()) {
-            GPA = dataSnapshot.child("gpa").getValue().toString();
+            GPA = Objects.requireNonNull(dataSnapshot.child("gpa").getValue()).toString();
         }
         if (dataSnapshot.child("cgpa").exists()) {
-            CGPA = dataSnapshot.child("cgpa").getValue().toString();
+            CGPA = Objects.requireNonNull(dataSnapshot.child("cgpa").getValue()).toString();
         }
         if (dataSnapshot.child("academicStatus").exists()) {
-            academicStatus = dataSnapshot.child("academicStatus").getValue().toString();
+            academicStatus = Objects.requireNonNull(dataSnapshot.child("academicStatus").getValue()).toString();
         }
         if (dataSnapshot.child("hours").exists()) {
-            hours = dataSnapshot.child("hours").getValue().toString();
+            hours = Objects.requireNonNull(dataSnapshot.child("hours").getValue()).toString();
         }
         if (dataSnapshot.child("totalHours").exists()) {
-            totalHours = dataSnapshot.child("totalHours").getValue().toString();
+            totalHours = Objects.requireNonNull(dataSnapshot.child("totalHours").getValue()).toString();
         }
         if (dataSnapshot.child("totalPoint").exists()) {
-            totalPoint = dataSnapshot.child("totalPoint").getValue().toString();
+            totalPoint = Objects.requireNonNull(dataSnapshot.child("totalPoint").getValue()).toString();
         }
         Trimester trimester = new Trimester(semesterName, GPA, CGPA, academicStatus, hours, totalHours, totalPoint);
         Iterable<DataSnapshot> subjectCodes = dataSnapshot.child("subjects").getChildren();
         for (DataSnapshot child : subjectCodes) {
             if (child.child("subjectCodes").getValue() != null && child.child("subjectNames").getValue() != null && child.child("subjectGades").getValue() != null) {
-                trimester.addSubject(child.child("subjectCodes").getValue().toString(), child.child("subjectNames").getValue().toString(), child.child("subjectGades").getValue().toString());
+                trimester.addSubject(Objects.requireNonNull(child.child("subjectCodes").getValue()).toString(), Objects.requireNonNull(child.child("subjectNames").getValue()).toString(), Objects.requireNonNull(child.child("subjectGades").getValue()).toString());
             }
         }
         return trimester;

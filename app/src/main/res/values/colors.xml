@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#276588</color>
     <color name="colorPrimaryDark">#1B475E</color>
-    <color name="backGroundColour">#E3E3E9</color>
+    <color name="backGroundColour">#F0F0F6</color>
     <color name="mmuColourSecondary">#ed1c24</color>
 
     <color name="colorAccent">#ed1c24</color>
