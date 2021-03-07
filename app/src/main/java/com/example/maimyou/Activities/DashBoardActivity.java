@@ -231,7 +231,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 
     public void Calculator(View view) {
         startActivity(new Intent(getApplicationContext(), calculatorActivity.class));
-        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
+//        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
     }
 
     public void logout(View view) {

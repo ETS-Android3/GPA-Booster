@@ -207,11 +207,7 @@ public class calculatorActivity extends AppCompatActivity implements PopupMenu.O
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-        CustomIntent.customType(this, "right-to-left");
-    }
+
     public void setPermission(int l){
         if(l==0){
             var1=false;

@@ -171,6 +171,9 @@ public class DisplayCourse {
         } else {
             gpa = 0;
         }
+        if(grade.toLowerCase().contains("ps")){
+            return 4;
+        }
         return gpa;
     }
 

@@ -29,7 +29,22 @@
             android:text="GPA Planner"
             android:textColor="#FFFFFF"
             android:textSize="20sp" />
+        <FrameLayout
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="7dp"
+                android:background="@drawable/ripple_effect_oval_no_background"
+                android:onClick="Menu"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_baseline_more_vert_24"
+                tools:ignore="ContentDescription,OnClick" />
+        </FrameLayout>
 
     </RelativeLayout>
 
@@ -67,24 +82,25 @@
                     android:layout_height="wrap_content"
                     android:text="0%"
                     android:includeFontPadding="false"
-                    android:textColor="@color/followers"
+                    android:textColor="@color/colorPrimary"
                     android:textSize="40sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
 
             <FrameLayout
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:layout_below="@+id/title"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="0dp">
 
                 <ProgressBar
                     style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
                     android:layout_gravity="end"
+                    android:padding="5dp"
                     android:alpha="0.8"
                     android:indeterminate="false"
                     android:max="100"
@@ -92,14 +108,16 @@
                     android:progressDrawable="@drawable/progress_background" />
 
                 <ProgressBar
+                    android:id="@+id/progressHours"
                     style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
                     android:layout_gravity="end"
                     android:alpha="0.8"
                     android:indeterminate="false"
                     android:max="100"
-                    android:progress="70"
+                    android:padding="5dp"
+                    android:progress="0"
                     android:progressDrawable="@drawable/progress_hours" />
 
                 <LinearLayout
@@ -117,8 +135,8 @@
                         android:layout_width="7dp"
                         android:layout_height="7dp"
                         android:layout_gravity="center"
-                        android:layout_marginEnd="10dp"
-                        android:backgroundTint="@color/followers"
+                        android:layout_marginEnd="5dp"
+                        android:backgroundTint="@color/colorPrimary"
                         android:elevation="2dp"
                         tools:ignore="UnusedAttribute" />
 
@@ -126,7 +144,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Completed"
-                        android:textColor="@color/followers" />
+                        android:textColor="@color/colorPrimary" />
 
                     <Space
                         android:layout_width="0dp"
@@ -137,7 +155,7 @@
                         android:layout_width="7dp"
                         android:layout_height="7dp"
                         android:layout_gravity="center"
-                        android:layout_marginEnd="10dp"
+                        android:layout_marginEnd="5dp"
                         android:backgroundTint="@color/grey"
                         android:elevation="2dp"
                         tools:ignore="UnusedAttribute" />
@@ -167,7 +185,7 @@
                         android:layout_gravity="center"
                         android:includeFontPadding="false"
                         android:text="0"
-                        android:textColor="@color/followers"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="50sp"
                         android:textStyle="bold" />
 
@@ -192,15 +210,17 @@
             android:id="@+id/lineChart"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_margin="20dp" />
-
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -224,7 +244,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:includeFontPadding="false"
-                    android:text="New completed hours: 0"
+                    android:text="Hours added to plan: 0"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -396,8 +416,11 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_gravity="center"
-            android:layout_margin="20dp"
-            android:onClick="reset"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:onClick="calculate"
             android:background="@drawable/tip_button_invert"
             android:text="Calculate"
             android:textColor="@color/backGroundColour" />
