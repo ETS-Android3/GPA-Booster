@@ -8,9 +8,10 @@ public class Marks {
     private String forth;
     private String fifth;
     private String sixth;
+    private int color;
 
 
-    public Marks(String Title, String First, String second, String third, String forth, String fifth, String sixth) {
+    public Marks(String Title, String First, String second, String third, String forth, String fifth, String sixth,int color) {
         this.Title = Title;
         this.First = First;
         this.second = second;
@@ -18,6 +19,11 @@ public class Marks {
         this.forth = forth;
         this.fifth = fifth;
         this.sixth = sixth;
+        this.color = color;
+    }
+
+    public int getColor() {
+        return color;
     }
 
     public String getTitle() {

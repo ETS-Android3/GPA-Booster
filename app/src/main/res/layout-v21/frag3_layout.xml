@@ -1,78 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/holo_green_light"
-    android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/backGroundColour">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="horizontal"
-        android:paddingLeft="17dp"
-        android:paddingRight="17dp">
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp">
+
 
         <EditText
             android:id="@+id/setMarksss"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_with_shadow_invert"
+            android:gravity="center"
             android:hint="Marks"
-            android:inputType="numberDecimal" />
-
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:inputType="numberDecimal"
+            android:textColor="@color/backGroundColour"
+            android:textColorHint="@color/backGroundColour"
+            tools:ignore="RtlSymmetry" />
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/both1" />
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_baseline_keyboard_arrow_left_24" />
 
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/setGradeee"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center"
             android:text="-"
-            android:textColor="#DB0000"
+            android:textColor="@color/colorPrimary"
             android:textSize="30sp" />
 
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/both2" />
-
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:scaleType="fitXY"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_keyboard_arrow_right_black_24dp" />
 
         <EditText
             android:id="@+id/setGPAAA"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:ems="10"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@drawable/edit_text_with_shadow_invert"
+            android:gravity="center"
             android:hint="GPA"
-            android:inputType="numberDecimal" />
-
+            android:inputType="numberDecimal"
+            android:textColor="@color/backGroundColour"
+            android:textColorHint="@color/backGroundColour"
+            tools:ignore="RtlSymmetry" />
 
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

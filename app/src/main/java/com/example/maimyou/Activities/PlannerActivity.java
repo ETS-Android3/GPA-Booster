@@ -2,6 +2,7 @@ package com.example.maimyou.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -118,6 +119,7 @@ public class PlannerActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void updateCharts() {
+//        newCompletedHours = (int) newCompletedHours;
         progress = (int) (((hoursDone + newCompletedHours) / totalCoreHours) * 100);
         completedRatio.setText(progress + "%");
         hoursFinished.setText("" + (int) (hoursDone + newCompletedHours));
@@ -127,31 +129,30 @@ public class PlannerActivity extends AppCompatActivity {
         double firstSem = (Trim.size() > 0) ? getDouble(Trim.get(0).trim().substring(0, 1)) : 1;
         double overFlow = 0;
         ArrayList<Double> comingGPAPerHour = new ArrayList<>();
-//        double lastSem = (Trim.size() > 0) ? getDouble(Trim.get(Trim.size() - 1).trim().substring(0, 1)) : 1;
         if (newCompletedHours > 0) {
             double startGPA = (GPA.size() > 0) ? (GPA.get(GPA.size() - 1)) : 0;
             double comingCGPA = (newCGPA * (hoursDone + newCompletedHours) - hoursDone * CGPA) / newCompletedHours;
-            double M = ((comingCGPA - startGPA) / (newCompletedHours / 2));
+            double M = ((comingCGPA - startGPA) * 2) / ((double) ((int) newCompletedHours - 1));
+            GPAToPlan = comingCGPA;
 
-            for (int i = (int) newCompletedHours; i > 0; i--) {
+            for (int i = ((int) newCompletedHours - 1); i >= 0; i--) {
                 double gpa = i * M + startGPA;
-                System.out.println(gpa);
                 if (gpa > 4) {
                     overFlow += gpa - 4;
                     gpa = 4;
                 } else if (gpa < 2) {
-                    overFlow -= gpa;
+                    overFlow -= (2 - gpa);
                     gpa = 2;
                 }
-                if (overFlow > 0) {
-                    if (overFlow > (4 - gpa)) {
+                if (overFlow > 0 && gpa < 4) {
+                    if (overFlow > (4 - gpa) && gpa < 4) {
                         overFlow -= (4 - gpa);
                         gpa = 4;
                     } else {
                         gpa += overFlow;
                         overFlow = 0;
                     }
-                } else if (overFlow < 0) {
+                } else if (overFlow < 0 && gpa > 2) {
                     if (overFlow < (2 - gpa)) {
                         overFlow += (gpa - 2);
                         gpa = 2;
@@ -194,9 +195,9 @@ public class PlannerActivity extends AppCompatActivity {
 //                    }
                     float value = (float) round(gpaHolder / size, 2);
                     value = (value > 4) ? 4 : value;
-                    value = (value < 2&&value!=0) ? 2 : value;
+                    value = (value < 2 && value != 0) ? 2 : value;
                     if (value > 0) {
-                        GPAToPlan=value;
+//                        GPAToPlan=value;
                         yAXES.add(new Entry(i, value));
                     }
                 }
@@ -252,7 +253,6 @@ public class PlannerActivity extends AppCompatActivity {
     }
 
     public void ConnectToFirebase() {
-
         FirebaseDatabase.getInstance().getReference().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot parentSnapshot) {
@@ -326,14 +326,23 @@ public class PlannerActivity extends AppCompatActivity {
                         String Name = Objects.requireNonNull(child.child("SubjectName").getValue()).toString();
                         String Hours = Objects.requireNonNull(child.child("SubjectHours").getValue()).toString();
                         if (!Code.toLowerCase().contains("mpu") && !Name.toLowerCase().startsWith("mpu") && !Name.toLowerCase().contains("train") && !Name.toLowerCase().contains("management") && !Name.toLowerCase().contains("introduction to research methodology")) {
+                            final boolean project = getDouble(Hours) > 0 && Name.toLowerCase().trim().compareTo("project") == 0;
                             if (!Elective.toLowerCase().contains("true")) {
                                 if (hoursDone < totalCoreHours) {
-                                    if (getDouble(Hours) > 0) hours.add(getDouble(Hours));
+                                    if (project) {
+                                        hours.add(8d);
+                                    } else if (getDouble(Hours) > 0) {
+                                        hours.add(getDouble(Hours));
+                                    }
                                 }
                                 totalCoreHours += getDouble(Hours);
                             } else if (!elective) {
                                 if (hoursDone < totalCoreHours) {
-                                    if (getDouble(Hours) > 0) hours.add(getDouble(Hours));
+                                    if (project) {
+                                        hours.add(8d);
+                                    } else if (getDouble(Hours) > 0) {
+                                        hours.add(getDouble(Hours));
+                                    }
                                 }
                                 totalCoreHours += getDouble(Hours);
                             }
@@ -372,7 +381,6 @@ public class PlannerActivity extends AppCompatActivity {
 
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
-
         long factor = (long) Math.pow(10, places);
         value = value * factor;
         long tmp = Math.round(value);
@@ -668,26 +676,31 @@ public class PlannerActivity extends AppCompatActivity {
     }
 
     public void calculate(View view) {
-        if (newCompletedHours > 18) {
+        if ((int) newCompletedHours > 18) {
             toast("calculator can take up to 18 hours only!");
             return;
         }
-        if (newCompletedHours < 0) {
-            toast("Invalid input");
+        if (newCompletedHours <= 0) {
+            toast("please add hours to plan");
             return;
         }
+        GPAToPlan = (GPAToPlan > 4) ? 4 : GPAToPlan;
+        GPAToPlan = (GPAToPlan < 2) ? 2 : GPAToPlan;
         double totHours = 0;
         StringBuilder passData = new StringBuilder();
-        passData.append(GPAToPlan).append(",");
-        for (Double num : hours) {
+        passData.append(round(GPAToPlan, 2)).append(",");
+        for (double num : hours) {
             totHours += num;
-            passData.append(num).append(",");
-            if (totHours >= newCompletedHours) {
+            if (totHours > newCompletedHours) {
                 break;
             }
+            passData.append((int) num).append(",");
         }
-        toast(passData.toString());
 
+        Intent intent = new Intent(getBaseContext(), calculatorActivity.class);
+        intent.putExtra("plan", passData.substring(0, passData.length() - 1));
+        startActivity(intent);
+//        toast(passData.substring(0, passData.length() - 1));
     }
 
     private void startProgress(int progressLocal) {

@@ -210,7 +210,7 @@ public class FragmentEdit extends Fragment {
             if (item.getTitle().toString().toLowerCase().contains("delete")) {
                 FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").removeValue();
                 FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").removeValue();
-                dashBoardActivity.resetFragmentEdit();
+                dashBoardActivity.delete();
             } else if (item.getTitle().toString().toLowerCase().contains("reset")) {
                 FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("CamsysInfo").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -218,6 +218,7 @@ public class FragmentEdit extends Fragment {
                         FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("Profile").setValue(snapshot.getValue()).addOnCompleteListener(task -> {
                             Toast.makeText(context, "Your profile has been reset successfully", Toast.LENGTH_LONG).show();
                             dashBoardActivity.openProfile();
+                            dashBoardActivity.SetSubjectsReview(dashBoardActivity.loadData("camsysId"));
                         }).addOnFailureListener(e -> {
                             Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
                         });

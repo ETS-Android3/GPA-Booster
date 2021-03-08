@@ -50,7 +50,7 @@
         app:umanoAnchorPoint="0.4"
         app:umanoFadeColor="#00FFFFFF"
         app:umanoOverlay="true"
-        app:umanoInitialState="expanded"
+        app:umanoInitialState="anchored"
         app:umanoPanelHeight="30dp"
         app:umanoShadowHeight="20dp">
 

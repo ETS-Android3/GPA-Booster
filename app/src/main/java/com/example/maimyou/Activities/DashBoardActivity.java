@@ -58,7 +58,9 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.apache.commons.lang3.text.WordUtils;
+
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -210,7 +212,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
 //        overridePendingTransition(R.anim.slide_in_up, R.anim.slide0);
     }
 
-    public void Planner(View view){
+    public void Planner(View view) {
         startActivity(new Intent(getApplicationContext(), PlannerActivity.class));
     }
 
@@ -378,8 +380,23 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
                 fragmentProfile).commit();
     }
 
-    public void resetFragmentEdit() {
+    public void delete() {
         fragmentEdit = new FragmentEdit(loadData("Id"), context, dashBoardActivity);
+        FirebaseDatabase.getInstance().getReference().child("Subjects").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    if (child.child("Grades").child(loadData("camsysId")).exists() && child.getKey() != null) {
+                        FirebaseDatabase.getInstance().getReference().child("Subjects").child(child.getKey()).child("Grades").child(loadData("camsysId")).removeValue();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -871,6 +888,7 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             SaveTo("ModifiedInfo", Name, Id, Degree, "Modified");
             SaveTo("CamsysInfo", Name, Id, Degree, "Camsys");
             SaveTo("Profile", Name, Id, Degree, "Camsys");
+            saveData(Id, "camsysId");
             SetSubjectsReviews(Id);
             InfoAvail = true;
             saveData("camsys", "Auto");
@@ -923,6 +941,36 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
                 for (subjects subjects : subjectsArr) {
                     if (snapshot.child(subjects.getCode()).exists()) {
                         FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(Id).setValue(subjects.getGrade());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void SetSubjectsReview(final String Id) {
+        FirebaseDatabase.getInstance().getReference().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot parentSnapshot) {
+                DataSnapshot subSnapshot = parentSnapshot.child("Subjects");
+                DataSnapshot proSnapshot = parentSnapshot.child("Member").child(loadData("Id")).child("Profile").child("Trimesters");
+                ArrayList<subjects> subjectsArr = new ArrayList<>();
+                if (proSnapshot.exists()) {
+                    for (DataSnapshot trim : proSnapshot.getChildren()) {
+                        for(DataSnapshot sub:trim.child("subjects").getChildren()){
+                            subjectsArr.add(new subjects(Objects.requireNonNull(sub.child("subjectCodes").getValue()).toString(), Objects.requireNonNull(sub.child("subjectNames").getValue()).toString(), Objects.requireNonNull(sub.child("subjectGades").getValue()).toString()));
+                        }
+                    }
+                    if (subjectsArr.size() > 0) {
+                        for (subjects subjects : subjectsArr) {
+                            if (subSnapshot.child(subjects.getCode()).exists()) {
+                                FirebaseDatabase.getInstance().getReference().child("Subjects").child(subjects.getCode()).child("Grades").child(Id).setValue(subjects.getGrade());
+                            }
+                        }
                     }
                 }
             }

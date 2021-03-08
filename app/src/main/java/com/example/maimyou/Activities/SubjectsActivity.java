@@ -37,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.example.maimyou.Activities.RegisterActivity.SHARED_PREFS;
 
@@ -116,8 +117,9 @@ public class SubjectsActivity extends AppCompatActivity {
                 DataSnapshot snapshot = parentSnapshot.child("Subjects");
                 if (snapshot.exists()) {
                     for (DataSnapshot child : snapshot.getChildren()) {
-                        subjects.add(new SubjectReviews(child.child("SubjectName").getValue(), child.child("Category").getValue(), child.getKey(), getRatings(), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("Id")).exists()));
-                        SearchSubjects.add(new SubjectReviews(child.child("SubjectName").getValue(), child.child("Category").getValue(), child.getKey(), getRatings(), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("Id")).exists()));
+                        SubjectReviews rev = new SubjectReviews(child.child("SubjectName").getValue(), child.child("Category").getValue(), child.getKey(), getRatings(child.child("rating")), Long.toString(child.child("Grades").getChildrenCount()), child.child("Grades").child(loadData("camsysId")).exists());
+                        subjects.add(rev);
+                        SearchSubjects.add(rev);
                     }
                     SubjectReviewsAdapter adapter = new SubjectReviewsAdapter(context, R.layout.subject_review, subjects);
                     adapter.setSubjectsActivity(subjectsActivity);
@@ -136,8 +138,29 @@ public class SubjectsActivity extends AppCompatActivity {
     }
 
 
-    public String getRatings() {
-        return "4.2";
+    public String getRatings(DataSnapshot ratings) {
+        if (ratings.exists()) {
+            double totalRate = 0, counter = 0;
+            for (DataSnapshot child : ratings.getChildren()) {
+                if (child.child("Rate").exists() && getDouble(Objects.requireNonNull(child.child("Rate").getValue()).toString()) > 0) {
+                    totalRate += getDouble(Objects.requireNonNull(child.child("Rate").getValue()).toString());
+                    counter++;
+                }
+            }
+            if (totalRate <= 0 || counter <= 0) {
+                return "0";
+            }
+            return Double.toString(round(totalRate / counter, 1));
+        }
+        return "0";
+    }
+
+    public double getDouble(String str) {
+        try {
+            return Double.parseDouble(str);
+        } catch (Exception ignored) {
+            return 0;
+        }
     }
 
     public void itemClicked(String code) {
@@ -246,6 +269,14 @@ public class SubjectsActivity extends AppCompatActivity {
                 r.getDisplayMetrics()
         );
         return (int) px;
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 
     @Override

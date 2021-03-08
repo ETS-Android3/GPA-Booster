@@ -1,307 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2196F3"
+    android:background="@color/backGroundColour"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/comehere"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/aboveme"
-        android:layout_marginBottom="0dp"
-        android:orientation="vertical"
-        android:paddingLeft="17dp"
-        android:paddingTop="17dp"
-        android:paddingRight="17dp"
-        android:paddingBottom="5dp"
-        android:visibility="visible">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/comehere"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/aboveme"
+            android:orientation="vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="7dp"
+            app:cardElevation="5dp">
 
         <ListView
             android:id="@+id/plans"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
+            android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="#E7D8B1">
-
-        </ListView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="0dp"
-            android:orientation="vertical">
-
-            <CheckBox
-                android:id="@+id/checkBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="1"
-                android:checked="false"
-                android:onClick="checkClicked"
-                android:paddingRight="17dp"
-                android:text="Show hours" />
+            android:background="@color/white"/>
 
             <LinearLayout
                 android:id="@+id/radioGroup2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="17dp"
-                android:layout_weight="1"
+                android:layout_gravity="bottom"
+                android:paddingRight="7dp"
+                android:paddingLeft="7dp"
+                android:background="@color/colorPrimary"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/textView32"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Range of marks ( 0 ) - ( 1"
-                    android:textColor="#000000" />
+                    android:layout_gravity="center"
+                    android:text="( 0 ) - ( 1"
+                    android:textColor="@color/backGroundColour" />
 
 
                 <SeekBar
                     android:id="@+id/seekBar2"
                     style="@style/Widget.AppCompat.SeekBar.Discrete"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:max="4"
+                    android:layout_gravity="center"
                     android:progress="4" />
 
                 <TextView
                     android:id="@+id/textView38"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="17dp"
+                    android:layout_marginEnd="17dp"
                     android:text="5 )"
-                    android:textColor="#000000" />
+                    android:layout_gravity="center"
+                    android:textColor="@color/backGroundColour" />
+
+
+                <CheckBox
+                    android:id="@+id/checkBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:checked="false"
+                    android:onClick="checkClicked"
+                    android:buttonTint="@color/backGroundColour"
+                    android:textColor="@color/backGroundColour"
+                    android:text="Show hours" />
             </LinearLayout>
 
-        </LinearLayout>
-
-    </RelativeLayout>
+        </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/aboveme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:paddingLeft="17dp"
-        android:paddingRight="17dp"
-        android:paddingBottom="17dp">
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="5dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/writeGPA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="GPA"
-                android:inputType="numberDecimal" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:paddingRight="5dp">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center">
-
-                    <ImageButton
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:background="#00FFFFFF"
-                        android:onClick="firstop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/image_background" />
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:background="#00FFFFFF"
-                        android:onClick="firstop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/winner" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center">
-
-                    <ImageButton
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:background="#00FFFFFF"
-                        android:onClick="firstop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/image_background" />
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:background="#00FFFFFF"
-                        android:onClick="secondupop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/second" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center">
-
-                    <ImageButton
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:background="#00FFFFFF"
-                        android:onClick="firstop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/image_background" />
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:background="#00FFFFFF"
-                        android:onClick="secondlowerop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/second2" />
-
-                </FrameLayout>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center">
-
-                    <ImageButton
-                        android:layout_width="35dp"
-                        android:layout_height="35dp"
-                        android:background="#00FFFFFF"
-                        android:onClick="firstop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/image_background" />
-
-                    <ImageButton
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:background="#00FFFFFF"
-                        android:onClick="thirdop"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/third" />
-
-                </FrameLayout>
-
-
-            </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/bottomm"
-                android:layout_width="120dp"
-                android:layout_height="40dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="3dp"
-                    android:layout_marginTop="3dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginBottom="3dp"
-                    android:background="#041A42">
-
-                </FrameLayout>
-
-                <ImageButton
-                    android:id="@+id/EnterB"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="#00FFFFFF"
-                    android:onClick="EnterPressed2"
-                    android:padding="5dp"
-                    android:scaleType="fitXY"
-                    app:srcCompat="@drawable/uploadrestitle" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <Space
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:id="@+id/EnterBText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:text="ENTER"
-                        android:textColor="#000000"
-                        android:textSize="16sp" />
-
-                    <Space
-                        android:layout_width="10dp"
-                        android:layout_height="wrap_content" />
-
-                    <ImageView
-                        android:id="@+id/retakelogo"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_margin="5dp"
-                        android:background="@drawable/semesterenter"
-                        android:paddingTop="1dp" />
-
-                    <Space
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.75" />
-                </LinearLayout>
-
-            </FrameLayout>
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/newCompleteHours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:includeFontPadding="false"
+            android:text="Enter number of subjects and GPA to calculate"
+            android:layout_marginBottom="10dp"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="14dp"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Number of subjects:"
-                android:textColor="#000000"
-                android:textSize="10sp" />
 
             <RadioGroup
                 android:id="@+id/radioGroup"
@@ -314,7 +118,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="radiob"
@@ -322,7 +126,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="radiob"
@@ -330,7 +134,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton3"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="radiob"
@@ -338,7 +142,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton4"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="radiob"
@@ -346,7 +150,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton5"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="radiob"
@@ -354,7 +158,7 @@
 
                 <RadioButton
                     android:id="@+id/radioButton6"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:onClick="radiob"
@@ -367,92 +171,273 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
             android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/textView29"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="Hours:"
-                android:textColor="#000000"/>
 
             <EditText
                 android:id="@+id/F1numhours1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:ems="10"
                 android:gravity="center"
-                android:hint="3"
+                android:hint="hours (optional default = 3)"
+                android:visibility="gone"
+                android:background="@drawable/edit_text_with_shadow_invert"
                 android:inputType="number"
-                android:visibility="invisible" />
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour" />
 
             <EditText
                 android:id="@+id/F1numhours2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:ems="10"
                 android:gravity="center"
-                android:hint="3"
+                android:visibility="gone"
+                android:hint="hours (optional)"
+                android:background="@drawable/edit_text_with_shadow_invert"
                 android:inputType="number"
-                android:visibility="invisible" />
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour" />
 
             <EditText
                 android:id="@+id/F1numhours3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:ems="10"
                 android:gravity="center"
+                android:visibility="gone"
                 android:hint="3"
+                android:background="@drawable/edit_text_with_shadow_invert"
                 android:inputType="number"
-                android:visibility="invisible" />
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour" />
 
             <EditText
                 android:id="@+id/F1numhours4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:ems="10"
                 android:gravity="center"
                 android:hint="3"
+                android:background="@drawable/edit_text_with_shadow_invert"
+                android:visibility="gone"
                 android:inputType="number"
-                android:visibility="invisible" />
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour" />
 
             <EditText
                 android:id="@+id/F1numhours5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:ems="10"
                 android:gravity="center"
                 android:hint="3"
+                android:background="@drawable/edit_text_with_shadow_invert"
+                android:visibility="gone"
                 android:inputType="number"
-                android:visibility="invisible" />
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour" />
 
             <EditText
                 android:id="@+id/F1numhours6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:ems="10"
                 android:gravity="center"
                 android:hint="3"
+                android:background="@drawable/edit_text_with_shadow_invert"
                 android:inputType="number"
-                android:visibility="invisible" />
+                android:visibility="gone"
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/writeGPA"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:hint="GPA"
+                android:background="@drawable/edit_text_with_shadow_invert"
+                android:inputType="numberDecimal"
+                android:textColor="@color/backGroundColour"
+                android:textColorHint="@color/backGroundColour"
+                tools:ignore="RtlSymmetry" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginEnd="5dp">
+
+                <FrameLayout
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:onClick="firstop"
+                    android:background="@drawable/tip_button_invert">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/winner"
+                        android:scaleType="fitXY"/>
+
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:onClick="secondupop"
+                    android:background="@drawable/tip_button_invert">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/second"
+                        android:scaleType="fitXY"/>
+
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:onClick="secondlowerop"
+                    android:background="@drawable/tip_button_invert">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/second2"
+                        android:scaleType="fitXY"/>
+
+                </FrameLayout>
+                <FrameLayout
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_gravity="center"
+                    android:onClick="thirdop"
+                    android:background="@drawable/tip_button_invert">
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/third"
+                        android:scaleType="fitXY"/>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!--            <FrameLayout-->
+            <!--                android:id="@+id/bottomm"-->
+            <!--                android:layout_width="120dp"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_alignParentLeft="true"-->
+            <!--                android:layout_alignParentRight="true"-->
+            <!--                android:layout_alignParentBottom="true">-->
+
+            <!--                <FrameLayout-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:layout_marginLeft="3dp"-->
+            <!--                    android:layout_marginTop="3dp"-->
+            <!--                    android:layout_marginRight="3dp"-->
+            <!--                    android:layout_marginBottom="3dp"-->
+            <!--                    android:background="#041A42">-->
+
+            <!--                </FrameLayout>-->
+
+            <!--                <ImageButton-->
+            <!--                    android:id="@+id/EnterB"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="40dp"-->
+            <!--                    android:background="#00FFFFFF"-->
+            <!--                    android:onClick="EnterPressed2"-->
+            <!--                    android:padding="5dp"-->
+            <!--                    android:scaleType="fitXY"-->
+            <!--                    app:srcCompat="@drawable/uploadrestitle" />-->
+
+            <!--                <LinearLayout-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:orientation="horizontal">-->
+
+            <!--                    <Space-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:layout_weight="1" />-->
+
+            <!--                    <TextView-->
+            <!--                        android:id="@+id/EnterBText"-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:layout_gravity="center"-->
+            <!--                        android:gravity="center"-->
+            <!--                        android:text="ENTER"-->
+            <!--                        android:textColor="#000000"-->
+            <!--                        android:textSize="16sp" />-->
+
+            <!--                    <Space-->
+            <!--                        android:layout_width="10dp"-->
+            <!--                        android:layout_height="wrap_content" />-->
+
+            <!--                    <ImageView-->
+            <!--                        android:id="@+id/retakelogo"-->
+            <!--                        android:layout_width="30dp"-->
+            <!--                        android:layout_height="30dp"-->
+            <!--                        android:layout_margin="5dp"-->
+            <!--                        android:background="@drawable/semesterenter"-->
+            <!--                        android:paddingTop="1dp" />-->
+
+            <!--                    <Space-->
+            <!--                        android:layout_width="wrap_content"-->
+            <!--                        android:layout_height="wrap_content"-->
+            <!--                        android:layout_weight="0.75" />-->
+            <!--                </LinearLayout>-->
+
+            <!--            </FrameLayout>-->
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/next"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:onClick="EnterPressed2"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/tip_button_invert"
+            android:text="Calculate"
+            android:textColor="@color/backGroundColour" />
     </LinearLayout>
-
-
 </RelativeLayout>
