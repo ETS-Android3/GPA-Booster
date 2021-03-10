@@ -1,10 +1,16 @@
 package com.example.maimyou.Dialogs;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spannable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -33,6 +39,7 @@ public class TipContainerDialog extends Dialog {
     int currentPage = 0;
     Dialog dialog = this;
     Boolean checked = false;
+    String string;
 
     public void setCheckBox(boolean isChecked) {
         this.checked = isChecked;
@@ -40,12 +47,16 @@ public class TipContainerDialog extends Dialog {
 
     //Views
     ImageButton closeTip;
-    TextView pageNumber, Manually;
+    TextView pageNumber, Manually, pageDes;
     Button back, next;
     CardView cardView;
     LinearLayout Container;
     RelativeLayout backGround;
     CheckBox checkBox;
+
+    public void setString(String string) {
+        this.string = string;
+    }
 
     public TipContainerDialog(DashBoardActivity a) {
         super(a);
@@ -61,6 +72,13 @@ public class TipContainerDialog extends Dialog {
         setContentView(R.layout.tip_container);
 
         View v = getWindow().getDecorView();
+
+        Rect displayRectangle = new Rect();
+        Window window = getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
+        v.setMinimumWidth((int)(displayRectangle.width() * 1f));
+        v.setMinimumHeight((int)(displayRectangle.height() * 1f));
+
         v.setBackgroundResource(android.R.color.transparent);
         setCanceledOnTouchOutside(true);//See here is the code
 
@@ -71,21 +89,36 @@ public class TipContainerDialog extends Dialog {
         back = findViewById(R.id.back);
         next = findViewById(R.id.next);
         pageNumber = findViewById(R.id.pageNumber);
+        pageDes = findViewById(R.id.pageDes);
         cardView = findViewById(R.id.cardView);
         Manually = findViewById(R.id.Manually);
         coverFlow = findViewById(R.id.coverflow);
-
         checkBox.setChecked(checked);
 
         backGround.setOnTouchListener((v1, event) -> {
             dialog.dismiss();
             return false;
         });
+        String str;
+        View.OnClickListener listener;
+        if (string.contains("man")) {
+            str = "Set profile manually";
+            listener = v12 -> {
+                dialog.dismiss();
+                D.setManually();
+            };
+            Manually.setTextColor(getContext().getResources().getColor(R.color.colorAccent));
+        } else {
+            str = "Set from Camsys";
+            listener = v12 -> {
+                dialog.dismiss();
+                D.setAuto();
+            };
+            Manually.setTextColor(getContext().getResources().getColor(R.color.address));
+        }
 
-        Manually.setOnClickListener(v12 -> {
-            dialog.dismiss();
-            D.setManually();
-        });
+        Manually.setText(Html.fromHtml("<u>" + str + "</u>"));
+        Manually.setOnClickListener(listener);
 
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -101,6 +134,7 @@ public class TipContainerDialog extends Dialog {
                 currentPage = tips.size() - 1;
             }
             pageNumber.setText((currentPage + 1) + "/" + tips.size());
+            pageDes.setText(tips.get(currentPage).getDes());
             coverFlow.scrollToPosition(currentPage);
         });
         next.setOnClickListener(view -> {
@@ -109,6 +143,7 @@ public class TipContainerDialog extends Dialog {
                 currentPage = 0;
             }
             pageNumber.setText((currentPage + 1) + "/" + tips.size());
+            pageDes.setText(tips.get(currentPage).getDes());
             coverFlow.scrollToPosition(currentPage);
         });
         closeTip.setOnClickListener(view -> dialog.dismiss());
@@ -117,13 +152,14 @@ public class TipContainerDialog extends Dialog {
         coverFlow.setAdapter(adapter);
         coverFlow.setOnScrollPositionListener(onScrollListener());
         pageNumber.setText((currentPage + 1) + "/" + tips.size());
+        pageDes.setText(tips.get(currentPage).getDes());
 
         coverFlow.post(() -> {
-            coverFlow.setCoverHeight((int)(((double)coverFlow.getHeight())/1.3d));
-            coverFlow.setCoverWidth((int)(((double)coverFlow.getHeight())/2.6d));
-            coverFlow.setMaxRotationAngle(0);
+            coverFlow.setCoverHeight((int) (((double) coverFlow.getHeight()) / 1.3d));
+            coverFlow.setCoverWidth((int) (((double) coverFlow.getHeight()) / 2.6d));
+            coverFlow.setMaxRotationAngle(10);
             coverFlow.setMaxScaleFactor(1.2f);
-            coverFlow.setRotation(0.1f);
+            coverFlow.setRotation(0.0f);
             coverFlow.setSpacing(0.5f);
             coverFlow.setVerticalPaddingTop(0);
             coverFlow.setReflectionOpacity(0);
@@ -145,23 +181,25 @@ public class TipContainerDialog extends Dialog {
 //        return (int) px;
 //    }
 
-    public int getInt(String str){
-        try{
+    public int getInt(String str) {
+        try {
             return Integer.parseInt(str);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
     }
+
     @SuppressLint("SetTextI18n")
     private FeatureCoverFlow.OnScrollPositionListener onScrollListener() {
         return new FeatureCoverFlow.OnScrollPositionListener() {
             @Override
             public void onScrolledToPosition(int position) {
                 Log.v("MainActiivty", "position: " + position);
-                D.saveData(Integer.toString(position),"Tip");
+                D.saveData(Integer.toString(position), "Tip");
                 currentPage = position;
                 pageNumber.setText((currentPage + 1) + "/" + tips.size());
+                pageDes.setText(tips.get(currentPage).getDes());
             }
 
             @Override
@@ -174,15 +212,5 @@ public class TipContainerDialog extends Dialog {
 
     public void setTips(ArrayList<Tip> tips) {
         this.tips = tips;
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Assassin Creed 3"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Avatar 3D"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Call Of Duty Black Ops 3"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "DotA 2"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Halo 5"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Left 4 Dead 2"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "StarCraft"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "The Witcher 3"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Tom raider 3"));
-//        tips.add(new Tip(R.mipmap.ic_launcher, "Need for Speed Most Wanted"));
     }
 }

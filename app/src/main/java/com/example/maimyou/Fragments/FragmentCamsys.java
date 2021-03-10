@@ -121,18 +121,18 @@ public class FragmentCamsys extends Fragment {
 //            fadeOutNoDelay(tipContainer);
             cdd = new TipContainerDialog(dashBoardActivity);
             ArrayList<Tip> tips = new ArrayList<>();
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
-            tips.add(new Tip(R.mipmap.ic_launcher, "", ""));
+            tips.add(new Tip(R.drawable.tips, "Tips", "You will find me here"));
+            tips.add(new Tip(R.drawable.refresh, "Refresh", "Refresh button used when website freezes"));
+            tips.add(new Tip(R.drawable.option_menu, "Option menu", "Can access Camsys websites from here and hide the upload button"));
+            tips.add(new Tip(R.drawable.upload_button, "Upload Button", "Select pdf result script file to extract your information"));
+            tips.add(new Tip(R.drawable.st1, "step 1", "To download your result script go to academic achievement and press on this button"));
+            tips.add(new Tip(R.drawable.st2, "step 2", "Select undergraduate"));
+            tips.add(new Tip(R.drawable.st3, "step 3", "Press search"));
+            tips.add(new Tip(R.drawable.st4, "step 4", "Press View Result"));
+//            tips.add(new Tip(R.mipmap.ic_launcher, "", "asdas a sad sdd f dsa  kjasdlk jfdklj k ds a j jkl js lk k"));
+//            tips.add(new Tip(R.mipmap.ic_launcher, "", "asdas as sda sd f dsa  kjasdlk jfdklj k ds a j jkl js lk k"));
             cdd.setTips(tips);
-
+            cdd.setString("man");
             cdd.setCanceledOnTouchOutside(true);
             cdd.setOnDismissListener(dialog -> {
                 tipOpened = false;

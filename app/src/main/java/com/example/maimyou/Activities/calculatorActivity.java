@@ -222,6 +222,8 @@ public class calculatorActivity extends AppCompatActivity implements PopupMenu.O
     public void Frag1Starter() {
         settingsDialog2 = new Dialog(this);
         settingsDialog2.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        settingsDialog2.getWindow().getDecorView().setBackgroundResource(android.R.color.transparent);
+        settingsDialog2.setCanceledOnTouchOutside(true);
         settingsDialog2.setContentView(getLayoutInflater().inflate(R.layout.image_layout2
                 , null));
         visibilityControlCenter(numOfSub);
@@ -260,6 +262,8 @@ public class calculatorActivity extends AppCompatActivity implements PopupMenu.O
         F1numhours5 = (EditText) findViewById(R.id.F1numhours5);
         F1numhours6 = (EditText) findViewById(R.id.F1numhours6);
         settingsDialog = new Dialog(this);
+        settingsDialog.getWindow().getDecorView().setBackgroundResource(android.R.color.transparent);
+        settingsDialog.setCanceledOnTouchOutside(true);
         settingsDialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         settingsDialog.setContentView(getLayoutInflater().inflate(R.layout.image_layout
                 , null));

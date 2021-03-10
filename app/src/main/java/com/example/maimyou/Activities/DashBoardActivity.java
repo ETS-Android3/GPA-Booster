@@ -108,6 +108,11 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
                 fragmentEdit).commit();
     }
 
+    public void setAuto() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new FragmentCamsys(this)).commit();
+    }
+
     public void empty(View view) {
 
     }
@@ -486,7 +491,6 @@ public class DashBoardActivity extends AppCompatActivity implements AdvancedWebV
             scan(parsedText.toString());
 
         } catch (Exception e) {
-
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new FragmentCamsys(this)).commit();
             Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();

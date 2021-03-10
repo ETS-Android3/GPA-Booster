@@ -751,6 +751,14 @@
                 android:padding="5dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/light_bulb__1_" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/arrow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="9dp"
+                android:alpha="0.7"
+                android:src="@color/colorRipple" />
         </FrameLayout>
 
         <FrameLayout

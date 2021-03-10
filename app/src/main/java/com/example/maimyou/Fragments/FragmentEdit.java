@@ -2,6 +2,8 @@ package com.example.maimyou.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +28,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.maimyou.Activities.DashBoardActivity;
 import com.example.maimyou.Adapters.AdapterDisplayCourseForEdit;
+import com.example.maimyou.CarouselLayout.Tip;
 import com.example.maimyou.Classes.DisplayCourseForEdit;
 import com.example.maimyou.Classes.Helper;
 import com.example.maimyou.Classes.Trimester;
 import com.example.maimyou.Classes.subjects;
 import com.example.maimyou.Dialogs.BottomSheetDialog;
+import com.example.maimyou.Dialogs.TipContainerDialog;
 import com.example.maimyou.R;
 import com.example.maimyou.RecycleViewMaterials.Child;
 import com.example.maimyou.RecycleViewMaterials.ChildAdapter;
@@ -65,6 +69,7 @@ public class FragmentEdit extends Fragment {
     BottomSheetDialog bottomSheet;
     AppBarLayout appBar;
     public CircleImageView profilePictureAdmin;
+    TipContainerDialog cdd;
 //    PopupWindow mypopupWindow;
 
 
@@ -117,6 +122,44 @@ public class FragmentEdit extends Fragment {
             Hours = new ArrayList<>();
             Names = new ArrayList<>();
             Trims = new ArrayList<>();
+            CircleImageView arrow = getView().findViewById(R.id.arrow);
+            fadeOutNoDelay(arrow);
+            getView().findViewById(R.id.lightBulb).setOnClickListener(v -> OpenTip());
+            cdd = new TipContainerDialog(dashBoardActivity);
+            ArrayList<Tip> tips = new ArrayList<>();
+            tips.add(new Tip(R.drawable.man1, "", "You can set your profile from here if you are bared or for other reasons"));
+            tips.add(new Tip(R.drawable.man2, "", "Set your id and name, the picture and Camsys password are optional"));
+            tips.add(new Tip(R.drawable.man3, "", "GPA and Hours will be calculated automatically after adding subjects"));
+            tips.add(new Tip(R.drawable.man4, "", "After adding subjects your average calculated CGPA will show here with new core hours"));
+            tips.add(new Tip(R.drawable.man5, "", "This is the maximum & minimum Calculated CGPA and you can change your CGPA in that range"));
+            tips.add(new Tip(R.drawable.man6, "", "After you are done press save"));
+            tips.add(new Tip(R.drawable.man7, "", "Thank you for downloading the app"));
+            cdd.setTips(tips);
+            cdd.setString("aut");
+            FirebaseDatabase.getInstance().getReference().child("Member").child(dashBoardActivity.loadData("Id")).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (!snapshot.child("DoNotShowUploadTip").exists()) {
+                        final Handler handler = new Handler(Looper.getMainLooper());
+                        handler.postDelayed(() -> {
+                            OpenTip();
+                            fadeIn(arrow, 200);
+                            handler.postDelayed(() -> fadeOut(arrow, 400), 2000);
+
+                        }, 1000);
+
+                    } else {
+                        cdd.setCheckBox(true);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            cdd.setCanceledOnTouchOutside(true);
             profilePictureAdmin = getView().findViewById(R.id.profilePictureAdmin);
             Title = getView().findViewById(R.id.Title);
             CGPAA = getView().findViewById(R.id.CGPAA);
@@ -203,6 +246,11 @@ public class FragmentEdit extends Fragment {
         }
     }
 
+    public void OpenTip() {
+        cdd.show();
+    }
+
+
     public void openPopUpWindow(View v) {
         PopupMenu popup = new PopupMenu(getContext(), v);
         popup.getMenuInflater().inflate(R.menu.edit_option_menu, popup.getMenu());
@@ -219,9 +267,7 @@ public class FragmentEdit extends Fragment {
                             Toast.makeText(context, "Your profile has been reset successfully", Toast.LENGTH_LONG).show();
                             dashBoardActivity.openProfile();
                             dashBoardActivity.SetSubjectsReview(dashBoardActivity.loadData("camsysId"));
-                        }).addOnFailureListener(e -> {
-                            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                        });
+                        }).addOnFailureListener(e -> Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show());
                         FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").setValue(snapshot.getValue());
                         FirebaseDatabase.getInstance().getReference().child("Member").child(id).child("ModifiedInfo").child("UpdatedFrom").setValue("Modified");
                     }

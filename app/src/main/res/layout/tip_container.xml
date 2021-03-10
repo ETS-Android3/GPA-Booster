@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:coverflow="http://schemas.android.com/tools"
+    android:id="@+id/backGround"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/backGround"
     android:background="@android:color/transparent">
 
     <FrameLayout
@@ -16,12 +16,9 @@
             android:id="@+id/cardView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:layout_marginBottom="?attr/actionBarSize"
             android:onClick="empty"
+            android:layout_margin="20dp"
             app:cardBackgroundColor="@color/colorPrimary"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
             app:cardCornerRadius="5dp"
             app:cardElevation="10dp">
 
@@ -107,7 +104,7 @@
                     android:id="@+id/coverflow"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="2"/>
+                    android:layout_weight="2" />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -122,16 +119,34 @@
                         android:textColor="#000000"
                         android:textSize="14sp" />
 
-                    <LinearLayout
+                    <ScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_above="@+id/bottom"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginEnd="20dp">
+
+                        <TextView
+                            android:id="@+id/pageDes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textStyle="bold" />
+                    </ScrollView>
+
+                    <LinearLayout
+                        android:id="@+id/bottom"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
                         android:layout_alignParentBottom="true"
                         android:layout_margin="10dp"
                         android:orientation="horizontal">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
+                            android:layout_height="35dp"
                             android:orientation="vertical">
 
                             <TextView
@@ -143,11 +158,12 @@
                                 android:textSize="14sp" />
 
                             <TextView
-                              android:id="@+id/Manually"
+                                android:id="@+id/Manually"
                                 android:layout_width="wrap_content"
                                 android:layout_height="0dp"
-                                android:layout_marginEnd="20dp"
                                 android:layout_weight="1"
+                                android:layout_marginEnd="5dp"
+                                android:gravity="bottom"
                                 android:background="@drawable/ripple_effect_rec_no_background"
                                 android:text="@string/manually"
                                 android:textColor="@color/mmuColourSecondary"
@@ -160,21 +176,22 @@
                             android:layout_width="0dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
-                            android:layout_margin="5dp"
-                            android:layout_weight="0.5"
+                            android:layout_weight="1"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginEnd="5dp"
                             android:background="@drawable/tip_button"
                             android:text="back"
-                            android:textColor="@color/colorPrimary" />
+                            android:textColor="@color/colorPrimaryDark" />
 
                         <Button
                             android:id="@+id/next"
                             android:layout_width="0dp"
                             android:layout_height="30dp"
                             android:layout_gravity="center"
-                            android:layout_weight="0.5"
+                            android:layout_weight="1"
                             android:background="@drawable/tip_button"
                             android:text="Next"
-                            android:textColor="@color/colorPrimary" />
+                            android:textColor="@color/colorPrimaryDark" />
                     </LinearLayout>
                 </RelativeLayout>
             </LinearLayout>

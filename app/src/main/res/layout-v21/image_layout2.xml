@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="#F8F8F8"
-    android:orientation="vertical">
+    app:cardCornerRadius="7dp"
+    android:layout_height="wrap_content">
 
-
-
-    <Button
-        android:id="@+id/button22"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:onClick="closeShowNum"
-        android:text="ok" />
-</LinearLayout>
+        android:layout_margin="5dp"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/newCompleteHours"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:text="Grades combinations are calculated based on the range between the maximum and minimum GPA of each combination\n\ne.g. when you increase the range to 5 any mark between 75 and 80 will be treated as 'A-' \nbut when you decrease the range to 1, only marks between 75 and 76 will be treated as 'A-' \n\nIf you want to get accurate results or compute the worst case scenario drag range to 1"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+
+        <Button
+            android:id="@+id/button22"
+            android:layout_width="80dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="5dp"
+            android:layout_gravity="center"
+            android:onClick="closeShowNum"
+            android:background="@drawable/tip_button_invert"
+            android:text="ok"
+            android:textColor="@color/backGroundColour" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
