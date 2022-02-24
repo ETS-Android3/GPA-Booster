@@ -18,14 +18,14 @@ It provides the user with all subjects offered in FOE syllabus including average
 The user can rate any subject or open its website on FOE and user can add own review.
 
 Features: <br />
--CGPA Calculator to calculate all possible grades to achieve specific GPA. <br />
--GPA to Grade conversions. <br />
--Auto login to the Camsys website which made it simpler for the students to enter Camsys. <br />
--Reading PDF to extract all information about the students to be stored in the database (FireBase). <br />
--Ability to display sort or modify on grades to see the new CGPA after retaking subjects. <br />
--Social media platform to share reviews and some Study materials. <br />
--All FOE course structures are uploaded on the server to make it easier for the students to view them. <br />
--CGPA Planner (To predict new possible CPGA for the best and worst case scenario). <br />
+- CGPA Calculator to calculate all possible grades to achieve specific GPA. <br />
+- GPA to Grade conversions. <br />
+- Auto login to the Camsys website which made it simpler for the students to enter Camsys. <br />
+- Reading PDF to extract all information about the students to be stored in the database (FireBase). <br />
+- Ability to display sort or modify on grades to see the new CGPA after retaking subjects. <br />
+- Social media platform to share reviews and some Study materials. <br />
+- All FOE course structures are uploaded on the server to make it easier for the students to view them. <br />
+- CGPA Planner (To predict new possible CPGA for the best and worst case scenario). <br />
 
 ScreenShots: <br />
 ![pjimage (1)](https://user-images.githubusercontent.com/60311634/155445482-4fcb873b-621a-4403-93dd-009c926524ad.jpg)
